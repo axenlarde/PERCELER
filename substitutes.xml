@@ -1,0 +1,10 @@
+<!--
+Substitute list
+-->
+<substitutes>
+	<substitute>
+		<type>phone</type>
+		<match>Analogique</match>
+		<replaceby>Analog Phone</replaceby>
+	</substitute>
+</substitutes>

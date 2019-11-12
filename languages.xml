@@ -1,0 +1,34 @@
+﻿<!--
+Language configuration file
+-->
+
+<languages>
+	<language>
+		<misc>
+			<name>english</name>
+		</misc>
+		<values>
+			<!--Misc-->
+			<selectbutton>Select</selectbutton>
+			<submitbutton>Submit</submitbutton>
+			<cancelbutton>Cancel</cancelbutton>
+			<yes>Yes</yes>
+			<no>No</no>
+			<error>Error</error>
+		</values>
+	</language>
+	<language>
+		<misc>
+			<name>french</name>
+		</misc>
+		<values>
+			<!--Misc-->
+			<selectbutton>Select</selectbutton>
+			<submitbutton>Submit</submitbutton>
+			<cancelbutton>Cancel</cancelbutton>
+			<yes>Yes</yes>
+			<no>No</no>
+			<error>Error</error>
+		</values>
+	</language>
+</languages>
