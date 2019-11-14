@@ -309,29 +309,47 @@ public class UsefulMethod
 	 */
 	public static String getFlatFileContent(String fileName) throws Exception
 		{
-		return xMLReader.fileRead(Variables.getMainConfigFileDirectory()+"\\"+fileName);
+		return xMLReader.fileRead(Variables.getMainDirectory()+"\\"+fileName);
+		}
+	
+	/**
+	 * Method used to initialize the database from
+	 * a collection file
+	 * @throws 
+	 */
+	public static void initDatabase(String collectionFileName) throws Exception
+		{
+		/**
+		 * Then we initialize the device list
+		 */
+		initDeviceList(collectionFileName);
+		
+		/**
+		 * First we initialize the office list
+		 */
+		initOfficeList(collectionFileName);
+		}
+	
+	/**
+	 * Method used to initialize the device list from
+	 * the collection file
+	 */
+	public static void initDeviceList(String collectionFileName) throws Exception
+		{
+		
 		}
 	
 	/************
-	 * Method used to read the office list file
+	 * Method used to initialize the office list from
+	 * the collection file
 	 * @throws Exception 
 	 */
-	public static ArrayList<Office> readOfficeFile(String fileName) throws Exception
+	public static ArrayList<Office> initOfficeList(String fileName) throws Exception
 		{
-		String file;
-		ArrayList<String> listParams = new ArrayList<String>();
-		ArrayList<String[][]> result;
-		ArrayList<Office> myOfficeList = new ArrayList<Office>();
-		
 		try
 			{
-			Variables.getLogger().info("Reading of the office list file : "+fileName);
-			file = UsefulMethod.getFlatFileContent(fileName);
-			
-			listParams.add("offices");
-			listParams.add("office");
-			result = xMLGear.getResultListTab(file, listParams);
-			
+			Variables.getLogger().info("Reading of the office file : "+fileName);
+			ArrayList<Office> myOfficeList = new ArrayList<Office>();
 			
 			//We create an ArrayList containing the offices
 			for(int i=0; i<result.size(); i++)

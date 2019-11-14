@@ -3,6 +3,7 @@ package com.alex.perceler.office.items;
 import java.util.ArrayList;
 
 import com.alex.perceler.axlitems.linkers.MobilityInfoLinker;
+import com.alex.perceler.misc.CollectionTools;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;

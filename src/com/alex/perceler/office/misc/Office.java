@@ -2,14 +2,16 @@ package com.alex.perceler.office.misc;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
+import com.alex.perceler.utils.Variables;
 
 /**
  * Represent an office
  *
  * @author Alexandre RATEL
  */
-public class Office
+public class Office extends ItemToMigrate  
 	{
 	/**
 	 * Variables
@@ -17,35 +19,78 @@ public class Office
 	public enum officeType
 		{
 		CAF,
-		ANT
+		ANT,
+		CER,
+		CNA,
+		CNE,
+		PRM
 		};
 	
 	private String idcomu,
-	id,
+	idCAF,
 	shortname,
 	fullname,
 	newName;
 	
-	private officeType type;
+	private officeType officeType;
 	private IPRange voiceIPRange, dataIPRange;
-	
 	private ArrayList<ItemToMigrate> itemList;
 
-	public Office(String idcomu, String id, String shortname, String fullname, String newName,
-			officeType type, IPRange voiceIPRange, IPRange dataIPRange, ArrayList<ItemToMigrate> itemList)
+	public Office(String idcomu, String idCAF, String shortname, String fullname, String newName,
+			officeType officeType, IPRange voiceIPRange, IPRange dataIPRange, ArrayList<ItemToMigrate> itemList)
 		{
-		super();
+		super(itmType.office,fullname);
 		this.idcomu = idcomu;
-		this.id = id;
+		this.idCAF = idCAF;
 		this.shortname = shortname;
 		this.fullname = fullname;
 		this.newName = newName;
-		this.type = type;
+		this.officeType = officeType;
 		this.voiceIPRange = voiceIPRange;
 		this.dataIPRange = dataIPRange;
 		this.itemList = itemList;
+		
+		//Do not forget to initialize ItemList and AxlList
+		}
+	
+	@Override
+	public void startSurvey() throws Exception
+		{
+		Variables.getLogger().debug("Starting survey for "+type+" "+name);
+		for(ItemToMigrate itm : itemList)
+			{
+			itm.startSurvey();
+			}
+		for(ItemToInject iti : axlList)
+			{
+			iti.getStatus();
+			}
 		}
 
+	@Override
+	public void migrate() throws Exception
+		{
+		Variables.getLogger().debug("Starting migration for "+type+" "+name);
+		for(ItemToMigrate itm : itemList)
+			{
+			itm.migrate();
+			}
+		for(ItemToInject iti : axlList)
+			{
+			iti.update();
+			}
+		}
+	
+	@Override
+	public void rollback() throws Exception
+		{
+		Variables.getLogger().debug("Starting rollback for "+type+" "+name);
+		for(ItemToMigrate itm : itemList)
+			{
+			itm.rollback();
+			}
+		}
+	
 	public String getIdcomu()
 		{
 		return idcomu;
@@ -58,12 +103,12 @@ public class Office
 
 	public String getId()
 		{
-		return id;
+		return idCAF;
 		}
 
 	public void setId(String id)
 		{
-		this.id = id;
+		this.idCAF = id;
 		}
 
 	public String getShortname()
@@ -96,14 +141,14 @@ public class Office
 		this.newName = newName;
 		}
 
-	public officeType getType()
+	public officeType getOfficeType()
 		{
-		return type;
+		return officeType;
 		}
 
-	public void setType(officeType type)
+	public void setOfficeType(officeType type)
 		{
-		this.type = type;
+		this.officeType = officeType;
 		}
 
 	public IPRange getVoiceIPRange()
@@ -134,6 +179,26 @@ public class Office
 	public void setItemList(ArrayList<ItemToMigrate> itemList)
 		{
 		this.itemList = itemList;
+		}
+
+	public String getIdCAF()
+		{
+		return idCAF;
+		}
+
+	public void setIdCAF(String idCAF)
+		{
+		this.idCAF = idCAF;
+		}
+
+	public ArrayList<ItemToInject> getAxlList()
+		{
+		return axlList;
+		}
+
+	public void setAxlList(ArrayList<ItemToInject> axlList)
+		{
+		this.axlList = axlList;
 		}
 
 	/*2019*//*RATEL Alexandre 8)*/

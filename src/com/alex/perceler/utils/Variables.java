@@ -1,8 +1,11 @@
 package com.alex.perceler.utils;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.ValueMatcher;
@@ -165,7 +168,7 @@ public class Variables
 	private static ArrayList<Office> OfficeList;
 	private static ArrayList<ItemToMigrate> DeviceList;
 	private static eMailSender eMSender;
-	private static String mainConfigFileDirectory;
+	private static String mainDirectory;
 	private static String configFileName;
 	private static String matcherFileName;
 	private static String officeListFileName;
@@ -174,6 +177,8 @@ public class Variables
 	private static ArrayList<ValueMatcher> substituteList;
 	private static ArrayList<storedUUID> uuidList;
 	private static boolean CUCMReachable;
+	private static String collectionFileName;
+	private static Workbook myWorkbook;
 	
 	//Langage management
 	public enum language{english,french};
@@ -190,11 +195,13 @@ public class Variables
 		{
 		CUCMReachable = true;
 		uuidList = new ArrayList<storedUUID>();
+		mainDirectory = ".";
 		configFileName = "configFile.xml";
 		matcherFileName = "matchers.xml";
 		officeListFileName = "officeList.xml";
 		languageFileName = "languages.xml";
 		substitutesFileName = "substitutes.xml";
+		collectionFileName = "database.xlsx";
 		}
 
 	public static String getSoftwareName()
@@ -288,32 +295,14 @@ public class Variables
 		Variables.eMSender = eMSender;
 		}
 
-	public static String getMainConfigFileDirectory() throws Exception
+	public static String getMainDirectory() throws Exception
 		{
-		if(mainConfigFileDirectory == null)
-			{
-			Variables.getLogger().debug("Initialisation of mainConfigFileDirectory");
-			
-			try
-				{
-				Variables.setMainConfigFileDirectory(UsefulMethod.getTargetOption("basedirectory"));
-				}
-			catch(Exception e)
-				{
-				Variables.getLogger().debug("Failed to retrieve the main directory", e);
-				/*
-				mainConfigFileDirectory = UsefulMethod.getDirectoryPath(".",
-						LanguageManagement.getString("invitMainDirectoryPhrase"),
-						LanguageManagement.getString("selectButton"));*/
-				}
-			}
-		
-		return mainConfigFileDirectory;
+		return mainDirectory;
 		}
 
-	public static void setMainConfigFileDirectory(String mainConfigFileDirectory)
+	public static void setMainDirectory(String mainConfigFileDirectory)
 		{
-		Variables.mainConfigFileDirectory = mainConfigFileDirectory;
+		Variables.mainDirectory = mainConfigFileDirectory;
 		}
 
 	public static String getConfigFileName()
@@ -448,6 +437,44 @@ public class Variables
 		{
 		Variables.substituteList = substituteList;
 		}
+	
+	public static Workbook getMyWorkbook() throws Exception
+		{
+		if(myWorkbook == null)
+			{
+			Variables.getLogger().debug("Initialisation of myWorkbook");
+			myWorkbook = WorkbookFactory.create(new FileInputStream(Variables.getCollectionFileName()));
+			}
+		
+		return myWorkbook;
+		}
+
+	public static void setMyWorkbook(Workbook myWorkbook)
+		{
+		Variables.myWorkbook = myWorkbook;
+		}
+
+	public static ArrayList<ItemToMigrate> getDeviceList()
+		{
+		return DeviceList;
+		}
+
+	public static void setDeviceList(ArrayList<ItemToMigrate> deviceList)
+		{
+		DeviceList = deviceList;
+		}
+
+	public static String getCollectionFileName()
+		{
+		return collectionFileName;
+		}
+
+	public static void setCollectionFileName(String collectionFileName)
+		{
+		Variables.collectionFileName = collectionFileName;
+		}
+	
+	
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

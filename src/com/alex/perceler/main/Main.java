@@ -2,6 +2,7 @@ package com.alex.perceler.main;
 
 import org.apache.log4j.Level;
 
+import com.alex.perceler.core.LetsParty;
 import com.alex.perceler.utils.InitLogging;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -18,89 +19,94 @@ public class Main
 	public Main()
 		{
 		//Set the software name
-				Variables.setSoftwareName("WOOT");
-				//Set the software version
-				Variables.setSoftwareVersion("1.2");
-				
-				/****************
-				 * Initialization of the logging
-				 */
-				Variables.setLogger(InitLogging.init(Variables.getSoftwareName()+"_LogFile.txt"));
-				Variables.getLogger().info("\r\n");
-				Variables.getLogger().info("#### Entering application");
-				Variables.getLogger().info("## Welcome to : "+Variables.getSoftwareName()+" version "+Variables.getSoftwareVersion());
-				Variables.getLogger().info("## Author : RATEL Alexandre : 2017");
-				/*******/
-				
-				/******
-				 * Initialization of the variables
-				 */
-				new Variables();
-				/************/
-				
-				/**********
-				 * We check if the java version is compatible
-				 */
-				UsefulMethod.checkJavaVersion();
-				/***************/
-				
-				/**********************
-				 * Reading of the configuration file
-				 */
-				try
-					{
-					//Config files reading
-					Variables.setTabConfig(UsefulMethod.readMainConfigFile(Variables.getConfigFileName()));
-					}
-				catch(Exception exc)
-					{
-					UsefulMethod.failedToInit(exc);
-					}
-				/********************/
-				
-				/*****************
-				 * Setting of the inside variables from what we read in the configuration file
-				 */
-				try
-					{
-					UsefulMethod.initInternalVariables();
-					}
-				catch(Exception exc)
-					{
-					Variables.getLogger().error(exc.getMessage());
-					Variables.getLogger().setLevel(Level.INFO);
-					}
-				/*********************/
-				
-				/****************
-				 * Init email server
-				 */
-				try
-					{
-					UsefulMethod.initEMailServer();
-					}
-				catch (Exception e)
-					{
-					e.printStackTrace();
-					Variables.getLogger().error("Failed to init the eMail server : "+e.getMessage());
-					}
-				/*************/
-				
-				/*******************
-				 * Start main user interface
-				 */
-				try
-					{
-					Variables.getLogger().info("Launching Main Class");
-					
-					}
-				catch (Exception exc)
-					{
-					UsefulMethod.failedToInit(exc);
-					}
-				/******************/
-				
-				//End of the main class
+		Variables.setSoftwareName("WOOT");
+		//Set the software version
+		Variables.setSoftwareVersion("1.2");
+		
+		/****************
+		 * Initialization of the logging
+		 */
+		Variables.setLogger(InitLogging.init(Variables.getSoftwareName()+"_LogFile.txt"));
+		Variables.getLogger().info("\r\n");
+		Variables.getLogger().info("#### Entering application");
+		Variables.getLogger().info("## Welcome to : "+Variables.getSoftwareName()+" version "+Variables.getSoftwareVersion());
+		Variables.getLogger().info("## Author : RATEL Alexandre : 2017");
+		/*******/
+		
+		/******
+		 * Initialization of the variables
+		 */
+		new Variables();
+		/************/
+		
+		/**********
+		 * We check if the java version is compatible
+		 */
+		UsefulMethod.checkJavaVersion();
+		/***************/
+		
+		/**********************
+		 * Reading of the configuration file
+		 */
+		try
+			{
+			//Config file reading
+			Variables.setTabConfig(UsefulMethod.readMainConfigFile(Variables.getConfigFileName()));
+			
+			//Database file reading
+			//Temp
+			UsefulMethod.initDatabase(Variables.getCollectionFileName());
+			//Temp
+			}
+		catch(Exception exc)
+			{
+			UsefulMethod.failedToInit(exc);
+			}
+		/********************/
+		
+		/*****************
+		 * Setting of the inside variables from what we read in the configuration file
+		 */
+		try
+			{
+			UsefulMethod.initInternalVariables();
+			}
+		catch(Exception exc)
+			{
+			Variables.getLogger().error(exc.getMessage());
+			Variables.getLogger().setLevel(Level.INFO);
+			}
+		/*********************/
+		
+		/****************
+		 * Init email server
+		 */
+		try
+			{
+			UsefulMethod.initEMailServer();
+			}
+		catch (Exception e)
+			{
+			e.printStackTrace();
+			Variables.getLogger().error("Failed to init the eMail server : "+e.getMessage());
+			}
+		/*************/
+		
+		/*******************
+		 * Start main user interface
+		 */
+		try
+			{
+			Variables.getLogger().info("Launching Main Class");
+			new LetsParty();//main file
+			}
+		catch (Exception exc)
+			{
+			UsefulMethod.failedToInit(exc);
+			}
+		/******************/
+		
+		//End of the main class
 		}
 	
 	
