@@ -12,6 +12,7 @@ public class OneLine
 	 * variables
 	 */
 	private String request;
+	private int waitingTime;
 	private String reply;
 	
 	

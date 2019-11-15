@@ -6,15 +6,15 @@ import java.math.BigInteger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import com.alex.woot.axlitems.misc.AXLItemLinker;
-import com.alex.woot.axlitems.misc.ToUpdate;
-import com.alex.woot.misc.ErrorTemplate;
-import com.alex.woot.misc.ItemToInject;
-import com.alex.woot.misc.SimpleRequest;
-import com.alex.woot.office.items.TrunkSip;
-import com.alex.woot.soap.items.SipTrunkDestination;
-import com.alex.woot.utils.Variables;
-import com.alex.woot.utils.Variables.itemType;
+import com.alex.perceler.axlitems.misc.AXLItemLinker;
+import com.alex.perceler.axlitems.misc.ToUpdate;
+import com.alex.perceler.misc.ErrorTemplate;
+import com.alex.perceler.misc.ItemToInject;
+import com.alex.perceler.misc.SimpleRequest;
+import com.alex.perceler.office.items.TrunkSip;
+import com.alex.perceler.soap.items.SipTrunkDestination;
+import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.itemType;
 
 
 
@@ -92,15 +92,7 @@ public class TrunkSipLinker extends AXLItemLinker
 	
 	/***************
 	 * Initialization
-	 */
-	public ArrayList<ErrorTemplate> doInitVersion85() throws Exception
-		{
-		ArrayList<ErrorTemplate> errorList = new ArrayList<ErrorTemplate>();
-		//To be written
-		
-		return errorList;
-		}
-	
+	 */	
 	public ArrayList<ErrorTemplate> doInitVersion105() throws Exception
 		{
 		ArrayList<ErrorTemplate> errorList = new ArrayList<ErrorTemplate>();
@@ -119,14 +111,6 @@ public class TrunkSipLinker extends AXLItemLinker
 		
 		deleteReq.setName(this.getName());//We add the parameters to the request
 		com.cisco.axl.api._10.StandardResponse resp = Variables.getAXLConnectionToCUCMV105().removeSipTrunk(deleteReq);//We send the request to the CUCM
-		}
-
-	public void doDeleteVersion85() throws Exception
-		{
-		com.cisco.axl.api._8.NameAndGUIDRequest deleteReq = new com.cisco.axl.api._8.NameAndGUIDRequest();
-		
-		deleteReq.setName(this.getName());//We add the parameters to the request
-		com.cisco.axl.api._8.StandardResponse resp = Variables.getAXLConnectionToCUCM85().removeSipTrunk(deleteReq);//We send the request to the CUCM
 		}
 	/**************/
 
@@ -185,60 +169,6 @@ public class TrunkSipLinker extends AXLItemLinker
 		
 		return resp.getReturn();//Return UUID
 		}
-
-	public String doInjectVersion85() throws Exception
-		{
-		com.cisco.axl.api._8.AddSipTrunkReq req = new com.cisco.axl.api._8.AddSipTrunkReq();
-		com.cisco.axl.api._8.XSipTrunk params = new com.cisco.axl.api._8.XSipTrunk();
-		
-		/**
-		 * We set the item parameters
-		 */
-		params.setName(this.getName());//Name
-		params.setDescription(this.description);
-		params.setProduct(this.product);
-		params.setClazz(this.xClass);
-		params.setProtocol(this.protocol);
-		params.setProtocolSide(this.protocolSide);
-		params.setCallingSearchSpaceName(new JAXBElement(new QName("callingSearchSpaceName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.callingsearchspace, this.callingSearchSpaceName)));
-		params.setDevicePoolName(new JAXBElement(new QName("devicePoolName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.devicepool, this.devicePoolName)));
-		params.setCommonDeviceConfigName(new JAXBElement(new QName("commonDeviceConfigName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.commondeviceconfig, this.commonDeviceConfigName)));
-		params.setLocationName(SimpleRequest.getUUIDV85(itemType.location, this.locationName));
-		params.setSecurityProfileName(new JAXBElement(new QName("securityProfileName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.siptrunksecurityprofile, this.securityProfileName)));
-		params.setSipProfileName(new JAXBElement(new QName("sipProfileName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.sipprofile, this.sipProfileName)));
-		params.setCgpnTransformationCssName(new JAXBElement(new QName("cgpnTransformationCssName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.callingsearchspace, this.callingPTransformationCssName)));
-		params.setUseDevicePoolCgpnTransformCss(this.useDevicePoolCallingPTransformCss);
-		params.setCdpnTransformationCssName(new JAXBElement(new QName("cdpnTransformationCssName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.callingsearchspace, this.calledPTransformationCssName)));
-		params.setUseDevicePoolCdpnTransformCss(this.useDevicePoolCalledPTransformCss);
-		params.setSubscribeCallingSearchSpaceName(new JAXBElement(new QName("subscribeCallingSearchSpaceName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.callingsearchspace, this.subscribeCallingSearchSpaceName)));
-		params.setSipTrunkType(this.sipTrunkType);
-		params.setRerouteCallingSearchSpaceName(new JAXBElement(new QName("rerouteCallingSearchSpaceName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.callingsearchspace, this.rerouteCallingSearchSpaceName)));
-		params.setUnknownPrefix(unknownPrefix);
-		params.setUnknownStripDigits(new JAXBElement(new QName("unknownStripDigits"), BigInteger.class, unknownStripDigits));
-		params.setCgpnTransformationUnknownCssName(new JAXBElement(new QName("cgpnTransformationUnknownCssName"), com.cisco.axl.api._8.XFkType.class,SimpleRequest.getUUIDV85(itemType.callingsearchspace, this.cgpnTransformationUnknownCssName)));
-		params.setUseDevicePoolCgpnTransformCssUnkn(useDevicePoolCgpnTransformCssUnkn);
-		
-		com.cisco.axl.api._8.XSipTrunk.Destinations myDest = new com.cisco.axl.api._8.XSipTrunk.Destinations();
-		
-		for(int i=0; i<myDestinations.size(); i++)
-			{
-			com.cisco.axl.api._8.XSipTrunkDestination mySTD = new com.cisco.axl.api._8.XSipTrunkDestination();
-			mySTD.setAddressIpv4(myDestinations.get(i).getAddressIpv4());
-			mySTD.setPort(myDestinations.get(i).getPort());
-			mySTD.setSortOrder(Integer.toString(i+1));
-			
-			myDest.getDestination().add(mySTD);
-			}
-		
-		params.setDestinations(myDest);
-		/************/
-		
-		req.setSipTrunk(params);//We add the parameters to the request
-		com.cisco.axl.api._8.StandardResponse resp = Variables.getAXLConnectionToCUCM85().addSipTrunk(req);//We send the request to the CUCM
-		
-		return resp.getReturn();//Return UUID
-		}
-	/**************/
 	
 	/***************
 	 * Update
@@ -255,23 +185,7 @@ public class TrunkSipLinker extends AXLItemLinker
 		/************/
 		
 		com.cisco.axl.api._10.StandardResponse resp = Variables.getAXLConnectionToCUCMV105().updateSipTrunk(req);//We send the request to the CUCM
-		}
-
-	public void doUpdateVersion85(ArrayList<ToUpdate> tuList) throws Exception
-		{
-		com.cisco.axl.api._8.UpdateSipTrunkReq req = new com.cisco.axl.api._8.UpdateSipTrunkReq();
-		
-		/***********
-		 * We set the item parameters
-		 */
-		req.setName(this.getName());
-		//Has to be written
-		/************/
-		
-		com.cisco.axl.api._8.StandardResponse resp = Variables.getAXLConnectionToCUCM85().updateSipTrunk(req);//We send the request to the CUCM
-		}
-	/**************/
-	
+		}	
 	
 	/*************
 	 * Get
@@ -293,29 +207,8 @@ public class TrunkSipLinker extends AXLItemLinker
 		
 		//Has to be written
 		
-		return myT;//Return a location
+		return myT;
 		}
-
-	public ItemToInject doGetVersion85() throws Exception
-		{
-		com.cisco.axl.api._8.GetSipTrunkReq req = new com.cisco.axl.api._8.GetSipTrunkReq();
-		
-		/**
-		 * We set the item parameters
-		 */
-		req.setName(this.getName());
-		/************/
-		
-		com.cisco.axl.api._8.GetSipTrunkRes resp = Variables.getAXLConnectionToCUCM85().getSipTrunk(req);//We send the request to the CUCM
-		
-		TrunkSip myT = new TrunkSip(this.getName());
-		myT.setUUID(resp.getReturn().getSipTrunk().getUuid());
-		
-		//Has to be written
-		
-		return myT;//Return a location
-		}
-	/****************/
 
 	public String getDescription()
 		{

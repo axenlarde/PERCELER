@@ -1,7 +1,7 @@
 package com.alex.perceler.soap.items;
 
-import com.alex.woot.misc.BasicItem;
-import com.alex.woot.misc.CollectionTools;
+import com.alex.perceler.misc.BasicItem;
+import com.alex.perceler.misc.CollectionTools;
 
 /**********************************
  * Class used to store a Sip Trunk Destination
@@ -24,6 +24,14 @@ public class SipTrunkDestination extends BasicItem
 		super();
 		this.addressIpv4 = addressIpv4;
 		this.port = port;
+		}
+	
+	public SipTrunkDestination(String addressIpv4, String port, String UUID)
+		{
+		super();
+		this.addressIpv4 = addressIpv4;
+		this.port = port;
+		this.UUID = UUID;
 		}
 	
 	@Override

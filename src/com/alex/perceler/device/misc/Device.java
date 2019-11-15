@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.alex.perceler.cli.OneLine;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
+import com.alex.perceler.office.items.SRSTReference;
+import com.alex.perceler.office.items.TrunkSip;
 import com.alex.perceler.utils.Variables;
 
 /**
@@ -30,7 +32,7 @@ public class Device extends ItemToMigrate
 	private ArrayList<OneLine> cliList;
 
 	public Device(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip,
-			String newgateway, String newmask)
+			String newgateway, String newmask) throws Exception
 		{
 		super(type, name);
 		this.ip = ip;
@@ -40,8 +42,65 @@ public class Device extends ItemToMigrate
 		this.newip = newip;
 		this.newgateway = newgateway;
 		this.newmask = newmask;
+		}
+	
+	@Override
+	public String getInfo()
+		{
+		return name+" "+
+		ip+" "+
+		type;
+		}
+	
+	@Override
+	public void init() throws Exception
+		{
+		// TODO Auto-generated method stub
 		
-		//Do not forget to initialize the cliList
+		}
+	
+	//To init the item
+	@Override
+	public void build() throws Exception
+		{
+		/**
+		 * First we find the related CUCM items
+		 * Only for ISR !
+		 */
+		if(type.equals(itmType.isr))
+			{
+			/**
+			 * We need to find 2 items : SRST reference and related sip trunk
+			 * To be sure to find the right ones we have to send SQL request to the CUCM
+			 * Just using the database is unreliable
+			 */
+			//Trunk SIP
+			ArrayList<TrunkSip> stList = DeviceTools.getSIPTrunk(ip);
+			if(stList != null)
+				{
+				axlList.addAll(stList);
+				}
+			else
+				{
+				Variables.getLogger().debug("No sip trunk found for the following ip :"+ip);
+				}
+			
+			//SRST reference
+			ArrayList<SRSTReference> srstRefList = DeviceTools.getSRSTReference(ip);
+			if(srstRefList != null)
+				{
+				axlList.addAll(srstRefList);
+				}
+			else
+				{
+				Variables.getLogger().debug("No SRST reference found for the following ip :"+ip);
+				}
+			}
+		
+		/**
+		 * Then we initialize the CLI list
+		 */
+		//cliList = DeviceTools.
 		}
 
 	@Override
@@ -49,13 +108,21 @@ public class Device extends ItemToMigrate
 		{
 		Variables.getLogger().debug("Starting survey for "+type+" "+name);
 		
-		//Ping
-		//To be written
-		//reachable = true/false;
+		reachable = DeviceTools.ping(ip);
 		
 		for(ItemToInject iti : axlList)
 			{
-			iti.getStatus();
+			//Here we just want to know if the object exists in the CUCM
+			//So this will just try to get the UUID of the item
+			if(!iti.isExisting())
+				{
+				//If the item doesn't exist we set the item as unreachable
+				//Doing so, we discourage the user to migrate it
+				//Maybe we will change that later
+				Variables.getLogger().debug("The item "+iti.getType().name()+" "+iti.getName()+" doesn't exist in the CUCM, so we declare the whole item as unreachable");
+				reachable = false;
+				break;
+				}
 			}
 		}
 
@@ -77,7 +144,6 @@ public class Device extends ItemToMigrate
 		{
 		Variables.getLogger().debug("Starting rollback for "+type+" "+name);
 		
-		//To be written
 		
 		}
 	

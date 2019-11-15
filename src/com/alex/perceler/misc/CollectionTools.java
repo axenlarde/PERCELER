@@ -624,7 +624,7 @@ public class CollectionTools
 	 * - False : We will just get an empty String
 	 * @throws Exception 
 	 */
-	public static String getRawValue(String pattern, Boolean emptyBehavior) throws Exception
+	public static String getRawValue(String pattern, Object obj, Boolean emptyBehavior) throws Exception
 		{
 		if((pattern == null) || (pattern .equals("")))
 			{
@@ -808,7 +808,7 @@ public class CollectionTools
 		{
 		for(int i= 0; i<list.size(); i++)
 			{
-			list.set(i,CollectionTools.getRawValue(list.get(i), emptyValueBehavior));
+			list.set(i,CollectionTools.getRawValue(list.get(i), null, emptyValueBehavior));
 			}
 		
 		return list;

@@ -23,6 +23,9 @@ import org.apache.log4j.Level;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.alex.perceler.device.misc.Device;
+import com.alex.perceler.misc.CollectionTools;
+import com.alex.perceler.misc.ItemToMigrate.itmType;
 import com.alex.perceler.misc.SimpleRequest;
 import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.office.misc.IPRange;
@@ -322,7 +325,7 @@ public class UsefulMethod
 		/**
 		 * Then we initialize the device list
 		 */
-		initDeviceList(collectionFileName);
+		Variables.setDeviceList(initDeviceList(collectionFileName));
 		
 		/**
 		 * First we initialize the office list
@@ -334,9 +337,31 @@ public class UsefulMethod
 	 * Method used to initialize the device list from
 	 * the collection file
 	 */
-	public static void initDeviceList(String collectionFileName) throws Exception
+	public static ArrayList<Device> initDeviceList(String collectionFileName) throws Exception
 		{
+		int maxIndex = CollectionTools.getTheLastIndexOfAColumn(UsefulMethod.getTargetOption("devicematcher"));
+		ArrayList<Device> deviceList = new ArrayList<Device>();
 		
+		for(int i=0; i<maxIndex; i++)
+			{
+			Device d = new Device(findDeviceType(CollectionTools.getValueFromCollectionFile(i, "file.device.type", false)),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.name", false),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.ip", false),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.mask", false),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.gateway", false),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.officeid", false),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.newip", false),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.newgateway", false),
+					CollectionTools.getValueFromCollectionFile(i, "file.device.newmask", false));
+			
+			Variables.getLogger().debug("New device added to the device list : "+d.getInfo());
+			deviceList.add(d);
+			
+			Variables.getLogger().debug("In addition, the device has been added to the database");
+			//To do
+			}
+		
+		return deviceList
 		}
 	
 	/************
@@ -880,6 +905,15 @@ public class UsefulMethod
 			}
 		
 		return false;
+		}
+	
+	public static itmType findDeviceType(String type)
+		{
+		if(type.contains("ISR"))return itmType.isr;
+		else if(type.contains("VG"))return itmType.vg;
+		else if(type.contains("audiocode"))return itmType.audiocode;
+		else if(type.contains("ascom"))return itmType.ascom;
+		else return itmType.sip;
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.misc.storedUUID;
@@ -166,12 +167,13 @@ public class Variables
 	private static Logger logger;
 	private static ArrayList<String[][]> tabConfig;
 	private static ArrayList<Office> OfficeList;
-	private static ArrayList<ItemToMigrate> DeviceList;
+	private static ArrayList<Device> DeviceList;
 	private static eMailSender eMSender;
 	private static String mainDirectory;
 	private static String configFileName;
 	private static String matcherFileName;
 	private static String officeListFileName;
+	private static String deviceListFileName;
 	private static String substitutesFileName;
 	private static ArrayList<String> matcherList;
 	private static ArrayList<ValueMatcher> substituteList;
@@ -274,7 +276,7 @@ public class Variables
 		if(OfficeList == null)
 			{
 			Variables.getLogger().debug("Initialisation of OfficeList");
-			Variables.setOfficeList(UsefulMethod.readOfficeFile(Variables.getOfficeListFileName()));
+			Variables.setOfficeList(UsefulMethod.initOfficeList(Variables.getOfficeListFileName()));
 			}
 		
 		return OfficeList;
@@ -454,12 +456,12 @@ public class Variables
 		Variables.myWorkbook = myWorkbook;
 		}
 
-	public static ArrayList<ItemToMigrate> getDeviceList()
+	public static ArrayList<Device> getDeviceList()
 		{
 		return DeviceList;
 		}
 
-	public static void setDeviceList(ArrayList<ItemToMigrate> deviceList)
+	public static void setDeviceList(ArrayList<Device> deviceList)
 		{
 		DeviceList = deviceList;
 		}

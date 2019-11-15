@@ -54,6 +54,20 @@ public class Office extends ItemToMigrate
 		}
 	
 	@Override
+	public void init() throws Exception
+		{
+		// TODO Auto-generated method stub
+		
+		}
+
+	@Override
+	public void build() throws Exception
+		{
+		// TODO Auto-generated method stub
+		
+		}
+	
+	@Override
 	public void startSurvey() throws Exception
 		{
 		Variables.getLogger().debug("Starting survey for "+type+" "+name);

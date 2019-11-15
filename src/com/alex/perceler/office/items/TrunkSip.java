@@ -2,14 +2,13 @@ package com.alex.perceler.office.items;
 
 import java.util.ArrayList;
 
-import com.alex.woot.axlitems.linkers.PhoneLinker;
-import com.alex.woot.axlitems.linkers.TrunkSipLinker;
-import com.alex.woot.misc.CollectionTools;
-import com.alex.woot.misc.ItemToInject;
-import com.alex.woot.soap.items.SipTrunkDestination;
-import com.alex.woot.utils.UsefulMethod;
-import com.alex.woot.utils.Variables;
-import com.alex.woot.utils.Variables.itemType;
+import com.alex.perceler.axlitems.linkers.TrunkSipLinker;
+import com.alex.perceler.misc.CollectionTools;
+import com.alex.perceler.misc.ItemToInject;
+import com.alex.perceler.soap.items.SipTrunkDestination;
+import com.alex.perceler.utils.UsefulMethod;
+import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.itemType;
 
 
 

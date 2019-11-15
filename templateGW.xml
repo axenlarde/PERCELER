@@ -1,8 +1,8 @@
 <!--
 Gateway config file
 -->
-<pattern>
-	<params>
+<xml>
+	<gateways>
 		<gateway>
 			<misc>
 				<name>ISR</name>
@@ -13,196 +13,20 @@ Gateway config file
 				<wait_50>User</wait_50>
 				<wait_50>Router</wait_50>
 			</configure>
-			<serial>
+			<before>
+				<wait_50>aaa new-model</wait_50>
+			</before>
+			<during>
 				<wait_50>aaa new-model</wait_50>
 				<wait_50>aaa authentication login default local</wait_50>
 				<wait_50>aaa authorization console</wait_50>
-				<wait_50>aaa authorization exec default local if-authenticated</wait_50>
-				<wait_50>aaa session-id common</wait_50>
-				<wait_50>'username '+login+' privilege 15 secret '+pass</wait_50>
-				<wait_50>'bridge irb'</wait_50>
-				<wait_50>bridge 1 protocol ieee</wait_50>
-				<wait_50>'bridge 1 route ip'</wait_50>
-				<wait_50>'interface GigabitEthernet0/0'</wait_50>
-				<wait_50>'backup interface GigabitEthernet0/1'</wait_50>
-				<wait_50>'description *** Active ***'</wait_50>
-				<wait_50>'bridge-group 1'</wait_50>
-				<wait_50>no shut</wait_50>
-				<wait_50>'interface GigabitEthernet0/1'</wait_50>
-				<wait_50>'description *** Passive ***'</wait_50>
-				<wait_50>no shut</wait_50>
-				<wait_50>'bridge-group 1'</wait_50>
-				<wait_50>'interface '+interface</wait_50>
-				<wait_50>'ip address '+ipgw+' '+maskgw</wait_50>
-				<wait_50>'description *** Interface Bridge ***'</wait_50>
-				<wait_50>no shut</wait_50>
-				<wait_50>'ip default-gateway '+defaultgw</wait_50>
-				<wait_50>'ip route 0.0.0.0 0.0.0.0 '+defaultgw</wait_50>
-			</serial>
-			<common>
-				<wait_50>service password-encryption</wait_50>
-				<wait_50>voice-card 0</wait_50>
-				<wait_50>dsp services dspfarm</wait_50>
-				<wait_50>voice service voip</wait_50>
-				<wait_50>fax protocol t38 ls-redundancy 0 hs-redundancy 0 fallback none</wait_50>
-				<wait_50>'ntp server '+ipntp</wait_50>
-				<wait_50>ip tcp path-mtu-discovery</wait_50>
-				<wait_50>clock timezone WEST 1 0</wait_50>
-				<wait_50>clock summer-time WEST recurring last Sun Mar 2:00 last Sun Oct 2:00</wait_50>
-				<wait_50>logging buffered 100000</wait_50>
-			</common>
-			<network>
-				<wait_50>'hostname '+nomgw</wait_50>
-				<wait_50>'ip domain name '+domainname</wait_50>
-			</network>
-			<port>
-				<wait_50>card type e1 0 0</wait_50>
-				<wait_50>network-clock-participate wic 0</wait_50>
-				<wait_50>network-clock-select 1 E1 0/0/0</wait_50>
-				<wait_50>isdn switch-type primary-net5</wait_50>
-				<wait_50>controller E1 0/0/0</wait_50>
-				<wait_50>'pri-group timeslots 1-'+nbit+' service mgcp'</wait_50>
-				<wait_50>interface Serial0/0/0:15</wait_50>
-				<wait_50>isdn switch-type primary-net5</wait_50>
-				<wait_50>isdn overlap-receiving T302 4000</wait_50>
-				<wait_50>voice-port 0/0/0:15</wait_50>
-				<wait_50>translation-profile incoming IN</wait_50>
-				<wait_50>translation-profile outgoing OUT</wait_50>
-			</port>
-			<translationrule>
-				<wait_50>'voice translation-rule 1'</wait_50>
-				<wait_50>'rule 1 /^0/ //'</wait_50>
-				<wait_50>'voice translation-rule 2'</wait_50>
-				<wait_50>'rule 1 /^'+prefixe+'/ /'+sda+'\1/ type unknown national plan unknown isdn'</wait_50>
-				<wait_50>voice translation-rule 3</wait_50>
-				<wait_50>rule 1 /^\(.*\)/ /000\1/ type international international</wait_50>
-				<wait_50>rule 2 /^\(.*\)/ /00\1/ type national national</wait_50>
-				<wait_50>rule 3 /^\(.*\)/ /00\1/ type unknown unknown</wait_50>
-				<wait_50>voice translation-rule 4</wait_50>
-				<wait_50>'rule 1 /^..../ /'+prefixe+'\1/'</wait_50>
-				<wait_50>voice translation-profile IN</wait_50>
-				<wait_50>translate calling 3</wait_50>
-				<wait_50>translate called 4</wait_50>
-				<wait_50>voice translation-profile OUT</wait_50>
-				<wait_50>translate calling 2</wait_50>
-				<wait_50>translate called 1</wait_50>
-			</translationrule>
-			<mgcp>
-				<wait_50>'ccm-manager mgcp'</wait_50>
-				<wait_50>'ccm-manager music-on-hold bind '+interface</wait_50>
-				<wait_50>'ccm-manager config server '+ccm1</wait_50>
-				<wait_50>ccm-manager config</wait_50>
-				<wait_50>'mgcp bind control source-interface '+interface</wait_50>
-				<wait_50>'mgcp bind media source-interface '+interface</wait_50>
-				<wait_50>'mgcp'</wait_50>
-			</mgcp>
-			<sccp>
-				<wait_50>'sccp local '+interface</wait_50>
-				<wait_50>'sccp ccm '+ccm1+' identifier 1 version 7.0+'</wait_50>
-				<wait_50>'sccp ccm '+ccm2+' identifier 2 version 7.0+'</wait_50>
-				<wait_50>sccp</wait_50>
-				<wait_50>sccp ccm group 1</wait_50>
-				<wait_50>associate ccm 1 priority 1</wait_50>
-				<wait_50>associate ccm 2 priority 2</wait_50>
-				<wait_50>'associate profile 1 register CFB_'+nsite</wait_50>
-				<wait_50>dspfarm profile 1 conference</wait_50>
-				<wait_50>codec g711ulaw</wait_50>
-				<wait_50>codec g711alaw</wait_50>
-				<wait_50>codec g729ar8</wait_50>
-				<wait_50>codec g729abr8</wait_50>
-				<wait_50>codec g729r8</wait_50>
-				<wait_50>codec g729br8</wait_50>
-				<wait_50>'maximum sessions '+maxsession</wait_50>
-				<wait_50>associate application SCCP</wait_50>
-				<wait_50>no shut</wait_50>
-			</sccp>
-			<dialpeer>
-				<wait_50>dial-peer voice 1 pots</wait_50>
-				<wait_50>'description *** '+country+' PSTN Access in case of SRST ***'</wait_50>
-				<wait_50>destination-pattern 0T</wait_50>
-				<wait_50>port 0/0/0:15</wait_50>
-				<wait_50>forward-digits all</wait_50>
-				<wait_50>dial-peer voice 2 pots</wait_50>
-				<wait_50>description *** Inbound Calls in case of SRST ***</wait_50>
-				<wait_50>incoming called-number .</wait_50>
-				<wait_50>direct-inward-dial</wait_50>
-				<wait_50>port 0/0/0:15</wait_50>
-				<wait_50>dial-peer voice 3 pots</wait_50>
-				<wait_50>description *** Emergency Access in case of SRST ***</wait_50>
-				<wait_50>destination-pattern 1[578]</wait_50>
-				<wait_50>port 0/0/0:15</wait_50>
-				<wait_50>forward-digits 2</wait_50>
-				<wait_50>dial-peer voice 4 pots</wait_50>
-				<wait_50>description *** Emergency Access in case of SRST ***</wait_50>
-				<wait_50>destination-pattern 01[578]</wait_50>
-				<wait_50>port 0/0/0:15</wait_50>
-				<wait_50>forward-digits 2</wait_50>
-				<wait_50>dial-peer voice 5 pots</wait_50>
-				<wait_50>description *** Emergency Access in case of SRST ***</wait_50>
-				<wait_50>destination-pattern 11[258]</wait_50>
-				<wait_50>port 0/0/0:15</wait_50>
-				<wait_50>forward-digits 3</wait_50>
-				<wait_50>dial-peer voice 6 pots</wait_50>
-				<wait_50>description *** Emergency Access in case of SRST ***</wait_50>
-				<wait_50>destination-pattern 011[258]</wait_50>
-				<wait_50>port 0/0/0:15</wait_50>
-				<wait_50>forward-digits 3</wait_50>
-			</dialpeer>
-			<srst>
-				<wait_50>application</wait_50>
-				<wait_50>global</wait_50>
-				<wait_50>service alternate Default</wait_50>
-				<wait_50>ccm-manager fallback-mgcp</wait_50>
-				<wait_50>call-manager-fallback</wait_50>
-				<wait_50>'max-conferences 4 gain -6'</wait_50>
-				<wait_50>transfer-system full-consult</wait_50>
-				<wait_50>'ip source-address '+ipgw+' port 2000'</wait_50>
-				<wait_50>'max-ephones 150'</wait_50>
-				<wait_50>yes</wait_50>
-				<wait_50>'max-dn 300'</wait_50>
-				<wait_50>system message primary Mode secours</wait_50>
-				<wait_50>transfer-pattern .T</wait_50>
-				<wait_50>keepalive 10</wait_50>
-				<wait_50>call-forward pattern .T</wait_50>
-				<wait_50>'moh '+mohfile</wait_50>
-				<wait_50>time-format 24</wait_50>
-				<wait_50>date-format dd-mm-yy</wait_50>
-			</srst>
-			<banner>
-				<wait_50>banner exec ^</wait_50>
-				<wait_50>'Connected to : '+nomgw</wait_50>
-				<wait_50>************************************************************************</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>*    L acces a cet equipement est restreint aux personnes autorisees   *</wait_50>
-				<wait_50>*                Veuillez vous deconnecter immediatement               *</wait_50>
-				<wait_50>*                 sous peine de poursuites judiciaires                 *</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>************************************************************************</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>*                    Unauthorised access prohibited                    *</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>*               Please, disconnect now or you ll be sued               *</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>************************************************************************</wait_50>
-				<wait_50>^</wait_50>
-			</banner>
-			<customerspec>
-				<wait_50>snmp-server community exploit RO</wait_50>
-				<wait_50>snmp-server community NETfenua99 RW</wait_50>
-			</customerspec>
-			<authentication>
-				<wait_50>line vty 0 4</wait_50>
-				<wait_50>transport input telnet ssh</wait_50>
-				<wait_50>line vty 5 15</wait_50>
-				<wait_50>transport input telnet ssh</wait_50>
-				<wait_4000>crypto key generate rsa usage-keys modulus 1024 exportable</wait_4000>
-			</authentication>
-			<saving>
+			</during>
+			<after>
 				<wait_50>'end'</wait_50>
 				<wait_2000>'copy running-config startup-config'</wait_2000>
 				<wait_50>''</wait_50>
 				<wait_4000>''</wait_4000>
-			</saving>
+			</after>
 		</gateway>
 		<gateway>
 			<misc>
@@ -214,92 +38,70 @@ Gateway config file
 				<wait_50>User</wait_50>
 				<wait_50>Router</wait_50>
 			</configure>
-			<serial>
+			<before>
+				<wait_50>aaa new-model</wait_50>
+			</before>
+			<during>
 				<wait_50>aaa new-model</wait_50>
 				<wait_50>aaa authentication login default local</wait_50>
 				<wait_50>aaa authorization console</wait_50>
-				<wait_50>aaa authorization exec default local if-authenticated</wait_50>
-				<wait_50>aaa session-id common</wait_50>
-				<wait_50>'username '+login+' privilege 15 secret '+pass</wait_50>
-				<wait_50>'bridge irb'</wait_50>
-				<wait_50>bridge 1 protocol ieee</wait_50>
-				<wait_50>'bridge 1 route ip'</wait_50>
-				<wait_50>'interface FastEthernet0/0'</wait_50>
-				<wait_50>'backup interface FastEthernet0/1'</wait_50>
-				<wait_50>'no ip address'</wait_50>
-				<wait_50>'description *** Active ***'</wait_50>
-				<wait_50>'bridge-group 1'</wait_50>
-				<wait_50>no shut</wait_50>
-				<wait_50>'interface FastEthernet0/1'</wait_50>
-				<wait_50>'description *** Passive ***'</wait_50>
-				<wait_50>no shut</wait_50>
-				<wait_50>'bridge-group 1'</wait_50>
-				<wait_50>'interface '+interface</wait_50>
-				<wait_50>'ip address '+ipgw+' '+maskgw</wait_50>
-				<wait_50>'description *** Interface Bridge ***'</wait_50>
-				<wait_50>'ip default-gateway '+defaultgw</wait_50>
-				<wait_50>'ip route 0.0.0.0 0.0.0.0 '+defaultgw</wait_50>
-			</serial>
-			<common>
-				<wait_50>service password-encryption</wait_50>
-				<wait_50>voice service voip</wait_50>
-				<wait_50>fax protocol t38 ls-redundancy 0 hs-redundancy 0 fallback none</wait_50>
-				<wait_50>'ntp server '+ipntp</wait_50>
-				<wait_50>clock timezone WEST 1 0</wait_50>
-				<wait_50>clock summer-time WEST recurring last Sun Mar 2:00 last Sun Oct 2:00</wait_50>
-				<wait_50>logging buffered 100000</wait_50>
-			</common>
-			<network>
-				<wait_50>'hostname '+nomgw</wait_50>
-				<wait_50>'ip domain name '+domainname</wait_50>
-			</network>
-			<sccp>
-				<wait_50>'sccp local '+interface</wait_50>
-				<wait_50>'sccp ccm '+ccm1+' identifier 1 version 7.0+'</wait_50>
-				<wait_50>'sccp ccm '+ccm2+' identifier 2 version 7.0+'</wait_50>
-				<wait_50>'sccp ccm '+ccm3+' identifier 3 version 7.0+'</wait_50>
-				<wait_50>sccp</wait_50>
-				<wait_50>sccp ccm group 1</wait_50>
-				<wait_50>associate ccm 1 priority 1</wait_50>
-				<wait_50>associate ccm 2 priority 2</wait_50>
-				<wait_50>associate ccm 3 priority 3</wait_50>
-				<wait_50>'ccm-manager config server '+ccm1</wait_50>
-				<wait_50>'ccm-manager sccp local '+interface</wait_50>
-				<wait_50>'ccm-manager sccp'</wait_50>
-			</sccp>
-			<banner>
-				<wait_50>banner login ^</wait_50>
-				<wait_50>'Connected to : '+nomgw</wait_50>
-				<wait_50>************************************************************************</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>*    L acces a cet equipement est restreint aux personnes autorisees   *</wait_50>
-				<wait_50>*                Veuillez vous deconnecter immediatement               *</wait_50>
-				<wait_50>*                 sous peine de poursuites judiciaires                 *</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>************************************************************************</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>*                    Unauthorised access prohibited                    *</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>*               Please, disconnect now or you ll be sued               *</wait_50>
-				<wait_50>*                                                                      *</wait_50>
-				<wait_50>************************************************************************</wait_50>
-				<wait_50>^</wait_50>
-			</banner>
-			<customerspec>
-				<wait_50>snmp-server community exploit RO</wait_50>
-				<wait_50>snmp-server community NETfenua99 RW</wait_50>
-			</customerspec>
-			<authentication>
-				<wait_50>line vty 0 4</wait_50>
-				<wait_50>transport input telnet ssh</wait_50>
-				<wait_4000>crypto key generate rsa usage-keys modulus 1024 exportable</wait_4000>
-			</authentication>
-			<saving>
+			</during>
+			<after>
 				<wait_50>'end'</wait_50>
 				<wait_2000>'copy running-config startup-config'</wait_2000>
 				<wait_50>''</wait_50>
 				<wait_4000>''</wait_4000>
-			</saving>
+			</after>
 		</gateway>
-	</params>
-</pattern>
+		<gateway>
+			<misc>
+				<name>AUDIOCODE</name>
+			</misc>
+			<configure>
+				<wait_50>enable</wait_50>
+				<wait_50>configure terminal</wait_50>
+				<wait_50>User</wait_50>
+				<wait_50>Router</wait_50>
+			</configure>
+			<before>
+				<wait_50>aaa new-model</wait_50>
+			</before>
+			<during>
+				<wait_50>aaa new-model</wait_50>
+				<wait_50>aaa authentication login default local</wait_50>
+				<wait_50>aaa authorization console</wait_50>
+			</during>
+			<after>
+				<wait_50>'end'</wait_50>
+				<wait_2000>'copy running-config startup-config'</wait_2000>
+				<wait_50>''</wait_50>
+				<wait_4000>''</wait_4000>
+			</after>
+		</gateway>
+		<gateway>
+			<misc>
+				<name>ASCOM</name>
+			</misc>
+			<configure>
+				<wait_50>enable</wait_50>
+				<wait_50>configure terminal</wait_50>
+				<wait_50>User</wait_50>
+				<wait_50>Router</wait_50>
+			</configure>
+			<before>
+				<wait_50>aaa new-model</wait_50>
+			</before>
+			<during>
+				<wait_50>aaa new-model</wait_50>
+				<wait_50>aaa authentication login default local</wait_50>
+				<wait_50>aaa authorization console</wait_50>
+			</during>
+			<after>
+				<wait_50>'end'</wait_50>
+				<wait_2000>'copy running-config startup-config'</wait_2000>
+				<wait_50>''</wait_50>
+				<wait_4000>''</wait_4000>
+			</after>
+		</gateway>
+	</gateways>
+</xml>
