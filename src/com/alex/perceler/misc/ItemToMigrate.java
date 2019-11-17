@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.actionType;
+import com.alex.perceler.utils.Variables.itmType;
 
 /**
  * Abstract Item to migrate class
@@ -15,17 +17,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	{
 	/**
 	 * Variables
-	 */
-	public enum itmType
-		{
-		office,
-		isr,
-		vg,
-		audiocode,
-		ascom,
-		sip
-		};
-		
+	 */	
 	public enum itmStatus
 		{
 		init,
@@ -33,6 +25,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		migration,
 		postaudit,
 		done,
+		disabled,
 		error
 		};
 	
@@ -40,6 +33,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	protected itmStatus status;
 	protected String id,name;
 	protected int index;
+	protected ArrayList<ErrorTemplate> errorList;
 	
 	//This List contains the AXL items that should be updated if this item is migrated 
 	protected ArrayList<ItemToInject> axlList;
@@ -47,12 +41,14 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	/**
 	 * Constructor
 	 */
-	public ItemToMigrate(itmType type, String name)
+	public ItemToMigrate(itmType type, String name, String id)
 		{
 		super();
 		this.type = type;
 		this.name = name;
-		id = DigestUtils.md5Hex(System.currentTimeMillis()+name);
+		this.id = id;
+		errorList = new ArrayList<ErrorTemplate>();
+		status = itmStatus.init;
 		}
 	
 	@Override
@@ -124,7 +120,17 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		{
 		this.index = index;
 		}
-	
+
+	public ArrayList<ErrorTemplate> getErrorList()
+		{
+		return errorList;
+		}
+
+	public void setErrorList(ArrayList<ErrorTemplate> errorList)
+		{
+		this.errorList = errorList;
+		}
+
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

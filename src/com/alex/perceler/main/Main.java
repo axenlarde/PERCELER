@@ -54,9 +54,7 @@ public class Main
 			Variables.setTabConfig(UsefulMethod.readMainConfigFile(Variables.getConfigFileName()));
 			
 			//Database file reading
-			//Temp
-			UsefulMethod.initDatabase(Variables.getCollectionFileName());
-			//Temp
+			UsefulMethod.initDatabase();
 			}
 		catch(Exception exc)
 			{

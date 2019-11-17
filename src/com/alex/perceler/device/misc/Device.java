@@ -8,6 +8,8 @@ import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.items.SRSTReference;
 import com.alex.perceler.office.items.TrunkSip;
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.actionType;
+import com.alex.perceler.utils.Variables.itmType;
 
 /**
  * Represent a device
@@ -31,10 +33,10 @@ public class Device extends ItemToMigrate
 	
 	private ArrayList<OneLine> cliList;
 
-	public Device(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip,
+	public Device(itmType type, String id, String name, String ip, String mask, String gateway, String officeid, String newip,
 			String newgateway, String newmask) throws Exception
 		{
-		super(type, name);
+		super(type, name, id);
 		this.ip = ip;
 		this.mask = mask;
 		this.gateway = gateway;
@@ -42,6 +44,18 @@ public class Device extends ItemToMigrate
 		this.newip = newip;
 		this.newgateway = newgateway;
 		this.newmask = newmask;
+		}
+	
+	public Device(BasicDevice bd)
+		{
+		super(bd.getType(), bd.getName(), bd.getId());
+		this.ip = bd.getId();
+		this.mask = bd.getMask();
+		this.gateway = bd.getGateway();
+		this.officeid = bd.getOfficeid();
+		this.newip = bd.getNewip();
+		this.newgateway = bd.getNewgateway();
+		this.newmask = bd.getNewmask();
 		}
 	
 	@Override
@@ -61,7 +75,7 @@ public class Device extends ItemToMigrate
 	
 	//To init the item
 	@Override
-	public void build() throws Exception
+	public void build(actionType action) throws Exception
 		{
 		/**
 		 * First we find the related CUCM items
@@ -95,6 +109,11 @@ public class Device extends ItemToMigrate
 				{
 				Variables.getLogger().debug("No SRST reference found for the following ip :"+ip);
 				}
+			}
+		
+		for(ItemToInject iti : axlList)
+			{
+			iti.build();
 			}
 		
 		/**
@@ -138,17 +157,6 @@ public class Device extends ItemToMigrate
 			iti.update();
 			}
 		}
-	
-	@Override
-	public void rollback() throws Exception
-		{
-		Variables.getLogger().debug("Starting rollback for "+type+" "+name);
-		
-		
-		}
-	
-	
-	
 	
 	
 	public String getIp()

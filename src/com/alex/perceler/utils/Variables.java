@@ -7,10 +7,13 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ItemToMigrate;
+import com.alex.perceler.misc.Task;
 import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.misc.storedUUID;
+import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.Office;
 
 
@@ -130,7 +133,8 @@ public class Variables
 		{
 		inject,
 		delete,
-		update
+		update,
+		rollback
 		};
 	
 	/********************************************
@@ -160,14 +164,40 @@ public class Variables
 		misc
 		};
 		
+	/**
+	 * ItemToMigrate type
+	 */
+	public enum itmType
+		{
+		office,
+		isr,
+		vg,
+		audiocode,
+		ascom,
+		sip
+		};
+	
+	/**
+	 * Office Type
+	 */
+	public enum officeType
+		{
+		CAF,
+		ANT,
+		CER,
+		CNA,
+		CNE,
+		PRM
+		};
+		
 	//Misc
 	private static String softwareName;
 	private static String softwareVersion;
 	private static cucmAXLVersion CUCMVersion;
 	private static Logger logger;
 	private static ArrayList<String[][]> tabConfig;
-	private static ArrayList<Office> OfficeList;
-	private static ArrayList<Device> DeviceList;
+	private static ArrayList<BasicOffice> OfficeList;
+	private static ArrayList<BasicDevice> DeviceList;
 	private static eMailSender eMSender;
 	private static String mainDirectory;
 	private static String configFileName;
@@ -181,6 +211,7 @@ public class Variables
 	private static boolean CUCMReachable;
 	private static String collectionFileName;
 	private static Workbook myWorkbook;
+	private static ArrayList<Task> taskList;
 	
 	//Langage management
 	public enum language{english,french};
@@ -201,6 +232,7 @@ public class Variables
 		configFileName = "configFile.xml";
 		matcherFileName = "matchers.xml";
 		officeListFileName = "officeList.xml";
+		deviceListFileName = "deviceList.xml";
 		languageFileName = "languages.xml";
 		substitutesFileName = "substitutes.xml";
 		collectionFileName = "database.xlsx";
@@ -271,18 +303,18 @@ public class Variables
 		Variables.tabConfig = tabConfig;
 		}
 
-	public static ArrayList<Office> getOfficeList() throws Exception
+	public static ArrayList<BasicOffice> getOfficeList() throws Exception
 		{
 		if(OfficeList == null)
 			{
 			Variables.getLogger().debug("Initialisation of OfficeList");
-			Variables.setOfficeList(UsefulMethod.initOfficeList(Variables.getOfficeListFileName()));
+			Variables.setOfficeList(UsefulMethod.initOfficeList());
 			}
 		
 		return OfficeList;
 		}
 
-	public static void setOfficeList(ArrayList<Office> officeList)
+	public static void setOfficeList(ArrayList<BasicOffice> officeList)
 		{
 		OfficeList = officeList;
 		}
@@ -456,12 +488,18 @@ public class Variables
 		Variables.myWorkbook = myWorkbook;
 		}
 
-	public static ArrayList<Device> getDeviceList()
+	public static ArrayList<BasicDevice> getDeviceList() throws Exception
 		{
+		if(DeviceList == null)
+			{
+			Variables.getLogger().debug("Initialisation of DeviceList");
+			Variables.setDeviceList(UsefulMethod.initDeviceList());
+			}
+		
 		return DeviceList;
 		}
 
-	public static void setDeviceList(ArrayList<Device> deviceList)
+	public static void setDeviceList(ArrayList<BasicDevice> deviceList)
 		{
 		DeviceList = deviceList;
 		}
@@ -474,6 +512,30 @@ public class Variables
 	public static void setCollectionFileName(String collectionFileName)
 		{
 		Variables.collectionFileName = collectionFileName;
+		}
+
+	public static String getDeviceListFileName()
+		{
+		return deviceListFileName;
+		}
+
+	public static void setDeviceListFileName(String deviceListFileName)
+		{
+		Variables.deviceListFileName = deviceListFileName;
+		}
+
+	public static synchronized ArrayList<Task> getTaskList()
+		{
+		if(taskList == null)
+			{
+			taskList = new ArrayList<Task>();
+			}
+		return taskList;
+		}
+
+	public static synchronized void setTaskList(ArrayList<Task> taskList)
+		{
+		Variables.taskList = taskList;
 		}
 	
 	

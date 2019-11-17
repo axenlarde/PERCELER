@@ -23,17 +23,20 @@ import org.apache.log4j.Level;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.CollectionTools;
-import com.alex.perceler.misc.ItemToMigrate.itmType;
+import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.SimpleRequest;
 import com.alex.perceler.misc.ValueMatcher;
+import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.IPRange;
 import com.alex.perceler.office.misc.Office;
-import com.alex.perceler.office.misc.Office.officeType;
 import com.alex.perceler.utils.Variables.SubstituteType;
 import com.alex.perceler.utils.Variables.cucmAXLVersion;
 import com.alex.perceler.utils.Variables.itemType;
+import com.alex.perceler.utils.Variables.itmType;
+import com.alex.perceler.utils.Variables.officeType;
 
 
 /**********************************
@@ -162,7 +165,7 @@ public class UsefulMethod
 		JFileChooser fcSource = new JFileChooser();
 		try
 			{
-			fcSource.setCurrentDirectory(new File(Variables.getMainConfigFileDirectory()));
+			fcSource.setCurrentDirectory(new File(Variables.getMainDirectory()));
 			
 			fcSource.setDialogTitle(invitPhrase);
 			
@@ -320,48 +323,49 @@ public class UsefulMethod
 	 * a collection file
 	 * @throws 
 	 */
-	public static void initDatabase(String collectionFileName) throws Exception
+	public static void initDatabase() throws Exception
 		{
 		/**
 		 * Then we initialize the device list
 		 */
-		Variables.setDeviceList(initDeviceList(collectionFileName));
+		Variables.setDeviceList(initDeviceList());
 		
 		/**
 		 * First we initialize the office list
 		 */
-		initOfficeList(collectionFileName);
+		Variables.setOfficeList(initOfficeList());
 		}
 	
 	/**
 	 * Method used to initialize the device list from
 	 * the collection file
 	 */
-	public static ArrayList<Device> initDeviceList(String collectionFileName) throws Exception
+	public static ArrayList<BasicDevice> initDeviceList() throws Exception
 		{
-		int maxIndex = CollectionTools.getTheLastIndexOfAColumn(UsefulMethod.getTargetOption("devicematcher"));
-		ArrayList<Device> deviceList = new ArrayList<Device>();
+		Variables.getLogger().info("Initializing the device list from collection file");
+		ArrayList<BasicDevice> deviceList = new ArrayList<BasicDevice>();
+		ArrayList<String> params = new ArrayList<String>();
+		params.add("devices");
+		params.add("device");
+		ArrayList<String[][]> content = xMLGear.getResultListTab(UsefulMethod.getFlatFileContent(Variables.getDeviceListFileName()), params);
 		
-		for(int i=0; i<maxIndex; i++)
+		for(String[][] s : content)
 			{
-			Device d = new Device(findDeviceType(CollectionTools.getValueFromCollectionFile(i, "file.device.type", false)),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.name", false),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.ip", false),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.mask", false),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.gateway", false),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.officeid", false),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.newip", false),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.newgateway", false),
-					CollectionTools.getValueFromCollectionFile(i, "file.device.newmask", false));
+			BasicDevice d = new BasicDevice(itmType.valueOf(UsefulMethod.getItemByName("type", s)),
+					UsefulMethod.getItemByName("name", s),
+					UsefulMethod.getItemByName("ip", s),
+					UsefulMethod.getItemByName("mask", s),
+					UsefulMethod.getItemByName("gateway", s),
+					UsefulMethod.getItemByName("officeid", s),
+					UsefulMethod.getItemByName("newip", s),
+					UsefulMethod.getItemByName("newgateway", s),
+					UsefulMethod.getItemByName("newmask", s));
 			
 			Variables.getLogger().debug("New device added to the device list : "+d.getInfo());
 			deviceList.add(d);
-			
-			Variables.getLogger().debug("In addition, the device has been added to the database");
-			//To do
 			}
 		
-		return deviceList
+		return deviceList;
 		}
 	
 	/************
@@ -369,54 +373,39 @@ public class UsefulMethod
 	 * the collection file
 	 * @throws Exception 
 	 */
-	public static ArrayList<Office> initOfficeList(String fileName) throws Exception
+	public static ArrayList<BasicOffice> initOfficeList() throws Exception
 		{
 		try
 			{
-			Variables.getLogger().info("Reading of the office file : "+fileName);
-			ArrayList<Office> myOfficeList = new ArrayList<Office>();
+			Variables.getLogger().info("Initializing the office list from collection file");
+			ArrayList<BasicOffice> officeList = new ArrayList<BasicOffice>();
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("offices");
+			params.add("office");
+			ArrayList<String[][]> content = xMLGear.getResultListTab(UsefulMethod.getFlatFileContent(Variables.getOfficeListFileName()), params);
 			
-			//We create an ArrayList containing the offices
-			for(int i=0; i<result.size(); i++)
+			for(String[][] s : content)
 				{
-				String[][] tab = result.get(i);
+				BasicOffice o = new BasicOffice(UsefulMethod.getItemByName("name", s),
+						UsefulMethod.getItemByName("idcomu", s),
+						UsefulMethod.getItemByName("idcaf", s),
+						UsefulMethod.getItemByName("shortname", s),
+						UsefulMethod.getItemByName("newName", s),
+						officeType.valueOf(UsefulMethod.getItemByName("type", s)),
+						UsefulMethod.getItemByName("voiceiprange", s),
+						UsefulMethod.getItemByName("dataiprange", s),
+						UsefulMethod.getItemByName("newvoiceiprange", s),
+						UsefulMethod.getItemByName("newdataiprange", s));
 				
-				IPRange voiceIPRange, dataIPRange;
-				
-				String[] temp = UsefulMethod.getItemByName("voiceiprange", tab).split("/");
-				voiceIPRange = new IPRange(temp[0], temp[1]);
-				temp = UsefulMethod.getItemByName("dataiprange", tab).split("/");
-				dataIPRange = new IPRange(temp[0], temp[1]);
-				
-				//We get the item list for this site
-				//To be written
-				
-				myOfficeList.add(new Office(UsefulMethod.getItemByName("idcomu",tab),
-						UsefulMethod.getItemByName("id",tab),
-						UsefulMethod.getItemByName("shortname",tab),
-						UsefulMethod.getItemByName("fullname",tab),
-						UsefulMethod.getItemByName("newName",tab),
-						officeType.valueOf(UsefulMethod.getItemByName("type",tab)),
-						voiceIPRange,
-						dataIPRange,
-						itemList));
+				Variables.getLogger().debug("New office added to the office list : "+o.getInfo());
+				officeList.add(o);
 				}
 			
-			Variables.getLogger().debug("Office found :");
-			for(Office o : myOfficeList)
-				{
-				Variables.getLogger().debug(o.getName());
-				}
-			
-			return myOfficeList;
-			}
-		catch(FileNotFoundException fnfexc)
-			{
-			throw new FileNotFoundException("The "+fileName+" file was not found : "+fnfexc.getMessage());
+			return officeList;
 			}
 		catch(Exception exc)
 			{
-			throw new Exception("ERROR with the "+fileName+" file : "+exc.getMessage());
+			throw new Exception("ERROR while initializing the office list");
 			}
 		}
 	

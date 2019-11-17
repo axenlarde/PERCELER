@@ -1,5 +1,7 @@
 package com.alex.perceler.office.misc;
 
+import com.alex.perceler.utils.UsefulMethod;
+
 /**
  * IPRange
  *
@@ -10,23 +12,35 @@ public class IPRange
 	/**
 	 * Variables
 	 */
-	private String ip,mask;
+	private String ipRange,mask;
 
-	public IPRange(String ip, String mask)
+	public IPRange(String ipRange, String mask)
 		{
 		super();
-		this.ip = ip;
+		this.ipRange = ipRange;
 		this.mask = mask;
 		}
-
-	public String getIp()
+	
+	public IPRange(String ipmask)
 		{
-		return ip;
+		String[] temp = ipmask.split("/");
+		ipRange = temp[0];
+		mask = temp[1];
+		}
+	
+	public String getInfo()
+		{
+		return ipRange+"/"+mask;
 		}
 
-	public void setIp(String ip)
+	public String getIpRange()
 		{
-		this.ip = ip;
+		return ipRange;
+		}
+
+	public void setIpRange(String ip)
+		{
+		this.ipRange = ip;
 		}
 
 	public String getMask()

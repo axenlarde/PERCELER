@@ -804,11 +804,11 @@ public class CollectionTools
 	 * @return
 	 * @throws Exception 
 	 */
-	public static ArrayList<String> resolveStringList(ArrayList<String> list, boolean emptyValueBehavior) throws Exception
+	public static ArrayList<String> resolveStringList(ArrayList<String> list, Object obj, boolean emptyValueBehavior) throws Exception
 		{
 		for(int i= 0; i<list.size(); i++)
 			{
-			list.set(i,CollectionTools.getRawValue(list.get(i), null, emptyValueBehavior));
+			list.set(i,CollectionTools.getRawValue(list.get(i), obj, emptyValueBehavior));
 			}
 		
 		return list;

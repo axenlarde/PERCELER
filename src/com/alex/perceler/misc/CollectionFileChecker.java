@@ -2,12 +2,12 @@ package com.alex.perceler.misc;
 
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.alex.woot.utils.UsefulMethod;
-import com.alex.woot.utils.Variables;
+import com.alex.perceler.utils.UsefulMethod;
+import com.alex.perceler.utils.Variables;
 
 /**********************************
  * Class aims to contain static method to check
- * Colleciton file content is correct
+ * Collection file content is correct
  * 
  * @author RATEL Alexandre
  **********************************/
