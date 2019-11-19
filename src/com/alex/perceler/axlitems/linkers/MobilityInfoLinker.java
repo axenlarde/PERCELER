@@ -112,7 +112,8 @@ public class MobilityInfoLinker extends AXLItemLinker
 		 * We set the item parameters
 		 */
 		req.setName(this.getName());
-		//has to be written
+		req.setSubNet(this.subnet);
+		req.setSubNetMaskSz(this.subnetMask);
 		/************/
 		
 		com.cisco.axl.api._10.StandardResponse resp = Variables.getAXLConnectionToCUCMV105().updateDeviceMobility(req);//We send the request to the CUCM

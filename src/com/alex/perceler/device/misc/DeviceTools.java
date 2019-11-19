@@ -8,9 +8,13 @@ import java.util.List;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.SimpleRequest;
 import com.alex.perceler.office.items.SRSTReference;
 import com.alex.perceler.office.items.TrunkSip;
+import com.alex.perceler.office.misc.BasicOffice;
+import com.alex.perceler.office.misc.IPRange;
+import com.alex.perceler.office.misc.Office;
 import com.alex.perceler.soap.items.SipTrunkDestination;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -173,7 +177,38 @@ public class DeviceTools
 		}
 	
 	
-	
+	/**
+	 * Will return Devices filtered by IP Range
+	 * @throws Exception 
+	 */
+	public static ArrayList<ItemToMigrate> getDevicesByIpRange(IPRange range) throws Exception
+		{
+		ArrayList<ItemToMigrate> l = new ArrayList<ItemToMigrate>();
+		
+		/**
+		 * First we add the known items such as the ISR and offices
+		 */
+		for(BasicDevice d : Variables.getDeviceList())
+			{
+			if((UsefulMethod.isIPIncludedInThisSubnet(range,d.getIp())) ||
+					(UsefulMethod.isIPIncludedInThisSubnet(range,d.getNewip())))l.add(new Device(d));
+			}
+		
+		for(BasicOffice o : Variables.getOfficeList())
+			{
+			if((o.getVoiceIPRange().compareTo(range)) ||
+					(o.getDataIPRange().compareTo(range)) ||
+					(o.getNewVoiceIPRange().compareTo(range)) ||
+					(o.getNewDataIPRange().compareTo(range)))l.add(new Office(o));
+			}
+		
+		/**
+		 * Then we look for phones
+		 */
+		
+		
+		return l;
+		}
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

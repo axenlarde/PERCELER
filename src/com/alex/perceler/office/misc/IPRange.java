@@ -32,6 +32,17 @@ public class IPRange
 		{
 		return ipRange+"/"+mask;
 		}
+	
+	public boolean compareTo(IPRange range)
+		{
+		if((ipRange.equals(range.getIpRange())) && (mask.equals(range.getMask())))return true;
+		return false;
+		}
+	
+	public String getCIDRFormat()
+		{
+		return ipRange+"/"+mask;
+		}
 
 	public String getIpRange()
 		{

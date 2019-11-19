@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
+import com.alex.perceler.office.items.DevicePool;
 import com.alex.perceler.office.items.MobilityInfo;
+import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itmType;
@@ -25,6 +27,9 @@ public class Office extends ItemToMigrate
 	idCAF,
 	shortname,
 	newName;
+	
+	private MobilityInfo voiceMI, dataMI;
+	private DevicePool dp;
 	
 	private officeType officeType;
 	private IPRange voiceIPRange, dataIPRange, newVoiceIPRange, newDataIPRange;
@@ -67,22 +72,19 @@ public class Office extends ItemToMigrate
 		}
 	
 	@Override
-	public void init() throws Exception
+	public void doInit() throws Exception
 		{
-		// TODO Auto-generated method stub
-		
+		//Write something if needed
 		}
 
 	@Override
-	public void build(actionType action) throws Exception
+	public void doBuild(actionType action) throws Exception
 		{
 		/**
 		 * We need to find one AXL items : mobilityInfo
 		 * To be sure to find the right one we have to send SQL request to the CUCM
 		 * Just using the database is unreliable
 		 */
-		MobilityInfo voiceMI, dataMI;
-		
 		if(action.equals(actionType.rollback))
 			{
 			voiceMI = OfficeTools.getMobilityInfo(newVoiceIPRange);
@@ -102,7 +104,6 @@ public class Office extends ItemToMigrate
 		else
 			{
 			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+voiceIPRange.getInfo());
-			errorList.add(new ErrorTemplate("No mobility info found for voice IP Range "+voiceIPRange.getInfo()));
 			}
 		if(dataMI != null)
 			{
@@ -112,40 +113,59 @@ public class Office extends ItemToMigrate
 		else
 			{
 			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+dataIPRange.getInfo());
-			errorList.add(new ErrorTemplate("No mobility info found for data IP Range "+dataIPRange.getInfo()));
-			}
-		
-		for(ItemToInject iti : axlList)
-			{
-			iti.build();
 			}
 		}
 	
+	/**
+	 * Will check items and return the error list
+	 */
 	@Override
-	public void startSurvey() throws Exception
+	public void doStartSurvey() throws Exception
 		{
-		Variables.getLogger().debug("Starting survey for "+name);
-		
-		//We check for the device pool
-		//To be written
-		
-		for(ItemToInject iti : axlList)
-			{
-			//To be written
-			}
+		//We check for the office device pool
+		dp = new DevicePool(UsefulMethod.getTargetOption("devicepoolprefix")+idcomu);//
+		if(!dp.isExisting())errorList.add(new ErrorTemplate(name+" The associated device pool has not been found : "+dp.getName()));
 		}
 
 	@Override
-	public void migrate() throws Exception
+	public void doUpdate(actionType action) throws Exception
 		{
-		Variables.getLogger().debug("Starting migration for "+type+" "+name);
-		
-		for(ItemToInject iti : axlList)
+		if(action.equals(actionType.update))
 			{
-			iti.update();
+			voiceMI.setSubnet(this.newVoiceIPRange.getIpRange());
+			voiceMI.setSubnetMask(this.newVoiceIPRange.getMask());
+			dataMI.setSubnet(this.newDataIPRange.getIpRange());
+			dataMI.setSubnetMask(this.newDataIPRange.getMask());
+			}
+		else
+			{
+			voiceMI.setSubnet(this.voiceIPRange.getIpRange());
+			voiceMI.setSubnetMask(this.voiceIPRange.getMask());
+			dataMI.setSubnet(this.dataIPRange.getIpRange());
+			dataMI.setSubnetMask(this.dataIPRange.getMask());
 			}
 		}
 	
+	@Override
+	public void doResolve() throws Exception
+		{
+		//Write something if needed
+		}
+	
+	@Override
+	public void doReset()
+		{
+		try
+			{
+			dp.reset();
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while reseting devices for "+type+" "+name+" "+e.getMessage(), e);
+			errorList.add(new ErrorTemplate("Failed to reset the device pool for "+type+" "+name));
+			}
+		}
+
 	public String getIdcomu()
 		{
 		return idcomu;

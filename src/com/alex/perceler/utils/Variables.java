@@ -134,7 +134,8 @@ public class Variables
 		inject,
 		delete,
 		update,
-		rollback
+		rollback,
+		reset
 		};
 	
 	/********************************************
@@ -174,6 +175,7 @@ public class Variables
 		vg,
 		audiocode,
 		ascom,
+		phone,
 		sip
 		};
 	

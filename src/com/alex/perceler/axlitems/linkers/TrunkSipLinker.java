@@ -14,6 +14,7 @@ import com.alex.perceler.misc.SimpleRequest;
 import com.alex.perceler.office.items.TrunkSip;
 import com.alex.perceler.soap.items.SipTrunkDestination;
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.cucmAXLVersion;
 import com.alex.perceler.utils.Variables.itemType;
 
 
@@ -181,7 +182,21 @@ public class TrunkSipLinker extends AXLItemLinker
 		 * We set the item parameters
 		 */
 		req.setName(this.getName());
-		//Has to be written
+		
+		
+		com.cisco.axl.api._10.UpdateSipTrunkReq.Destinations myDest = new com.cisco.axl.api._10.UpdateSipTrunkReq.Destinations();
+		for(int i=0; i<myDestinations.size(); i++)
+			{
+			com.cisco.axl.api._10.XSipTrunkDestination mySTD = new com.cisco.axl.api._10.XSipTrunkDestination();
+			mySTD.setAddressIpv4(myDestinations.get(i).getAddressIpv4());
+			mySTD.setPort(myDestinations.get(i).getPort());
+			mySTD.setSortOrder(Integer.toString(i+1));
+			
+			myDest.getDestination().add(mySTD);
+			}
+		
+		req.setDestinations(myDest);
+		
 		/************/
 		
 		com.cisco.axl.api._10.StandardResponse resp = Variables.getAXLConnectionToCUCMV105().updateSipTrunk(req);//We send the request to the CUCM
@@ -209,6 +224,35 @@ public class TrunkSipLinker extends AXLItemLinker
 		
 		return myT;
 		}
+	
+	/************
+	 * Reset
+	 */
+	public void reset() throws Exception
+		{
+		if(Variables.getCUCMVersion().equals(cucmAXLVersion.version105))
+			{
+			doResetVersion105();
+			}
+		else
+			{
+			throw new Exception("Unsupported AXL Version");
+			}
+		}
+	
+	public void doResetVersion105() throws Exception
+		{
+		com.cisco.axl.api._10.NameAndGUIDRequest req = new com.cisco.axl.api._10.NameAndGUIDRequest();
+		
+		/**
+		 * We set the item parameters
+		 */
+		req.setName(this.name);
+		/************/
+		
+		com.cisco.axl.api._10.StandardResponse resp = Variables.getAXLConnectionToCUCMV105().resetSipTrunk(req);//We send the request to the CUCM
+		}
+	/*************/
 
 	public String getDescription()
 		{

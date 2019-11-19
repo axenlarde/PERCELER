@@ -2,11 +2,10 @@ package com.alex.perceler.misc;
 
 import java.util.ArrayList;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itmType;
+import com.alex.perceler.utils.Variables.statusType;
 
 /**
  * Abstract Item to migrate class
@@ -22,7 +21,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		{
 		init,
 		preaudit,
-		migration,
+		update,
 		postaudit,
 		done,
 		disabled,
@@ -52,15 +51,99 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		}
 	
 	@Override
+	public void init() throws Exception
+		{
+		//Write something if needed
+		
+		doInit();
+		}
+	
+	@Override
+	public void build(actionType action) throws Exception
+		{
+		Variables.getLogger().debug("Starting build for "+type+" "+name);
+		
+		doBuild(action);
+		
+		for(ItemToInject iti : axlList)
+			{
+			iti.build();
+			}
+		}
+	
+	@Override
+	public ArrayList<String> startSurvey() throws Exception
+		{
+		Variables.getLogger().debug("Starting survey for "+type+" "+name);
+		
+		doStartSurvey();
+		
+		for(ItemToInject iti : axlList)
+			{
+			if(!iti.getStatus().equals(statusType.disabled))
+				{
+				errorList.add(new ErrorTemplate(name+" : The following item has not been found and therefore will not be updated : "+iti.getInfo()));
+				}
+			}
+		
+		ArrayList<String> l = new ArrayList<String>();
+		for(ErrorTemplate e : errorList)
+			{
+			l.add(e.getErrorDesc());
+			}
+		
+		return l;
+		}
+	
+	@Override
+	public void update(actionType action) throws Exception
+		{
+		Variables.getLogger().debug("Starting migration for "+type+" "+name);
+		
+		doUpdate(action);
+		
+		for(ItemToInject iti : axlList)
+			{
+			if(!iti.getStatus().equals(statusType.disabled))
+				{
+				iti.update();
+				}
+			else
+				{
+				Variables.getLogger().debug("The following item has been disabled so we do not process it : "+iti.getInfo());
+				}
+			}
+		}
+	
+	@Override
 	public void resolve() throws Exception
 		{
 		Variables.getLogger().debug("Starting resolution for "+type+" "+name);
+		doResolve();
+		
 		for(ItemToInject iti : axlList)
 			{
 			iti.resolve();
 			}
 		}
 	
+	@Override
+	public void reset()
+		{
+		Variables.getLogger().debug("Starting reset for "+type+" "+name);
+		doReset();
+		}
+	
+	@Override
+	public void action(actionType action) throws Exception
+		{
+		switch(action)
+			{
+			case update:update();break;
+			case reset:reset();break;
+			}
+		}
+
 	public itmType getType()
 		{
 		return type;

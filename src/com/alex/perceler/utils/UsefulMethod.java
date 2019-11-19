@@ -19,6 +19,7 @@ import javax.swing.JFileChooser;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.commons.net.util.SubnetUtils;
+import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
 import org.apache.log4j.Level;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -578,19 +579,35 @@ public class UsefulMethod
 		}
 	
 	/**
-	 * Method used to convert a String network mask into an integer one
+	 * Method used to convert a long network mask into a short one
 	 * 
 	 * For instance :
 	 * Convert 255.255.255.0 into 24
 	 * Convert 255.255.240.0 into 20
 	 */
-	public static String convertStringMaskToIntMask(String mask)
+	public static String convertlongMaskToShortOne(String mask)
 		{
 		//We check if mask is a long or a CIDR one
 		if(!Tester.IPValide(mask))return mask;
 		
 		SubnetUtils subnet = new SubnetUtils("192.168.1.0", mask.trim());
 		return subnet.getInfo().getCidrSignature().split("/")[1];
+		}
+	
+	/**
+	 * Method used to convert a short network mask into a long one
+	 * 
+	 * For instance :
+	 * Convert 24 into 255.255.255.0
+	 * Convert 20 into 255.255.240.0
+	 */
+	public static String convertShortMaskToLongOne(String mask)
+		{
+		//We check if mask is a long or a CIDR one
+		if(mask.length()<3)return mask;
+		
+		SubnetUtils subnet = new SubnetUtils("192.168.1.0/"+mask);
+		return subnet.getInfo().getNetmask();
 		}
 	
 	/**********
@@ -903,6 +920,23 @@ public class UsefulMethod
 		else if(type.contains("audiocode"))return itmType.audiocode;
 		else if(type.contains("ascom"))return itmType.ascom;
 		else return itmType.sip;
+		}
+	
+	/**
+	 * Used to check if the IP is in the subnet
+	 */
+	public static boolean isIPIncludedInThisSubnet(IPRange range, String ip)
+		{
+		try
+			{
+			SubnetInfo subnet = new SubnetUtils(range.getCIDRFormat()).getInfo();
+			return subnet.isInRange(ip);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR : "+e.getMessage(),e);
+			}
+		return false;
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

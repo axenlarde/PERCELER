@@ -10,8 +10,6 @@ import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.itemType;
 
-
-
 /**********************************
  * Class used to define an item of type "Device Pool"
  * 
@@ -48,7 +46,6 @@ public class TrunkSip extends ItemToInject
 	useDevicePoolCgpnTransformCssUnkn;
 	
 	private ArrayList<SipTrunkDestination> myDestinations;
-	
 
 	/***************
 	 * Constructor
@@ -271,6 +268,19 @@ public class TrunkSip extends ItemToInject
 			{
 			tuList.add(TrunkSipLinker.toUpdate.myDestinations);
 			}
+		}
+	
+	/**
+	 * Used to reset the device pool and therefore the associated devices
+	 * @throws Exception 
+	 */
+	public void reset() throws Exception
+		{
+		if(this.UUID == null)
+			{
+			myTrunkSip.get();
+			}	
+		myTrunkSip.reset();
 		}
 	
 	public String getDescription()

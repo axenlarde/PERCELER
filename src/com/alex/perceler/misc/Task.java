@@ -67,29 +67,32 @@ public class Task extends Thread
 		}
 	
 	/**
+	 * Start survey process
+	 */
+	private void startSurvey() throws Exception
+		{
+		for(ItemToMigrate myToDo : todoList)
+			{
+			myToDo.startSurvey();
+			}
+		}
+	
+	/**
 	 * Start the real process
 	 */
-	private void startProcess()
+	private void startProcess(actionType action)
 		{
 		for(ItemToMigrate myToDo : todoList)
 			{
 			try
 				{
-				myToDo.migrate();
+				myToDo.action(action);
 				}
 			catch (Exception e)
 				{
 				Variables.getLogger().error("An error occured with the item \""+myToDo.getName()+"\" : "+e.getMessage(), e);
 				myToDo.setStatus(itmStatus.error);
 				}
-			}
-		}
-	
-	private void startSurvey() throws Exception
-		{
-		for(ItemToMigrate myToDo : todoList)
-			{
-			myToDo.startSurvey();
 			}
 		}
 	
@@ -102,12 +105,15 @@ public class Task extends Thread
 			status = itmStatus.preaudit;
 			startBuildProcess();
 			startSurvey();
-			status = itmStatus.migration;
+			status = itmStatus.update;
+			
+			//We then wait for the user to accept the migration
 			while(pause)
 				{
 				this.sleep(500);
 				}
-			startProcess();
+			startProcess(actionType.update);
+			startProcess(actionType.reset);
 			status = itmStatus.postaudit;
 			startSurvey();//Once finished we proceed with another survey
 			status = itmStatus.done;

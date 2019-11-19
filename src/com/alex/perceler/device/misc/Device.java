@@ -3,12 +3,15 @@ package com.alex.perceler.device.misc;
 import java.util.ArrayList;
 
 import com.alex.perceler.cli.OneLine;
+import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.items.SRSTReference;
 import com.alex.perceler.office.items.TrunkSip;
+import com.alex.perceler.soap.items.SipTrunkDestination;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
+import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
 
 /**
@@ -67,15 +70,14 @@ public class Device extends ItemToMigrate
 		}
 	
 	@Override
-	public void init() throws Exception
+	public void doInit() throws Exception
 		{
-		// TODO Auto-generated method stub
-		
+		//Write something if needed
 		}
 	
 	//To init the item
 	@Override
-	public void build(actionType action) throws Exception
+	public void doBuild(actionType action) throws Exception
 		{
 		/**
 		 * First we find the related CUCM items
@@ -111,11 +113,6 @@ public class Device extends ItemToMigrate
 				}
 			}
 		
-		for(ItemToInject iti : axlList)
-			{
-			iti.build();
-			}
-		
 		/**
 		 * Then we initialize the CLI list
 		 */
@@ -123,41 +120,78 @@ public class Device extends ItemToMigrate
 		}
 
 	@Override
-	public void startSurvey() throws Exception
+	public void doStartSurvey() throws Exception
 		{
-		Variables.getLogger().debug("Starting survey for "+type+" "+name);
-		
-		reachable = DeviceTools.ping(ip);
-		
-		for(ItemToInject iti : axlList)
+		if(type.equals(itmType.phone))
 			{
-			//Here we just want to know if the object exists in the CUCM
-			//So this will just try to get the UUID of the item
-			if(!iti.isExisting())
-				{
-				//If the item doesn't exist we set the item as unreachable
-				//Doing so, we discourage the user to migrate it
-				//Maybe we will change that later
-				Variables.getLogger().debug("The item "+iti.getType().name()+" "+iti.getName()+" doesn't exist in the CUCM, so we declare the whole item as unreachable");
-				reachable = false;
-				break;
-				}
+			
+			}
+		else
+			{
+			reachable = DeviceTools.ping(ip);
+			if(!reachable)errorList.add(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
 			}
 		}
 
 	@Override
-	public void migrate() throws Exception
+	public void doUpdate(actionType action) throws Exception
 		{
-		Variables.getLogger().debug("Starting migration for "+type+" "+name);
-		
-		//To be written
+		String nip,cip;
+		if(action.equals(actionType.rollback))
+			{
+			cip = newip;
+			nip = ip;
+			}
+		else
+			{
+			cip = ip;
+			nip = newip;
+			}
 		
 		for(ItemToInject iti : axlList)
 			{
-			iti.update();
+			if(iti.getType().equals(itemType.trunksip))
+				{
+				for(SipTrunkDestination std : ((TrunkSip)iti).getMyDestinations())
+					{
+					if(std.getAddressIpv4().equals(cip))std.setAddressIpv4(nip);
+					}
+				}
+			else if(iti.getType().equals(itemType.srstreference))
+				{
+				if(((SRSTReference)iti).getIpAddress().equals(cip))((SRSTReference)iti).setIpAddress(nip);
+				}
 			}
+		
+		//Same for clid
 		}
 	
+	@Override
+	public void doResolve() throws Exception
+		{
+		//Write something if needed
+		}
+	
+	@Override
+	public void doReset()
+		{
+		try
+			{
+			for(ItemToInject iti : axlList)
+				{
+				if(iti.getType().equals(itemType.trunksip))
+					{
+					//In case of trunk SIP we must reset it to apply changes
+					((TrunkSip) iti).reset();
+					}
+				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while reseting sip trunk for "+type+" "+name+" "+e.getMessage(), e);
+			errorList.add(new ErrorTemplate("Failed to reset the sip trunk for "+type+" "+name));
+			}
+		}
 	
 	public String getIp()
 		{

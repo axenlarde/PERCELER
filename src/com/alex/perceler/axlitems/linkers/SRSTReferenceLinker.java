@@ -94,7 +94,8 @@ public class SRSTReferenceLinker extends AXLItemLinker
 		 * We set the item parameters
 		 */
 		req.setName(this.getName());
-		//Has to be written
+		req.setIpAddress(this.ipAddress);
+		req.setSipNetwork(this.ipAddress);
 		/************/
 		
 		com.cisco.axl.api._10.StandardResponse resp = Variables.getAXLConnectionToCUCMV105().updateSrst(req);//We send the request to the CUCM
