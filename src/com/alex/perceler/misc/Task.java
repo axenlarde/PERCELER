@@ -51,17 +51,7 @@ public class Task extends Thread
 		Variables.getLogger().info("Beginning of the build process");
 		for(ItemToMigrate todo : todoList)
 			{
-			todo.build(action);
-			
-			/*
-			if(todo.getErrorList().size() != 0)
-				{
-				for(ErrorTemplate e : todo.getErrorList())
-					{
-					Variables.getLogger().debug("- "+e.getTargetName()+" "+e.getIssueName()+" "+e.getErrorDesc()+" "+e.getError().name()+" "+e.getIssueType().name());
-					}
-				todo.setStatus(itmStatus.disabled);
-				}*/
+			todo.build();
 			}
 		Variables.getLogger().info("End of the build process");
 		}
@@ -71,22 +61,26 @@ public class Task extends Thread
 	 */
 	private void startSurvey() throws Exception
 		{
+		Variables.getLogger().info("Beginning of the survey process");
 		for(ItemToMigrate myToDo : todoList)
 			{
 			myToDo.startSurvey();
 			}
+		Variables.getLogger().info("End of the survey process");
 		}
 	
 	/**
 	 * Start the real process
 	 */
-	private void startProcess(actionType action)
+	private void startUpdate()
 		{
+		Variables.getLogger().info("Beginning of the update process");
 		for(ItemToMigrate myToDo : todoList)
 			{
 			try
 				{
-				myToDo.action(action);
+				if(!myToDo.getStatus().equals(itmStatus.disabled))myToDo.update();
+				else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 				}
 			catch (Exception e)
 				{
@@ -94,13 +88,28 @@ public class Task extends Thread
 				myToDo.setStatus(itmStatus.error);
 				}
 			}
+		Variables.getLogger().info("End of the update process");
+		}
+	
+	/**
+	 * Start reset process
+	 */
+	private void startReset()
+		{
+		Variables.getLogger().info("Beginning of the reset process");
+		for(ItemToMigrate myToDo : todoList)
+			{
+			if(!myToDo.getStatus().equals(itmStatus.disabled))myToDo.reset();
+			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
+			}
+		Variables.getLogger().info("End of the reset process");
 		}
 	
 	public void run()
 		{
 		try
 			{
-			Variables.getLogger().info("Task "+taskID+" begins");
+			Variables.getLogger().info(action+" task "+taskID+" begins");
 			started = true;
 			status = itmStatus.preaudit;
 			startBuildProcess();
@@ -112,14 +121,14 @@ public class Task extends Thread
 				{
 				this.sleep(500);
 				}
-			startProcess(actionType.update);
-			startProcess(actionType.reset);
+			startUpdate();
+			startReset();
 			status = itmStatus.postaudit;
 			startSurvey();//Once finished we proceed with another survey
 			status = itmStatus.done;
 			
 			end = true;
-			Variables.getLogger().info("Task ends");
+			Variables.getLogger().info(action+" task "+taskID+" ends");
 			Variables.setUuidList(new ArrayList<storedUUID>());//We clean the UUID list
 			Variables.getLogger().info("UUID list cleared");
 			}

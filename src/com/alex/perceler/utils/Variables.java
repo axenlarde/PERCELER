@@ -15,6 +15,7 @@ import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.misc.storedUUID;
 import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.Office;
+import com.cisco.schemas.ast.soap.RisPortType;
 
 
 /**********************************
@@ -222,7 +223,10 @@ public class Variables
 	
 	//AXL
     private static com.cisco.axlapiservice10.AXLPort AXLConnectionToCUCMV105;//Connection to CUCM version 105
-		
+	
+    //RISPORT
+    private static RisPortType risConnection;
+    
     /**************
      * Constructor
      **************/
@@ -538,6 +542,20 @@ public class Variables
 	public static synchronized void setTaskList(ArrayList<Task> taskList)
 		{
 		Variables.taskList = taskList;
+		}
+
+	public static RisPortType getRisConnection() throws Exception
+		{
+		if(risConnection == null)
+			{
+			UsefulMethod.initRISConnectionToCUCM();
+			}
+		return risConnection;
+		}
+
+	public static void setRisConnection(RisPortType risConnection)
+		{
+		Variables.risConnection = risConnection;
 		}
 	
 	

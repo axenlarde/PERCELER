@@ -18,6 +18,7 @@ import com.alex.perceler.office.misc.Office;
 import com.alex.perceler.soap.items.SipTrunkDestination;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.actionType;
 
 /**
  * Device toolbox
@@ -181,7 +182,7 @@ public class DeviceTools
 	 * Will return Devices filtered by IP Range
 	 * @throws Exception 
 	 */
-	public static ArrayList<ItemToMigrate> getDevicesByIpRange(IPRange range) throws Exception
+	public static ArrayList<ItemToMigrate> getDevicesByIpRange(IPRange range, actionType action) throws Exception
 		{
 		ArrayList<ItemToMigrate> l = new ArrayList<ItemToMigrate>();
 		
@@ -191,7 +192,7 @@ public class DeviceTools
 		for(BasicDevice d : Variables.getDeviceList())
 			{
 			if((UsefulMethod.isIPIncludedInThisSubnet(range,d.getIp())) ||
-					(UsefulMethod.isIPIncludedInThisSubnet(range,d.getNewip())))l.add(new Device(d));
+					(UsefulMethod.isIPIncludedInThisSubnet(range,d.getNewip())))l.add(new Device(d, action));
 			}
 		
 		for(BasicOffice o : Variables.getOfficeList())
@@ -199,13 +200,13 @@ public class DeviceTools
 			if((o.getVoiceIPRange().compareTo(range)) ||
 					(o.getDataIPRange().compareTo(range)) ||
 					(o.getNewVoiceIPRange().compareTo(range)) ||
-					(o.getNewDataIPRange().compareTo(range)))l.add(new Office(o));
+					(o.getNewDataIPRange().compareTo(range)))l.add(new Office(o, action));
 			}
 		
 		/**
 		 * Then we look for phones
 		 */
-		
+		//To be written
 		
 		return l;
 		}

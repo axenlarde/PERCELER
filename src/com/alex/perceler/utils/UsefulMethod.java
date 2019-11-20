@@ -33,11 +33,14 @@ import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.IPRange;
 import com.alex.perceler.office.misc.Office;
+import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.Variables.SubstituteType;
 import com.alex.perceler.utils.Variables.cucmAXLVersion;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
 import com.alex.perceler.utils.Variables.officeType;
+import com.cisco.schemas.ast.soap.RISService70;
+import com.cisco.schemas.ast.soap.RisPortType;
 
 
 /**********************************
@@ -439,7 +442,7 @@ public class UsefulMethod
 				Variables.setAXLConnectionToCUCMV105(axlPort);
 				}
 			
-			Variables.getLogger().debug("WSDL Initialization done");
+			Variables.getLogger().debug("AXL WSDL Initialization done");
 			
 			/**
 			 * We now check if the CUCM is reachable by asking him its version
@@ -449,7 +452,50 @@ public class UsefulMethod
 			}
 		catch (Exception e)
 			{
-			Variables.getLogger().error("Error while initializing CUCM connection : "+e.getMessage(),e);
+			Variables.getLogger().error("Error while initializing AXL CUCM connection : "+e.getMessage(),e);
+			Variables.setCUCMReachable(false);
+			throw e;
+			}
+		}
+	
+	/******
+	 * Method used to initialize the AXL Connection to the CUCM
+	 */
+	public static synchronized void initRISConnectionToCUCM() throws Exception
+		{
+		try
+			{
+			UsefulMethod.disableSecurity();//We first turned off security
+			
+			if(Variables.getCUCMVersion().equals(cucmAXLVersion.version85))
+				{
+				throw new Exception("RIS unsupported version");
+				}
+			else if(Variables.getCUCMVersion().equals(cucmAXLVersion.version105))
+				{
+				RISService70 ris = new RISService70();
+				RisPortType risPort = ris.getRisPort70();
+				
+				// Set the URL, user, and password on the JAX-WS client
+				String validatorUrl = "https://"+UsefulMethod.getTargetOption("rishost")+":"+UsefulMethod.getTargetOption("risport")+"/realtimeservice2/services/RISService70";
+				
+				((BindingProvider) risPort).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, validatorUrl);
+				((BindingProvider) risPort).getRequestContext().put(BindingProvider.USERNAME_PROPERTY, UsefulMethod.getTargetOption("risusername"));
+				((BindingProvider) risPort).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, UsefulMethod.getTargetOption("rispassword"));
+				
+				Variables.setRisConnection(risPort);
+				}
+			
+			Variables.getLogger().debug("RIS WSDL Initialization done");
+			
+			/**
+			 * We now check if the RSI service works by asking a simple request
+			 */
+			if(RisportTools.getPhoneStatus("SEP1234567890EF") == null)throw new Exception("RIS test query return null");
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("Error while initializing RIS CUCM connection : "+e.getMessage(),e);
 			Variables.setCUCMReachable(false);
 			throw e;
 			}

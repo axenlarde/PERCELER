@@ -34,22 +34,26 @@ public class TaskManager
 				for(String s : itemList)
 					{
 					boolean found = false;
+					//Devices
 					for(BasicDevice d : Variables.getDeviceList())
 						{
 						if(d.getId().equals(s))
 							{
-							todoList.add(new Device(d));
+							//In case of rollback we reverse the old and new values
+							todoList.add(new Device(d, action));
 							found = true;
 							break;
 							}
 						}
 					if(!found)
 						{
+						//Offices
 						for(BasicOffice o : Variables.getOfficeList())
 							{
 							if(o.getId().equals(s))
 								{
-								todoList.add(new Office(o));
+								//In case of rollback we reverse the old and new values
+								todoList.add(new Office(o, action));
 								found = true;
 								break;
 								}

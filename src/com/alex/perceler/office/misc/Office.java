@@ -2,11 +2,13 @@ package com.alex.perceler.office.misc;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.items.DevicePool;
 import com.alex.perceler.office.items.MobilityInfo;
+import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
@@ -30,38 +32,67 @@ public class Office extends ItemToMigrate
 	
 	private MobilityInfo voiceMI, dataMI;
 	private DevicePool dp;
+	private ArrayList<BasicPhone> phoneList;
 	
 	private officeType officeType;
 	private IPRange voiceIPRange, dataIPRange, newVoiceIPRange, newDataIPRange;
 
 	public Office(String name, String id, String idcomu, String idCAF, String shortname,
 			String newName, officeType officeType, String voiceIPRange,
-			String dataIPRange, String newVoiceIPRange, String newDataIPRange)
+			String dataIPRange, String newVoiceIPRange, String newDataIPRange, actionType action)
 		{
-		super(itmType.office, name, id);
+		super(itmType.office, name, id, action);
 		this.idcomu = idcomu;
 		this.idCAF = idCAF;
 		this.shortname = shortname;
 		this.newName = newName;
 		this.officeType = officeType;
-		this.voiceIPRange = new IPRange(voiceIPRange);
-		this.dataIPRange = new IPRange(dataIPRange);
-		this.newVoiceIPRange = new IPRange(newVoiceIPRange);
-		this.newDataIPRange = new IPRange(newDataIPRange);
+		
+		/**
+		 * In case of rollback we reverse the following values
+		 */
+		if(action.equals(actionType.rollback))
+			{
+			this.voiceIPRange = new IPRange(newVoiceIPRange);
+			this.dataIPRange = new IPRange(newDataIPRange);
+			this.newVoiceIPRange = new IPRange(voiceIPRange);
+			this.newDataIPRange = new IPRange(dataIPRange);
+			}
+		else
+			{
+			this.voiceIPRange = new IPRange(voiceIPRange);
+			this.dataIPRange = new IPRange(dataIPRange);
+			this.newVoiceIPRange = new IPRange(newVoiceIPRange);
+			this.newDataIPRange = new IPRange(newDataIPRange);
+			}
 		}
 	
-	public Office(BasicOffice bo)
+	public Office(BasicOffice bo, actionType action)
 		{
-		super(itmType.office, bo.getFullname(), bo.getId());
+		super(itmType.office, bo.getFullname(), bo.getId(), action);
 		this.idcomu = bo.getIdcomu();
 		this.idCAF = bo.getIdCAF();
 		this.shortname = bo.getShortname();
 		this.newName = bo.getNewName();
 		this.officeType = bo.getOfficeType();
-		this.voiceIPRange = bo.getVoiceIPRange();
-		this.dataIPRange = bo.getDataIPRange();
-		this.newVoiceIPRange = bo.getNewVoiceIPRange();
-		this.newDataIPRange = bo.getNewDataIPRange();
+		
+		/**
+		 * In case of rollback we reverse the following values
+		 */
+		if(action.equals(actionType.rollback))
+			{
+			this.voiceIPRange = bo.getNewVoiceIPRange();
+			this.dataIPRange = bo.getNewDataIPRange();
+			this.newVoiceIPRange = bo.getVoiceIPRange();
+			this.newDataIPRange = bo.getDataIPRange();
+			}
+		else
+			{
+			this.voiceIPRange = bo.getVoiceIPRange();
+			this.dataIPRange = bo.getDataIPRange();
+			this.newVoiceIPRange = bo.getNewVoiceIPRange();
+			this.newDataIPRange = bo.getNewDataIPRange();
+			}
 		}
 
 	@Override
@@ -78,23 +109,15 @@ public class Office extends ItemToMigrate
 		}
 
 	@Override
-	public void doBuild(actionType action) throws Exception
+	public void doBuild() throws Exception
 		{
 		/**
 		 * We need to find one AXL items : mobilityInfo
 		 * To be sure to find the right one we have to send SQL request to the CUCM
 		 * Just using the database is unreliable
 		 */
-		if(action.equals(actionType.rollback))
-			{
-			voiceMI = OfficeTools.getMobilityInfo(newVoiceIPRange);
-			dataMI = OfficeTools.getMobilityInfo(newDataIPRange);
-			}
-		else
-			{
-			voiceMI = OfficeTools.getMobilityInfo(voiceIPRange);
-			dataMI = OfficeTools.getMobilityInfo(dataIPRange);
-			}
+		voiceMI = OfficeTools.getMobilityInfo(voiceIPRange);
+		dataMI = OfficeTools.getMobilityInfo(dataIPRange);
 		
 		if(voiceMI != null)
 			{
@@ -114,6 +137,16 @@ public class Office extends ItemToMigrate
 			{
 			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+dataIPRange.getInfo());
 			}
+		
+		/**
+		 * We build the associated device pool
+		 */
+		dp = new DevicePool(UsefulMethod.getTargetOption("devicepoolprefix")+idcomu);
+		
+		/**
+		 * We now build the associated phone list
+		 */
+		phoneList = OfficeTools.getDevicePoolPhoneList(dp.getName());
 		}
 	
 	/**
@@ -123,27 +156,25 @@ public class Office extends ItemToMigrate
 	public void doStartSurvey() throws Exception
 		{
 		//We check for the office device pool
-		dp = new DevicePool(UsefulMethod.getTargetOption("devicepoolprefix")+idcomu);//
-		if(!dp.isExisting())errorList.add(new ErrorTemplate(name+" The associated device pool has not been found : "+dp.getName()));
+		if(!dp.isExisting())errorList.add(new ErrorTemplate(name+" warning the associated device pool has not been found : "+dp.getName()));
+		
+		//We get the associated phones status
+		phoneList = RisportTools.doPhoneSurvey(phoneList);
+		for()
 		}
 
 	@Override
-	public void doUpdate(actionType action) throws Exception
+	public void doUpdate() throws Exception
 		{
-		if(action.equals(actionType.update))
-			{
-			voiceMI.setSubnet(this.newVoiceIPRange.getIpRange());
-			voiceMI.setSubnetMask(this.newVoiceIPRange.getMask());
-			dataMI.setSubnet(this.newDataIPRange.getIpRange());
-			dataMI.setSubnetMask(this.newDataIPRange.getMask());
-			}
-		else
-			{
-			voiceMI.setSubnet(this.voiceIPRange.getIpRange());
-			voiceMI.setSubnetMask(this.voiceIPRange.getMask());
-			dataMI.setSubnet(this.dataIPRange.getIpRange());
-			dataMI.setSubnetMask(this.dataIPRange.getMask());
-			}
+		/**
+		 * here we first used the current values to check that
+		 * the items exists. Now we are about to proceed with the update so
+		 * we change the values with the new ones 
+		 */
+		voiceMI.setSubnet(this.newVoiceIPRange.getIpRange());
+		voiceMI.setSubnetMask(this.newVoiceIPRange.getMask());
+		dataMI.setSubnet(this.newDataIPRange.getIpRange());
+		dataMI.setSubnetMask(this.newDataIPRange.getMask());
 		}
 	
 	@Override
@@ -274,6 +305,16 @@ public class Office extends ItemToMigrate
 	public void setNewDataIPRange(IPRange newDataIPRange)
 		{
 		this.newDataIPRange = newDataIPRange;
+		}
+
+	public ArrayList<BasicPhone> getPhoneList()
+		{
+		return phoneList;
+		}
+
+	public void setPhoneList(ArrayList<BasicPhone> phoneList)
+		{
+		this.phoneList = phoneList;
 		}
 
 	

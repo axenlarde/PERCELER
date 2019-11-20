@@ -13,6 +13,7 @@ import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
+import com.alex.perceler.utils.Variables.statusType;
 
 /**
  * Represent a device
@@ -37,28 +38,67 @@ public class Device extends ItemToMigrate
 	private ArrayList<OneLine> cliList;
 
 	public Device(itmType type, String id, String name, String ip, String mask, String gateway, String officeid, String newip,
-			String newgateway, String newmask) throws Exception
+			String newgateway, String newmask, actionType action) throws Exception
 		{
-		super(type, name, id);
+		super(type, name, id, action);
+		this.officeid = officeid;
+		
 		this.ip = ip;
 		this.mask = mask;
 		this.gateway = gateway;
-		this.officeid = officeid;
 		this.newip = newip;
 		this.newgateway = newgateway;
 		this.newmask = newmask;
+		
+		/**
+		 * In case of rollback we reverse the following values
+		 */
+		if(action.equals(actionType.rollback))
+			{
+			this.ip = newip;
+			this.mask = newmask;
+			this.gateway = newgateway;
+			this.newip = ip;
+			this.newgateway = gateway;
+			this.newmask = mask;
+			}
+		else
+			{
+			this.ip = ip;
+			this.mask = mask;
+			this.gateway = gateway;
+			this.newip = newip;
+			this.newgateway = newgateway;
+			this.newmask = newmask;
+			}
 		}
 	
-	public Device(BasicDevice bd)
+	public Device(BasicDevice bd, actionType action)
 		{
-		super(bd.getType(), bd.getName(), bd.getId());
-		this.ip = bd.getId();
-		this.mask = bd.getMask();
-		this.gateway = bd.getGateway();
+		super(bd.getType(), bd.getName(), bd.getId(), action);
 		this.officeid = bd.getOfficeid();
-		this.newip = bd.getNewip();
-		this.newgateway = bd.getNewgateway();
-		this.newmask = bd.getNewmask();
+		
+		/**
+		 * In case of rollback we reverse the following values
+		 */
+		if(action.equals(actionType.rollback))
+			{
+			this.ip = bd.getNewip();
+			this.mask = bd.getNewmask();
+			this.gateway = bd.getNewgateway();
+			this.newip = bd.getIp();
+			this.newgateway = bd.getGateway();
+			this.newmask = bd.getMask();
+			}
+		else
+			{
+			this.ip = bd.getIp();
+			this.mask = bd.getMask();
+			this.gateway = bd.getGateway();
+			this.newip = bd.getNewip();
+			this.newgateway = bd.getNewgateway();
+			this.newmask = bd.getNewmask();
+			}
 		}
 	
 	@Override
@@ -77,7 +117,7 @@ public class Device extends ItemToMigrate
 	
 	//To init the item
 	@Override
-	public void doBuild(actionType action) throws Exception
+	public void doBuild() throws Exception
 		{
 		/**
 		 * First we find the related CUCM items
@@ -129,37 +169,37 @@ public class Device extends ItemToMigrate
 		else
 			{
 			reachable = DeviceTools.ping(ip);
-			if(!reachable)errorList.add(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
+			if(!reachable)
+				{
+				/**
+				 * If the device is not reachable, we should not update the CUCM data. So we disable the entire item
+				 */
+				status = itmStatus.disabled;
+				errorList.add(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
+				}
 			}
 		}
 
 	@Override
-	public void doUpdate(actionType action) throws Exception
+	public void doUpdate() throws Exception
 		{
-		String nip,cip;
-		if(action.equals(actionType.rollback))
-			{
-			cip = newip;
-			nip = ip;
-			}
-		else
-			{
-			cip = ip;
-			nip = newip;
-			}
-		
+		/**
+		 * here we first used the current values to check that
+		 * the items exists. Now we are about to proceed with the update so
+		 * we change the values with the new ones 
+		 */
 		for(ItemToInject iti : axlList)
 			{
 			if(iti.getType().equals(itemType.trunksip))
 				{
 				for(SipTrunkDestination std : ((TrunkSip)iti).getMyDestinations())
 					{
-					if(std.getAddressIpv4().equals(cip))std.setAddressIpv4(nip);
+					if(std.getAddressIpv4().equals(ip))std.setAddressIpv4(newip);
 					}
 				}
 			else if(iti.getType().equals(itemType.srstreference))
 				{
-				if(((SRSTReference)iti).getIpAddress().equals(cip))((SRSTReference)iti).setIpAddress(nip);
+				if(((SRSTReference)iti).getIpAddress().equals(ip))((SRSTReference)iti).setIpAddress(newip);
 				}
 			}
 		

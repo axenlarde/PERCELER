@@ -6,9 +6,9 @@ import java.util.List;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.SimpleRequest;
 import com.alex.perceler.office.items.MobilityInfo;
-import com.alex.perceler.office.items.SRSTReference;
 import com.alex.perceler.utils.Variables;
 
 /**
@@ -61,7 +61,52 @@ public class OfficeTools
 		return null;
 		}
 	
-	
+	/**
+	 * Used to get a devicepool associated phones
+	 */
+	public static ArrayList<BasicPhone> getDevicePoolPhoneList(String DevicePoolName)
+		{
+		ArrayList<BasicPhone> l = new ArrayList<BasicPhone>();
+		
+		String request = "select d.name, d.description, tm.name as model from device d, devicepool dp, typemodel tm where dp.pkid=d.fkdevicepool and tm.enum=d.tkmodel and dp.name='"+DevicePoolName+"'";
+		
+		try
+			{
+			List<Object> reply = SimpleRequest.doSQLQuery(request);
+			
+			for(Object o : reply)
+				{
+				BasicPhone bp = new BasicPhone("TBD", "", "");
+				Element rowElement = (Element) o;
+				NodeList list = rowElement.getChildNodes();
+				
+				for(int i = 0; i< list.getLength(); i++)
+					{
+					if(list.item(i).getNodeName().equals("name"))
+						{
+						bp.setName(list.item(i).getTextContent());
+						}
+					else if(list.item(i).getNodeName().equals("description"))
+						{
+						bp.setDescription(list.item(i).getTextContent());
+						}
+					else if(list.item(i).getNodeName().equals("model"))
+						{
+						bp.setModel(list.item(i).getTextContent());
+						}
+					}
+				l.add(bp);
+				}
+			Variables.getLogger().debug("Found "+l.size()+" phones for "+DevicePoolName);
+			return l;
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while trying to get the devicepool's phones for "+DevicePoolName+" "+e.getMessage(),e);
+			}
+		
+		return null;
+		}
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

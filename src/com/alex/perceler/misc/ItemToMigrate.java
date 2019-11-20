@@ -28,6 +28,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		error
 		};
 	
+	protected actionType action;
 	protected itmType type;
 	protected itmStatus status;
 	protected String id,name;
@@ -40,9 +41,10 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	/**
 	 * Constructor
 	 */
-	public ItemToMigrate(itmType type, String name, String id)
+	public ItemToMigrate(itmType type, String name, String id, actionType action)
 		{
 		super();
+		this.action = action;
 		this.type = type;
 		this.name = name;
 		this.id = id;
@@ -59,11 +61,11 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		}
 	
 	@Override
-	public void build(actionType action) throws Exception
+	public void build() throws Exception
 		{
 		Variables.getLogger().debug("Starting build for "+type+" "+name);
 		
-		doBuild(action);
+		doBuild();
 		
 		for(ItemToInject iti : axlList)
 			{
@@ -96,11 +98,11 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		}
 	
 	@Override
-	public void update(actionType action) throws Exception
+	public void update() throws Exception
 		{
 		Variables.getLogger().debug("Starting migration for "+type+" "+name);
 		
-		doUpdate(action);
+		doUpdate();
 		
 		for(ItemToInject iti : axlList)
 			{
@@ -132,16 +134,6 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		{
 		Variables.getLogger().debug("Starting reset for "+type+" "+name);
 		doReset();
-		}
-	
-	@Override
-	public void action(actionType action) throws Exception
-		{
-		switch(action)
-			{
-			case update:update();break;
-			case reset:reset();break;
-			}
 		}
 
 	public itmType getType()
@@ -212,6 +204,16 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	public void setErrorList(ArrayList<ErrorTemplate> errorList)
 		{
 		this.errorList = errorList;
+		}
+
+	public actionType getAction()
+		{
+		return action;
+		}
+
+	public void setAction(actionType action)
+		{
+		this.action = action;
 		}
 
 	
