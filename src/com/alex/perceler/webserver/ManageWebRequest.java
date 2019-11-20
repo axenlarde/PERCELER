@@ -2,8 +2,12 @@ package com.alex.perceler.webserver;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.action.TaskManager;
+import com.alex.perceler.misc.Task;
+import com.alex.perceler.misc.Task.taskActionType;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.xMLGear;
 import com.cisco.axl.api._10.LUser;
 
@@ -18,36 +22,23 @@ public class ManageWebRequest
 	/**
 	 * Variables
 	 */
-	/**
-	 * web request
-	 */
 	public enum webRequestType
 		{
 		doAuthenticate,
 		getOfficeList,
 		getDeviceList,
-		setItemToMigrate,
-		getCurrentTask,
-		getTaskStatus,
-		getTaskHistory,
+		getTaskList,
+		getDevice,
+		getOffice,
 		getTask,
-		startMigration,
+		newTask,
+		setTask,
 		success,
 		error
 		}
 	
 	/**
-	 * Will decode web request
-	 * 
-	 * Web request format :
-	 * <xml>
-	 * 	<request>
-	 * 		<type>webRequestType<type>
-	 * 		<content>
-	 * 			<...>
-	 * 		</content>
-	 * 	</request>
- 	 * </xml> 
+	 * Parse a web request
 	 * @throws Exception 
 	 */
 	public synchronized static WebRequest parseWebRequest(String content) throws Exception
@@ -64,280 +55,233 @@ public class ManageWebRequest
 		}
 	
 	/**
-	 * Get all the CUCM users
+	 * doAuthenticate
 	 */
-	/*
-	public synchronized static WebRequest getCUCMUsers(String content)
+	public synchronized static WebRequest doAuthenticate(String content)	
 		{
 		try
 			{
-			com.cisco.axl.api._10.ListUserReq req = new com.cisco.axl.api._10.ListUserReq();
-			com.cisco.axl.api._10.ListUserReq.SearchCriteria sc = new com.cisco.axl.api._10.ListUserReq.SearchCriteria();
-			com.cisco.axl.api._10.LUser rt = new com.cisco.axl.api._10.LUser();
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("request");
+			params.add("content");
 			
-			sc.setUserid("");
-			rt.setUuid("");
-			rt.setLastName("");
-			rt.setFirstName("");
-			rt.setUserid("");
-			rt.setMailid("");
-			rt.setTelephoneNumber("");//Should be improved, we should instead retrieve the associated line
+			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
+			String[][] t = parsed.get(0);
 			
-			req.setSearchCriteria(sc);
-			req.setReturnedTags(rt);
+			String userID = UsefulMethod.getItemByName("userid", t);
+			String password = UsefulMethod.getItemByName("userpassword", t);
 			
-			com.cisco.axl.api._10.ListUserRes resp = Variables.getAXLConnectionToCUCMV105().listUser(req);
+			if(UsefulMethod.doAuthenticate(userID, password))return WebRequestBuilder.buildWebRequest(webRequestType.success, null);
+			else return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing doAuthenticate web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * getOfficeList
+	 */
+	public synchronized static WebRequest getOfficeList()	
+		{
+		try
+			{
+			return WebRequestBuilder.buildWebRequest(webRequestType.getOfficeList, null);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing getOfficeList web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * getDeviceList
+	 */
+	public synchronized static WebRequest getDeviceList()	
+		{
+		try
+			{
+			return WebRequestBuilder.buildWebRequest(webRequestType.getDeviceList, null);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing getDeviceList web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * getTaskList
+	 */
+	public synchronized static WebRequest getTaskList()	
+		{
+		try
+			{
+			return WebRequestBuilder.buildWebRequest(webRequestType.getTaskList, null);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing getTaskList web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * getOffice
+	 */
+	public synchronized static WebRequest getOffice(String content)	
+		{
+		try
+			{
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("request");
+			params.add("content");
 			
-			ArrayList<CUCMUser> ul = new ArrayList<CUCMUser>();
+			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
+			String[][] t = parsed.get(0);
 			
-			for(LUser u : resp.getReturn().getUser())
+			String officeID = UsefulMethod.getItemByName("officeid", t);
+			return WebRequestBuilder.buildWebRequest(webRequestType.getOffice, officeID);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing getOffice web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * getDevice
+	 */
+	public synchronized static WebRequest getDevice(String content)	
+		{
+		try
+			{
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("request");
+			params.add("content");
+			
+			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
+			String[][] t = parsed.get(0);
+			
+			String deviceID = UsefulMethod.getItemByName("deviceid", t);
+			return WebRequestBuilder.buildWebRequest(webRequestType.getDevice, deviceID);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing getDevice web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * getTask
+	 */
+	public synchronized static WebRequest getTask(String content)	
+		{
+		try
+			{
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("request");
+			params.add("content");
+			
+			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
+			String[][] t = parsed.get(0);
+			
+			String taskID = UsefulMethod.getItemByName("taskid", t);
+			return WebRequestBuilder.buildWebRequest(webRequestType.getTask, taskID);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing getTask web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * newTask
+	 */
+	public synchronized static WebRequest newTask(String content)	
+		{
+		try
+			{
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("request");
+			params.add("content");
+			
+			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
+			String[][] tab = parsed.get(0);
+			
+			actionType action = actionType.valueOf(UsefulMethod.getItemByName("action", tab));
+			String ownerid = UsefulMethod.getItemByName("ownerid", tab);
+			
+			params.add("itemlist");
+			parsed = xMLGear.getResultListTab(content, params);
+			tab = parsed.get(0);
+			ArrayList<String> idList = new ArrayList<String>();
+			
+			for(String[] t : tab)
 				{
-				ul.add(new CUCMUser(u.getFirstName(),
-						u.getLastName(),
-						u.getUserid(),
-						u.getMailid(),
-						u.getTelephoneNumber(),
-						u.getUuid()));
+				idList.add(t[1]);
 				}
 			
-			Variables.getLogger().debug(ul.size()+" user retrieved form CUCM");
+			String taskID = TaskManager.addNewTask(idList, action, ownerid);
 			
-			return WebRequestBuilder.buildGetCUCMUsersReply(ul);
+			return WebRequestBuilder.buildWebRequest(webRequestType.getTask, taskID);
 			}
 		catch (Exception e)
 			{
-			Variables.getLogger().error("Error while fetching CUCM users : "+e.getMessage(),e);
+			Variables.getLogger().error("ERROR while processing newTask web request : "+e.getMessage(),e);
 			}
 		
-		return null;
-		}*/
-	
-	/**
-	 * Get the internal user list
-	 * 
-	 * Web request format :
-	 * <xml>
-	 * 	<request>
-	 * 		<type>getUserList<type>
-	 * 	</request>
- 	 * </xml> 
-	 */
-	public synchronized static WebRequest getUserList()
-		{
-		return WebRequestBuilder.buildGetUserList();
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
 		}
 	
 	/**
-	 * Add a new user
-	 * 
-	 * Web request format :
-	 * <xml>
-	 * 	<request>
-	 * 		<type>addUser<type>
-	 * 		<content>
-	 * 			<user>
-	 * 				<...>
-	 * 			</user>
-	 * 		</content>
-	 * 	</request>
- 	 * </xml> 
+	 * setTask
 	 */
-	public synchronized static WebRequest addUser(String content)
+	public synchronized static WebRequest setTask(String content)	
 		{
 		try
 			{
 			ArrayList<String> params = new ArrayList<String>();
 			params.add("request");
 			params.add("content");
-			params.add("user");
+			params.add("task");
 			
 			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
-			String[][] t = parsed.get(0);
+			String[][] tab = parsed.get(0);
 			
-			/**
-			 * At this point we just receive the salesforce user id and the extension
-			 * from the web portal. We do not check if the extension is correct and we do not
-			 * try to find the matching cucm user. In addition, after adding the user
-			 * we still have to manually add the ECCP to the line and add the device to the
-			 * application user. So could be a lot improved
-			 */
+			String taskID = UsefulMethod.getItemByName("taskid", tab);
+			taskActionType action = taskActionType.valueOf(UsefulMethod.getItemByName("action", tab));
 			
-			//using the id received we get the user info from salesforce
-			String salesforceID = UsefulMethod.getItemByName("salesforceid", t);
-			SalesForceUser su = SalesForceManager.getUser(salesforceID);
-			
-			ManageUserFile.addUser(su.getFirstName(),
-					su.getLastName(),
-					UsefulMethod.getItemByName("extension", t),
-					su.getEmail(),
-					"forlateruse",
-					salesforceID,
-					true,
-					true,
-					true,
-					UsefulMethod.getTargetOption("defaultbrowser"),
-					"");
-			
-			return WebRequestBuilder.buildSuccess();
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("Failed to add a new user : "+e.getMessage(),e);
-			}
-		
-		return null;
-		}
-	
-	/**
-	 * Update a given user
-	 * 
-	 * Web request format :
-	 * <xml>
-	 * 	<request>
-	 * 		<type>updateUser<type>
-	 * 		<content>
-	 * 			<user>
-	 * 				<id>
-	 * 				<extension>
-	 * 				<defaultbrowser>
-	 * 				<browseroptions>
-	 * 				<incomingCallPopup>
-	 * 				<reverseLookup>
-	 * 				<emailReminder>
-	 * 			</user>
-	 * 		</content>
-	 * 	</request>
- 	 * </xml> 
-	 */
-	public synchronized static WebRequest updateUser(String content)
-		{
-		try
-			{
-			ArrayList<String> params = new ArrayList<String>();
-			params.add("request");
-			params.add("content");
-			params.add("user");
-			
-			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
-			String[][] t = parsed.get(0);
-			
-			ManageUserFile.updateUser(UsefulMethod.getItemByName("id", t),
-					UsefulMethod.getItemByName("extension", t),
-					UsefulMethod.getItemByName("defaultbrowser", t),
-					UsefulMethod.getItemByName("browseroptions", t),
-					Boolean.parseBoolean(UsefulMethod.getItemByName("incomingcallpopup", t)),
-					Boolean.parseBoolean(UsefulMethod.getItemByName("reverselookup", t)),
-					Boolean.parseBoolean(UsefulMethod.getItemByName("emailreminder", t)));
-			
-			return WebRequestBuilder.buildSuccess();
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("Failed to add a new user : "+e.getMessage(),e);
-			}
-		
-		return null;
-		}
-	
-	/**
-	 * Delete a given user
-	 * 
-	 * Web request format :
-	 * <xml>
-	 * 	<request>
-	 * 		<type>updateUser<type>
-	 * 		<content>
-	 * 			<user>
-	 * 				<id>
-	 * 			</user>
-	 * 		</content>
-	 * 	</request>
- 	 * </xml> 
-	 */
-	public synchronized static WebRequest deleteUser(String content)
-		{
-		try
-			{
-			ArrayList<String> params = new ArrayList<String>();
-			params.add("request");
-			params.add("content");
-			params.add("user");
-			
-			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
-			String[][] t = parsed.get(0);
-			
-			ManageUserFile.deleteUser(UsefulMethod.getItemByName("id", t));
-			
-			return WebRequestBuilder.buildSuccess();
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("Failed to delete user : "+e.getMessage(),e);
-			}
-		
-		return null;
-		}
-	
-	/**
-	 * Get a given user
-	 * 
-	 * Web request format :
-	 * <xml>
-	 * 	<request>
-	 * 		<type>getUser<type>
-	 * 		<content>
-	 * 			<user>
-	 * 				<id>
-	 * 			</user>
-	 * 		</content>
-	 * 	</request>
- 	 * </xml> 
-	 */
-	public synchronized static WebRequest getUser(String content)
-		{
-		try
-			{
-			ArrayList<String> params = new ArrayList<String>();
-			params.add("request");
-			params.add("content");
-			params.add("user");
-			
-			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
-			String[][] t = parsed.get(0);
-			
-			for(User u : Variables.getUserList())
+			for(Task t : Variables.getTaskList())
 				{
-				if(u.getID().equals(UsefulMethod.getItemByName("id", t)))
+				if(t.getTaskId().equals(taskID))
 					{
-					return WebRequestBuilder.buildGetUserReply(u);
+					t.act(action);
+					break;
 					}
 				}
+			
+			return WebRequestBuilder.buildWebRequest(webRequestType.success, taskID);
 			}
 		catch (Exception e)
 			{
-			Variables.getLogger().error("Failed to retreive the given user : "+e.getMessage(),e);
+			Variables.getLogger().error("ERROR while processing newTask web request : "+e.getMessage(),e);
 			}
 		
-		return null;
-		}
-	
-	/**
-	 * get settings
-	 */
-	public synchronized static WebRequest getSettings()
-		{
-		//To be written
-		
-		return null;
-		}
-	
-	/**
-	 * update settings
-	 */
-	public synchronized static WebRequest updateSettings(String content)
-		{
-		//To be written
-		return null;
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

@@ -39,7 +39,6 @@ public class TaskManager
 						{
 						if(d.getId().equals(s))
 							{
-							//In case of rollback we reverse the old and new values
 							todoList.add(new Device(d, action));
 							found = true;
 							break;
@@ -52,7 +51,6 @@ public class TaskManager
 							{
 							if(o.getId().equals(s))
 								{
-								//In case of rollback we reverse the old and new values
 								todoList.add(new Office(o, action));
 								found = true;
 								break;
@@ -63,7 +61,7 @@ public class TaskManager
 					}
 				
 				//We generate a new unique ID
-				String id = DigestUtils.md5Hex(System.currentTimeMillis()+"8)");
+				String id = DigestUtils.md5Hex(System.currentTimeMillis()+Math.random()+"8)");
 				Task t = new Task(todoList, id, ownerID, action);
 				Variables.getTaskList().add(t);
 				t.start();

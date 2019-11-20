@@ -19,9 +19,9 @@ public class Main
 	public Main()
 		{
 		//Set the software name
-		Variables.setSoftwareName("WOOT");
+		Variables.setSoftwareName("PERCELER");
 		//Set the software version
-		Variables.setSoftwareVersion("1.2");
+		Variables.setSoftwareVersion("1.0");
 		
 		/****************
 		 * Initialization of the logging
@@ -30,7 +30,7 @@ public class Main
 		Variables.getLogger().info("\r\n");
 		Variables.getLogger().info("#### Entering application");
 		Variables.getLogger().info("## Welcome to : "+Variables.getSoftwareName()+" version "+Variables.getSoftwareVersion());
-		Variables.getLogger().info("## Author : RATEL Alexandre : 2017");
+		Variables.getLogger().info("## Author : RATEL Alexandre : 2019");
 		/*******/
 		
 		/******

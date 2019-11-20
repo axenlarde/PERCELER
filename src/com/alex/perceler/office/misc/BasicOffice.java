@@ -39,7 +39,7 @@ public class BasicOffice
 		this.dataIPRange = new IPRange(dataIPRange);
 		this.newVoiceIPRange = new IPRange(newVoiceIPRange);
 		this.newDataIPRange = new IPRange(newDataIPRange);
-		id = DigestUtils.md5Hex(System.currentTimeMillis()+fullname);
+		id = DigestUtils.md5Hex(fullname+idcomu+voiceIPRange);
 		}
 	
 	public String getInfo()

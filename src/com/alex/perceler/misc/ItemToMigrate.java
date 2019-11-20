@@ -23,6 +23,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		preaudit,
 		update,
 		postaudit,
+		reset,
 		done,
 		disabled,
 		error
@@ -109,6 +110,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 			if(!iti.getStatus().equals(statusType.disabled))
 				{
 				iti.update();
+				if(iti.getStatus().equals(statusType.error))this.status = itmStatus.error;
 				}
 			else
 				{

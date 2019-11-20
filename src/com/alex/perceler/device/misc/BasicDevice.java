@@ -38,7 +38,7 @@ public class BasicDevice
 		this.newip = newip;
 		this.newgateway = newgateway;
 		this.newmask = newmask;
-		id = DigestUtils.md5Hex(System.currentTimeMillis()+name);
+		id = DigestUtils.md5Hex(name+ip+officeid);
 		}
 	
 	public String getInfo()

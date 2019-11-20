@@ -1,11 +1,21 @@
 package com.alex.perceler.webserver;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.security.KeyStore;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import com.alex.perceler.utils.HttpsTrustManager;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.webserver.ManageWebRequest.webRequestType;
@@ -14,6 +24,9 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsParameters;
+import com.sun.net.httpserver.HttpsServer;
 
 /**
  * Class used to manage web request
@@ -33,7 +46,55 @@ public class WebListenerManager implements HttpHandler
 		{
 		try
 			{
+			/*
 			HttpServer server = HttpServer.create(new InetSocketAddress(Integer.parseInt(UsefulMethod.getTargetOption("webserverport"))), 0);
+			HttpContext context = server.createContext("/PERCELER", this);
+			server.start();
+			Variables.getLogger().debug("Web Server started !");*/
+			
+			HttpsServer server = HttpsServer.create(new InetSocketAddress(Integer.parseInt(UsefulMethod.getTargetOption("webserverport"))), 0);
+			
+			X509TrustManager xtm = new HttpsTrustManager();
+            TrustManager[] mytm = { xtm };
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            
+            //initialise the keystore
+            char[] password = "password".toCharArray();
+            KeyStore ks = KeyStore.getInstance("JKS");
+            FileInputStream fis = new FileInputStream("./testkey.jks");
+            ks.load(fis, password);
+            
+            // setup the key manager factory
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            kmf.init(ks, password);
+            
+            //setup the trust manager factory
+            //TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            //tmf.init(ks);
+            
+            sslContext.init(kmf.getKeyManagers(), mytm, null);
+            
+            server.setHttpsConfigurator(new HttpsConfigurator(sslContext)
+            	{
+	            public void configure(HttpsParameters params)
+	            	{
+	                try
+	                	{
+	                    SSLContext c = SSLContext.getDefault();
+	                    SSLEngine engine = c.createSSLEngine();
+	                    params.setNeedClientAuth(false);
+	                    params.setCipherSuites(engine.getEnabledCipherSuites());
+	                    params.setProtocols(engine.getEnabledProtocols());
+	                    SSLParameters defaultSSLParameters = c.getDefaultSSLParameters();
+	                    params.setSSLParameters(defaultSSLParameters);
+	                	}
+	                catch(Exception exc)
+	                	{
+	                    Variables.getLogger().debug("ERROR : "+exc.getMessage(),exc);
+	                	}
+	            	}
+            	});
+			
 			HttpContext context = server.createContext("/PERCELER", this);
 			server.start();
 			Variables.getLogger().debug("Web Server started !");
@@ -76,39 +137,39 @@ public class WebListenerManager implements HttpHandler
 					
 					if(wr.getType().equals(webRequestType.doAuthenticate))
 						{
-						reply = ManageWebRequest.getCUCMUsers(content);
+						reply = ManageWebRequest.doAuthenticate(content);
 						}
 					else if(wr.getType().equals(webRequestType.getOfficeList))
 						{
-						
+						reply = ManageWebRequest.getOfficeList();
 						}
 					else if(wr.getType().equals(webRequestType.getDeviceList))
 						{
-						
+						reply = ManageWebRequest.getDeviceList();
 						}
-					else if(wr.getType().equals(webRequestType.setItemToMigrate))
+					else if(wr.getType().equals(webRequestType.getTaskList))
 						{
-						
+						reply = ManageWebRequest.getTaskList();
 						}
-					else if(wr.getType().equals(webRequestType.getCurrentTask))
+					else if(wr.getType().equals(webRequestType.getOffice))
 						{
-						
+						reply = ManageWebRequest.getOffice(content);
 						}
-					else if(wr.getType().equals(webRequestType.getTaskStatus))
+					else if(wr.getType().equals(webRequestType.getDevice))
 						{
-						
-						}
-					else if(wr.getType().equals(webRequestType.getTaskHistory))
-						{
-						
+						reply = ManageWebRequest.getDevice(content);
 						}
 					else if(wr.getType().equals(webRequestType.getTask))
 						{
-						
+						reply = ManageWebRequest.getTask(content);
 						}
-					else if(wr.getType().equals(webRequestType.startMigration))
+					else if(wr.getType().equals(webRequestType.newTask))
 						{
-						
+						reply = ManageWebRequest.newTask(content);
+						}
+					else if(wr.getType().equals(webRequestType.setTask))
+						{
+						reply = ManageWebRequest.setTask(content);
 						}
 					
 					OutputStream os = exc.getResponseBody();

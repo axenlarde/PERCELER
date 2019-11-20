@@ -39,6 +39,7 @@ import com.alex.perceler.utils.Variables.cucmAXLVersion;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
 import com.alex.perceler.utils.Variables.officeType;
+import com.cisco.axlapiservice10.AXLError;
 import com.cisco.schemas.ast.soap.RISService70;
 import com.cisco.schemas.ast.soap.RisPortType;
 
@@ -351,11 +352,12 @@ public class UsefulMethod
 		ArrayList<String> params = new ArrayList<String>();
 		params.add("devices");
 		params.add("device");
+		
 		ArrayList<String[][]> content = xMLGear.getResultListTab(UsefulMethod.getFlatFileContent(Variables.getDeviceListFileName()), params);
 		
 		for(String[][] s : content)
 			{
-			BasicDevice d = new BasicDevice(itmType.valueOf(UsefulMethod.getItemByName("type", s)),
+			BasicDevice d = new BasicDevice(itmType.valueOf(UsefulMethod.getItemByName("type", s).toLowerCase()),
 					UsefulMethod.getItemByName("name", s),
 					UsefulMethod.getItemByName("ip", s),
 					UsefulMethod.getItemByName("mask", s),
@@ -409,7 +411,7 @@ public class UsefulMethod
 			}
 		catch(Exception exc)
 			{
-			throw new Exception("ERROR while initializing the office list");
+			throw new Exception("ERROR while initializing the office list : "+exc.getMessage(),exc);
 			}
 		}
 	
@@ -982,6 +984,30 @@ public class UsefulMethod
 			{
 			Variables.getLogger().error("ERROR : "+e.getMessage(),e);
 			}
+		return false;
+		}
+	
+	/**
+	 * To make a user authenticate by the CUCM 
+	 */
+	public static boolean doAuthenticate(String userID, String password)
+		{
+		try
+			{
+			com.cisco.axl.api._10.DoAuthenticateUserReq req = new com.cisco.axl.api._10.DoAuthenticateUserReq();
+			
+			req.setUserid(userID);
+			req.setPassword(password);
+			
+			com.cisco.axl.api._10.DoAuthenticateUserRes resp = Variables.getAXLConnectionToCUCMV105().doAuthenticateUser(req);
+			
+			return Boolean.parseBoolean(resp.getReturn().getUserAuthenticated());
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while authenticating user "+userID+" : "+e.getMessage(),e);
+			}
+		
 		return false;
 		}
 	

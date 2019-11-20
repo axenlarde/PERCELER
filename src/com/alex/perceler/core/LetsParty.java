@@ -1,6 +1,6 @@
 package com.alex.perceler.core;
 
-import com.alex.perceler.utils.Variables;
+import com.alex.perceler.webserver.WebListenerManager;
 
 /**
  * Class aiming to start everything needed
@@ -22,7 +22,7 @@ public class LetsParty
 		/**
 		 * Start the web server used to handle web request
 		 */
-		//To be written
+		new WebListenerManager();
 		
 		//temp
 		//Start a CUCM update task
