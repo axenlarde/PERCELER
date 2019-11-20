@@ -110,7 +110,7 @@ public class MobilityInfo extends ItemToInject
 		subnetMask = CollectionTools.getRawValue(subnetMask, this, true);
 		
 		//Convert 255.255.255.0 into 24
-		subnetMask = UsefulMethod.convertStringMaskToIntMask(subnetMask);//Has to be a number of bit
+		subnetMask = UsefulMethod.convertlongMaskToShortOne(subnetMask);//Has to be a number of bit
 		members = CollectionTools.resolveStringList(members, this, true);
 		
 		Variables.getLogger().debug("Device Mobility Info details : "+subnet+" "+subnetMask);

@@ -23,15 +23,15 @@ public class ManageWebRequest
 	 */
 	public enum webRequestType
 		{
-		getCUCMUsers,
-		getSalesforceUsers,
-		getUserList,
-		getUser,
-		addUser,
-		updateUser,
-		deleteUser,
-		getSettings,
-		updateSettings,
+		doAuthenticate,
+		getOfficeList,
+		getDeviceList,
+		setItemToMigrate,
+		getCurrentTask,
+		getTaskStatus,
+		getTaskHistory,
+		getTask,
+		startMigration,
 		success,
 		error
 		}

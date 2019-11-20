@@ -24,6 +24,8 @@ public interface ItemToMigrateImpl
 	public String getInfo();//To display item info
 	public void reset();//To reset the item
 	public void doReset();//Is called in addition of the main method
+	public String getDetailedStatus();//Return the detailed status of the item
+	public String doGetDetailedStatus();//Return the detailed status of the item
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

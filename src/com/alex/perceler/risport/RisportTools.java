@@ -99,7 +99,8 @@ public class RisportTools
 			if(phoneList.size() == 0)throw new Exception("Phone list cannot be empty");
 			/**
 			 * We limit the number of phone to request at the same time because
-			 * we know the RIS service works better with less phones
+			 * we know the RIS service works better with smaller request
+			 * Especially in large cluster
 			 */
 			int maxPhoneRequest = Integer.parseInt(UsefulMethod.getTargetOption("rismaxphonerequest"));
 			ArrayList<BasicPhone> result = new ArrayList<BasicPhone>();
@@ -111,7 +112,7 @@ public class RisportTools
 				index++;
 				if((temp.size()==maxPhoneRequest) || (index == phoneList.size()))
 					{
-					CmSelectionCriteria criteria = buildRISRequest(temp);
+					CmSelectionCriteria criteria = buildRISRequest(phoneList);
 					
 					//make selectCmDevice request
 					SelectCmDeviceReturn selectResponse = Variables.getRisConnection().selectCmDevice("",criteria);

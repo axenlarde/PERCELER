@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
+import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.webserver.ManageWebRequest.webRequestType;
 import com.sun.net.httpserver.Headers;
@@ -33,7 +34,7 @@ public class WebListenerManager implements HttpHandler
 		try
 			{
 			HttpServer server = HttpServer.create(new InetSocketAddress(Integer.parseInt(UsefulMethod.getTargetOption("webserverport"))), 0);
-			HttpContext context = server.createContext("/WRM", this);
+			HttpContext context = server.createContext("/PERCELER", this);
 			server.start();
 			Variables.getLogger().debug("Web Server started !");
 			}
@@ -62,7 +63,7 @@ public class WebListenerManager implements HttpHandler
 					hs.add("Keep-Alive", "timeout = 20000 max = 100");
 					exc.sendResponseHeaders(200, 0);
 					}
-				else if(exc.getRequestMethod().equals("POST"))
+				else if((exc.getRequestMethod().equals("POST")) || (exc.getRequestMethod().equals("GET")))
 					{
 					Variables.getLogger().debug("Web Server : "+exc.getRequestMethod()+" Method received");
 					
@@ -73,41 +74,41 @@ public class WebListenerManager implements HttpHandler
 					WebRequest wr = ManageWebRequest.parseWebRequest(content);
 					WebRequest reply = null;
 					
-					if(wr.getType().equals(webRequestType.getCUCMUsers))
+					if(wr.getType().equals(webRequestType.doAuthenticate))
 						{
 						reply = ManageWebRequest.getCUCMUsers(content);
 						}
-					else if(wr.getType().equals(webRequestType.getSalesforceUsers))
+					else if(wr.getType().equals(webRequestType.getOfficeList))
 						{
-						reply = ManageWebRequest.getSalesforceUsers(content);
+						
 						}
-					else if(wr.getType().equals(webRequestType.getUserList))
+					else if(wr.getType().equals(webRequestType.getDeviceList))
 						{
-						reply = ManageWebRequest.getUserList();
+						
 						}
-					else if(wr.getType().equals(webRequestType.addUser))
+					else if(wr.getType().equals(webRequestType.setItemToMigrate))
 						{
-						reply = ManageWebRequest.addUser(content);
+						
 						}
-					else if(wr.getType().equals(webRequestType.updateUser))
+					else if(wr.getType().equals(webRequestType.getCurrentTask))
 						{
-						reply = ManageWebRequest.updateUser(content);
+						
 						}
-					else if(wr.getType().equals(webRequestType.deleteUser))
+					else if(wr.getType().equals(webRequestType.getTaskStatus))
 						{
-						reply = ManageWebRequest.deleteUser(content);
+						
 						}
-					else if(wr.getType().equals(webRequestType.getUser))
+					else if(wr.getType().equals(webRequestType.getTaskHistory))
 						{
-						reply = ManageWebRequest.getUser(content);
+						
 						}
-					else if(wr.getType().equals(webRequestType.getSettings))
+					else if(wr.getType().equals(webRequestType.getTask))
 						{
-						reply = ManageWebRequest.getSettings();
+						
 						}
-					else if(wr.getType().equals(webRequestType.updateSettings))
+					else if(wr.getType().equals(webRequestType.startMigration))
 						{
-						reply = ManageWebRequest.updateSettings(content);
+						
 						}
 					
 					OutputStream os = exc.getResponseBody();
@@ -124,7 +125,7 @@ public class WebListenerManager implements HttpHandler
 						{
 						Variables.getLogger().debug("Something went wrong while building the reply so we send an error message");
 						exc.sendResponseHeaders(500, 0);
-						os.write("".getBytes());//Not sure is useful
+						os.write("".getBytes());
 						}
 					
 					os.flush();

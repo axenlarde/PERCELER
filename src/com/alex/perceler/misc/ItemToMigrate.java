@@ -135,6 +135,34 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		Variables.getLogger().debug("Starting reset for "+type+" "+name);
 		doReset();
 		}
+	
+	@Override
+	public String getDetailedStatus()
+		{
+		StringBuffer result = new StringBuffer("");
+		
+		result.append("Item error list : \r\n");
+		for(ErrorTemplate e : errorList)
+			{
+			result.append("- "+e.getErrorDesc()+"\r\n");
+			}
+		
+		result.append("\r\n");
+		result.append("CUCM items : \r\n");
+		for(ItemToInject iti : axlList)
+			{
+			result.append("- "+iti.getName()+" : "+iti.getType().name()+" : "+iti.getStatus().name()+" : \r\n");
+			for(ErrorTemplate e : iti.getErrorList())
+				{
+				result.append("	+ "+e+"\r\n");
+				}
+			}
+		
+		result.append("\r\n");
+		result.append(doGetDetailedStatus());
+		
+		return result.toString();
+		}
 
 	public itmType getType()
 		{

@@ -1,7 +1,7 @@
 package com.alex.perceler.soap.items;
 
-import com.alex.woot.misc.BasicItem;
-import com.alex.woot.misc.CollectionTools;
+import com.alex.perceler.misc.BasicItem;
+import com.alex.perceler.misc.CollectionTools;
 
 /**
  * Class used to store a local route group value

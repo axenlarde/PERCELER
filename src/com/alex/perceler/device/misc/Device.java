@@ -162,21 +162,14 @@ public class Device extends ItemToMigrate
 	@Override
 	public void doStartSurvey() throws Exception
 		{
-		if(type.equals(itmType.phone))
+		reachable = DeviceTools.ping(ip);
+		if(!reachable)
 			{
-			
-			}
-		else
-			{
-			reachable = DeviceTools.ping(ip);
-			if(!reachable)
-				{
-				/**
-				 * If the device is not reachable, we should not update the CUCM data. So we disable the entire item
-				 */
-				status = itmStatus.disabled;
-				errorList.add(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
-				}
+			/**
+			 * If the device is not reachable, we should not update the CUCM data. So we disable the entire item
+			 */
+			status = itmStatus.disabled;
+			errorList.add(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
 			}
 		}
 
@@ -231,6 +224,16 @@ public class Device extends ItemToMigrate
 			Variables.getLogger().error("ERROR while reseting sip trunk for "+type+" "+name+" "+e.getMessage(), e);
 			errorList.add(new ErrorTemplate("Failed to reset the sip trunk for "+type+" "+name));
 			}
+		}
+	
+	/**
+	 * Will return a detailed status of the item
+	 * For instance will return phone status
+	 */
+	public String doGetDetailedStatus()
+		{
+		//To be Written
+		return "";
 		}
 	
 	public String getIp()

@@ -159,8 +159,18 @@ public class Office extends ItemToMigrate
 		if(!dp.isExisting())errorList.add(new ErrorTemplate(name+" warning the associated device pool has not been found : "+dp.getName()));
 		
 		//We get the associated phones status
-		phoneList = RisportTools.doPhoneSurvey(phoneList);
-		for()
+		ArrayList<BasicPhone> pl = RisportTools.doPhoneSurvey(phoneList);
+		for(BasicPhone bp : pl)
+			{
+			for(BasicPhone p : phoneList)
+				{
+				if(p.getName().equals(bp.getName()))
+					{
+					p.newStatus(bp.getStatus());
+					p.newIP(bp.getIp());
+					}
+				}
+			}
 		}
 
 	@Override
@@ -195,6 +205,34 @@ public class Office extends ItemToMigrate
 			Variables.getLogger().error("ERROR while reseting devices for "+type+" "+name+" "+e.getMessage(), e);
 			errorList.add(new ErrorTemplate("Failed to reset the device pool for "+type+" "+name));
 			}
+		}
+	
+	/**
+	 * Will return a detailed status of the item
+	 * For instance will return phone status
+	 */
+	public String doGetDetailedStatus()
+		{
+		StringBuffer result = new StringBuffer("");
+		
+		result.append("Phones : \r\n");
+		result.append("- Found : "+phoneList.size()+"\r\n");
+		
+		StringBuffer temp = new StringBuffer("");
+		int total = 0;
+		for(BasicPhone p : phoneList)
+			{
+			if(!p.isOK())
+				{
+				total++;
+				temp.append("+ "+p.getName()+" "+p.getModel()+" "+p.getDescription()+" : "+p.getNewStatus()+"\r\n");
+				}
+			}
+		
+		result.append("- Lost : "+total+"\r\n");
+		result.append(temp);
+		
+		return result.toString();
 		}
 
 	public String getIdcomu()

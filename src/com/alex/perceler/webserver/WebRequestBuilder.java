@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.webserver.ManageWebRequest.webRequestType;
 
 /**
  * Used to build web request
@@ -16,117 +18,91 @@ public class WebRequestBuilder
 	
 	/**
 	 * To build the requested request
+	 * getOfficeList
 	 */
-	public static WebRequest buildGetCUCMUsersReply(ArrayList<CUCMUser> ul)
+	public static WebRequest buildGetOfficeListReply()
 		{
 		StringBuffer content = new StringBuffer();
 		
 		content.append("<xml>\r\n");
-		content.append("	<cucmusers>\r\n");
+		content.append("	<reply>\r\n");
+		content.append("		<type>getOfficeList</type>\r\n");
+		content.append("		<content>\r\n");
+		content.append("			<offices>\r\n");
 		
-		for(CUCMUser u : ul)
+		try
 			{
-			content.append("		<cucmuser>\r\n");
-			content.append("			<firstname>"+u.getFirstName()+"</firstname>\r\n");
-			content.append("			<lastname>"+u.getLastName()+"</lastname>\r\n");
-			content.append("			<userid>"+u.getUserID()+"</userid>\r\n");
-			content.append("			<email>"+u.getEmail()+"</email>\r\n");
-			content.append("			<extension>"+u.getExtension()+"</extension>\r\n");
-			content.append("			<uuid>"+u.getUUID()+"</uuid>\r\n");
-			content.append("		</cucmuser>\r\n");
+			for(BasicOffice o : Variables.getOfficeList())
+				{
+				content.append("				<office>\r\n");
+				content.append("					<id>"+o.getId()+"</id>\r\n");
+				content.append("					<idcomu>"+o.getIdcomu()+"</idcomu>\r\n");
+				content.append("					<idcaf>"+o.getIdCAF()+"</idcaf>\r\n");
+				content.append("					<fullname>"+o.getFullname()+"</fullname>\r\n");
+				content.append("					<shortname>"+o.getShortname()+"</shortname>\r\n");
+				content.append("					<newname>"+o.getNewName()+"</newname>\r\n");
+				content.append("					<officetype>"+o.getOfficeType()+"</officetype>\r\n");
+				content.append("					<voiceiprange>"+o.getVoiceIPRange().getCIDRFormat()+"</voiceiprange>\r\n");
+				content.append("					<dataiprange>"+o.getDataIPRange().getCIDRFormat()+"</dataiprange>\r\n");
+				content.append("					<newvoiceiprange>"+o.getNewVoiceIPRange().getCIDRFormat()+"</newvoiceiprange>\r\n");
+				content.append("					<newdataiprange>"+o.getNewDataIPRange().getCIDRFormat()+"</newdataiprange>\r\n");
+				content.append("				</office>\r\n");
+				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while retrieving the office list : "+e.getMessage());
+			content.append("				</office>\r\n");
 			}
 		
-		content.append("	</cucmusers>\r\n");
+		content.append("			</offices>\r\n");
+		content.append("		</content>\r\n");
+		content.append("	</reply>\r\n");
 		content.append("</xml>\r\n");
 		
-		return new WebRequest(content.toString(), webRequestType.getCUCMUsers);
+		return new WebRequest(content.toString(), webRequestType.getOfficeList);
 		}
+	
+	
+	
+	
 	
 	/**
 	 * To build the requested request
 	 */
-	public static WebRequest buildGetUserList()
+	public synchronized static WebRequest buildSuccess(webRequestType type)
 		{
-		try
-			{
-			StringBuffer content = new StringBuffer();
-			
-			content.append("<xml>\r\n");
-			content.append("	<users>\r\n");
-			
-			for(User u : Variables.getUserList())
-				{
-				content.append("		<user>\r\n");
-				content.append("			<firstname>"+u.getFirstName()+"</firstname>\r\n");
-				content.append("			<lastname>"+u.getLastName()+"</lastname>\r\n");
-				content.append("			<extension>"+u.getExtension()+"</extension>\r\n");
-				content.append("			<status>"+u.getStatus()+"</status>\r\n");
-				content.append("			<id>"+u.getID()+"</id>\r\n");
-				content.append("		</user>\r\n");
-				}
-			
-			content.append("	</users>\r\n");
-			content.append("</xml>\r\n");
-			
-			return new WebRequest(content.toString(), webRequestType.getUserList);
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("Error while building user list : "+e.getMessage(),e);
-			}
-		/*
-		try
-			{
-			return new WebRequest(xMLReader.fileRead("./"+Variables.getUserFileName()), webRequestType.getUserList);
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("Error while building user list : "+e.getMessage(),e);
-			}*/
+		StringBuffer content = new StringBuffer();
 		
-		return null;
-		}
-	
-	/**
-	 * To build the requested request
-	 */
-	public static WebRequest buildGetUserReply(User u)
-		{
-		try
-			{
-			StringBuffer content = new StringBuffer();
-			
-			content.append("<xml>\r\n");
-			content.append("	<user>\r\n");
-			content.append("		<firstname>"+u.getFirstName()+"</firstname>\r\n");
-			content.append("		<lastname>"+u.getLastName()+"</lastname>\r\n");
-			content.append("		<extension>"+u.getExtension()+"</extension>\r\n");
-			content.append("		<email>"+u.getEmail()+"</email>\r\n");
-			content.append("		<defaultbrowser>"+u.getDefaultBrowser()+"</defaultbrowser>\r\n");
-			content.append("		<browseroptions>"+u.getBrowserOptions()+"</browseroptions>\r\n");
-			content.append("		<emailreminder>"+u.isEmailReminder()+"</emailreminder>\r\n");
-			content.append("		<incomingcallpopup>"+u.isIncomingCallPopup()+"</incomingcallpopup>\r\n");
-			content.append("		<reverselookup>"+u.isReverseLookup()+"</reverselookup>\r\n");
-			content.append("		<status>"+u.getStatus()+"</status>\r\n");
-			content.append("	</user>\r\n");
-			content.append("</xml>\r\n");
-			
-			return new WebRequest(content.toString(), webRequestType.getUser);
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("Error while building user list : "+e.getMessage(),e);
-			}
+		content.append("<xml>\r\n");
+		content.append("	<reply>\r\n");
+		content.append("		<type>"+type.name()+"</type>\r\n");
+		content.append("		<content>\r\n");
+		content.append("			</success>\r\n");
+		content.append("		</content>\r\n");
+		content.append("	</reply>\r\n");
+		content.append("</xml>\r\n");
 		
-		return null;
+		return new WebRequest(content.toString(), webRequestType.success);
 		}
 	
 	/**
 	 * To build the requested request
 	 */
-	public synchronized static WebRequest buildSuccess()
+	public synchronized static WebRequest buildError(webRequestType type)
 		{
-		return new WebRequest("Done !", webRequestType.success);
+		StringBuffer content = new StringBuffer();
+		
+		content.append("<xml>\r\n");
+		content.append("	<reply>\r\n");
+		content.append("		<type>"+type.name()+"</type>\r\n");
+		content.append("		<content>\r\n");
+		content.append("			</error>\r\n");
+		content.append("		</content>\r\n");
+		content.append("	</reply>\r\n");
+		content.append("</xml>\r\n");
+		
+		return new WebRequest(content.toString(), webRequestType.error);
 		}
 	
 	

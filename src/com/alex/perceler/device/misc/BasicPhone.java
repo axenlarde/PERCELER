@@ -19,7 +19,7 @@ public class BasicPhone
 		Unknown
 		};
 	
-	private String Name,
+	private String name,
 	description,
 	model,
 	ip,
@@ -33,7 +33,7 @@ public class BasicPhone
 	public BasicPhone(String name, String description, String model, String ip, phoneStatus status)
 		{
 		super();
-		Name = name;
+		this.name = name;
 		this.description = description;
 		this.model = model;
 		this.ip = ip;
@@ -43,7 +43,7 @@ public class BasicPhone
 	public BasicPhone(String name, String description, String model, String ip, String status)
 		{
 		super();
-		Name = name;
+		this.name = name;
 		this.description = description;
 		this.model = model;
 		this.ip = ip;
@@ -53,19 +53,43 @@ public class BasicPhone
 	public BasicPhone(String name, String description, String model)
 		{
 		super();
-		Name = name;
+		this.name = name;
 		this.description = description;
 		this.model = model;
+		}
+	
+	public void newStatus(phoneStatus status)
+		{
+		if(this.status == null)this.status = status;
+		else this.newStatus = status;
+		}
+	
+	public void newIP(String ip)
+		{
+		if(this.ip == null)this.ip = ip;
+		else this.newip = ip;
+		}
+	
+	public boolean isOK()
+		{
+		if(newStatus != null)
+			{
+			if((status.equals(phoneStatus.Registered)) && (!newStatus.equals(phoneStatus.Registered)))
+				{
+				return false;
+				}
+			}
+		return true;
 		}
 
 	public String getName()
 		{
-		return Name;
+		return name;
 		}
 
 	public void setName(String name)
 		{
-		Name = name;
+		this.name = name;
 		}
 
 	public String getDescription()
