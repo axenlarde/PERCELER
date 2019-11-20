@@ -176,8 +176,9 @@ public class WebListenerManager implements HttpHandler
 					
 					if(reply != null)
 						{
-						Variables.getLogger().debug("Web Server : Sending response : ");
+						Variables.getLogger().debug("Web Server : Sending response for request "+wr.getType().name());
 						Variables.getLogger().debug(reply.getContent());
+						Variables.getLogger().debug("Reply length : "+reply.getContent().getBytes().length);
 						
 						exc.sendResponseHeaders(200, reply.getContent().getBytes().length);
 						os.write(reply.getContent().getBytes());

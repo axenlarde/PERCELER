@@ -1,5 +1,8 @@
 package com.alex.perceler.office.misc;
 
+import org.apache.commons.validator.routines.InetAddressValidator;
+
+import com.alex.perceler.utils.Tester;
 import com.alex.perceler.utils.UsefulMethod;
 
 /**
@@ -23,9 +26,25 @@ public class IPRange
 	
 	public IPRange(String ipmask)
 		{
-		String[] temp = ipmask.split("/");
-		ipRange = temp[0];
-		mask = temp[1];
+		if(ipmask.contains("/"))
+			{
+			String[] temp = ipmask.split("/");
+			if(InetAddressValidator.getInstance().isValidInet4Address(temp[0]))
+				{
+				ipRange = temp[0];
+				mask = temp[1];
+				}
+			else
+				{
+				ipRange = "";
+				mask = "";
+				}
+			}
+		else
+			{
+			ipRange = "";
+			mask = "";
+			}
 		}
 	
 	public String getInfo()
@@ -41,6 +60,10 @@ public class IPRange
 	
 	public String getCIDRFormat()
 		{
+		if((ipRange.equals("")) || (mask.equals("")))
+			{
+			return "";
+			}
 		return ipRange+"/"+mask;
 		}
 

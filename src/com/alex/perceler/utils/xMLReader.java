@@ -54,7 +54,7 @@ public class xMLReader
 		//We remove the UTF8 header
 		//template = template.substring(1, template.length());
 		
-		Variables.getLogger().info("File content : "+template);
+		//Variables.getLogger().info("File content : "+template);
 		Variables.getLogger().info("Finished reading");
 		tampon.close();
 		monFichier.close();

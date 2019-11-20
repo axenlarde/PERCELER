@@ -85,7 +85,7 @@ public class ManageWebRequest
 	/**
 	 * getOfficeList
 	 */
-	public synchronized static WebRequest getOfficeList()	
+	public synchronized static WebRequest getOfficeList()
 		{
 		try
 			{

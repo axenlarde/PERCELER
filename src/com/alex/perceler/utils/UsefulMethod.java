@@ -357,18 +357,25 @@ public class UsefulMethod
 		
 		for(String[][] s : content)
 			{
-			BasicDevice d = new BasicDevice(itmType.valueOf(UsefulMethod.getItemByName("type", s).toLowerCase()),
-					UsefulMethod.getItemByName("name", s),
-					UsefulMethod.getItemByName("ip", s),
-					UsefulMethod.getItemByName("mask", s),
-					UsefulMethod.getItemByName("gateway", s),
-					UsefulMethod.getItemByName("officeid", s),
-					UsefulMethod.getItemByName("newip", s),
-					UsefulMethod.getItemByName("newgateway", s),
-					UsefulMethod.getItemByName("newmask", s));
-			
-			Variables.getLogger().debug("New device added to the device list : "+d.getInfo());
-			deviceList.add(d);
+			try
+				{
+				BasicDevice d = new BasicDevice(getITMType(UsefulMethod.getItemByName("type", s)),
+						UsefulMethod.getItemByName("name", s),
+						UsefulMethod.getItemByName("ip", s),
+						UsefulMethod.getItemByName("mask", s),
+						UsefulMethod.getItemByName("gateway", s),
+						UsefulMethod.getItemByName("officeid", s),
+						UsefulMethod.getItemByName("newip", s),
+						UsefulMethod.getItemByName("newgateway", s),
+						UsefulMethod.getItemByName("newmask", s));
+				
+				Variables.getLogger().debug("New device added to the device list : "+d.getInfo());
+				deviceList.add(d);
+				}
+			catch (Exception e)
+				{
+				Variables.getLogger().error("Could not add the following device : "+UsefulMethod.getItemByName("name", s)+" : "+e.getMessage(), e);
+				}
 			}
 		
 		return deviceList;
@@ -392,19 +399,26 @@ public class UsefulMethod
 			
 			for(String[][] s : content)
 				{
-				BasicOffice o = new BasicOffice(UsefulMethod.getItemByName("name", s),
-						UsefulMethod.getItemByName("idcomu", s),
-						UsefulMethod.getItemByName("idcaf", s),
-						UsefulMethod.getItemByName("shortname", s),
-						UsefulMethod.getItemByName("newName", s),
-						officeType.valueOf(UsefulMethod.getItemByName("type", s)),
-						UsefulMethod.getItemByName("voiceiprange", s),
-						UsefulMethod.getItemByName("dataiprange", s),
-						UsefulMethod.getItemByName("newvoiceiprange", s),
-						UsefulMethod.getItemByName("newdataiprange", s));
-				
-				Variables.getLogger().debug("New office added to the office list : "+o.getInfo());
-				officeList.add(o);
+				try
+					{
+					BasicOffice o = new BasicOffice(UsefulMethod.getItemByName("fullname", s),
+							UsefulMethod.getItemByName("idcomu", s),
+							UsefulMethod.getItemByName("idcaf", s),
+							UsefulMethod.getItemByName("shortname", s),
+							UsefulMethod.getItemByName("newname", s),
+							officeType.valueOf(UsefulMethod.getItemByName("type", s).toUpperCase()),
+							UsefulMethod.getItemByName("voiceiprange", s),
+							UsefulMethod.getItemByName("dataiprange", s),
+							UsefulMethod.getItemByName("newvoiceiprange", s),
+							UsefulMethod.getItemByName("newdataiprange", s));
+					
+					Variables.getLogger().debug("New office added to the office list : "+o.getInfo());
+					officeList.add(o);
+					}
+				catch (Exception e)
+					{
+					Variables.getLogger().error("Could not add the following office : "+UsefulMethod.getItemByName("fullname", s)+" : "+e.getMessage(), e);
+					}
 				}
 			
 			return officeList;
@@ -1009,6 +1023,15 @@ public class UsefulMethod
 			}
 		
 		return false;
+		}
+	
+	public static itmType getITMType(String type)
+		{
+		for(itmType t : itmType.values())
+			{
+			if(type.toLowerCase().contains(t.name()))return t;
+			}
+		return null;
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

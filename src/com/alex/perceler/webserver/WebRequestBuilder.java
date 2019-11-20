@@ -363,7 +363,7 @@ public class WebRequestBuilder
 		content.append(tabs+"<device>\r\n");
 		content.append(tabs+"	<id>"+d.getId()+"</id>\r\n");
 		content.append(tabs+"	<name>"+d.getName()+"</name>\r\n");
-		content.append(tabs+"	<type>"+d.getType().name()+"</type>\r\n");
+		content.append(tabs+"	<type>"+d.getType()+"</type>\r\n");
 		content.append(tabs+"	<ip>"+d.getIp()+"</ip>\r\n");
 		content.append(tabs+"	<mask>"+d.getMask()+"</mask>\r\n");
 		content.append(tabs+"	<gateway>"+d.getGateway()+"</gateway>\r\n");

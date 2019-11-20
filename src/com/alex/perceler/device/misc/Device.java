@@ -2,6 +2,8 @@ package com.alex.perceler.device.misc;
 
 import java.util.ArrayList;
 
+import org.apache.commons.validator.routines.InetAddressValidator;
+
 import com.alex.perceler.cli.OneLine;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
@@ -43,32 +45,25 @@ public class Device extends ItemToMigrate
 		super(type, name, id, action);
 		this.officeid = officeid;
 		
-		this.ip = ip;
-		this.mask = mask;
-		this.gateway = gateway;
-		this.newip = newip;
-		this.newgateway = newgateway;
-		this.newmask = newmask;
-		
 		/**
 		 * In case of rollback we reverse the following values
 		 */
 		if(action.equals(actionType.rollback))
 			{
-			this.ip = newip;
+			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(newip))?newip:"";
 			this.mask = newmask;
-			this.gateway = newgateway;
-			this.newip = ip;
-			this.newgateway = gateway;
+			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(newgateway))?newgateway:"";
+			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(ip))?ip:"";
+			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(gateway))?gateway:"";
 			this.newmask = mask;
 			}
 		else
 			{
-			this.ip = ip;
+			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(ip))?ip:"";
 			this.mask = mask;
-			this.gateway = gateway;
-			this.newip = newip;
-			this.newgateway = newgateway;
+			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(gateway))?gateway:"";
+			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(newip))?newip:"";
+			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(newgateway))?newgateway:"";
 			this.newmask = newmask;
 			}
 		}
@@ -83,20 +78,20 @@ public class Device extends ItemToMigrate
 		 */
 		if(action.equals(actionType.rollback))
 			{
-			this.ip = bd.getNewip();
+			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewip()))?bd.getNewip():"";
 			this.mask = bd.getNewmask();
-			this.gateway = bd.getNewgateway();
-			this.newip = bd.getIp();
-			this.newgateway = bd.getGateway();
+			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewgateway()))?bd.getNewgateway():"";
+			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getIp()))?bd.getIp():"";
+			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getGateway()))?bd.getGateway():"";
 			this.newmask = bd.getMask();
 			}
 		else
 			{
-			this.ip = bd.getIp();
+			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getIp()))?bd.getIp():"";
 			this.mask = bd.getMask();
-			this.gateway = bd.getGateway();
-			this.newip = bd.getNewip();
-			this.newgateway = bd.getNewgateway();
+			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getGateway()))?bd.getGateway():"";
+			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewip()))?bd.getNewip():"";
+			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewgateway()))?bd.getNewgateway():"";
 			this.newmask = bd.getNewmask();
 			}
 		}
