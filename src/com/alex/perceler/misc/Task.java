@@ -2,9 +2,12 @@ package com.alex.perceler.misc;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.cli.CliManager;
+import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
+import com.alex.perceler.utils.Variables.itmType;
 import com.alex.perceler.utils.Variables.statusType;
 
 /**********************************
@@ -31,6 +34,7 @@ public class Task extends Thread
 	private boolean pause, stop, started, end;
 	private String taskID, ownerID;
 	private actionType action;
+	private CliManager cliManager;
 	
 	/***************
 	 * Constructor
@@ -86,6 +90,31 @@ public class Task extends Thread
 	private void startUpdate()
 		{
 		Variables.getLogger().info("Beginning of the update process");
+		
+		/**
+		 * First we take all the devices and start the cli update process
+		 * Because each cliInjector is a different thread we can start them all
+		 * simultaneously to save time
+		 */
+		cliManager = new CliManager();
+		
+		for(ItemToMigrate myToDo : todoList)
+			{
+			if(!myToDo.getStatus().equals(itmStatus.disabled))
+				{
+				if(myToDo instanceof Device)
+					{
+					cliManager.getCliIList().add(((Device)myToDo).getCliInjector());
+					}
+				}
+			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
+			}
+		if(cliManager.getCliIList().size() != 0)cliManager.start();
+		
+		/**
+		 * Then we start the axl item updates wich is not multithreaded
+		 * so it has to be item by item
+		 */
 		for(ItemToMigrate myToDo : todoList)
 			{
 			try
@@ -205,9 +234,9 @@ public class Task extends Thread
 		{
 		switch(action)
 			{
-			case pause:pause = true;break;
-			case start:pause = false;break;
-			case stop:stop = true;break;
+			case pause:setPause(true);break;
+			case start:setPause(false);break;
+			case stop:setStop(true);break;
 			default:break;
 			}
 		}
@@ -243,11 +272,13 @@ public class Task extends Thread
 		
 		if(this.pause)
 			{
-			Variables.getLogger().debug("The user asked to pause the task");
+			Variables.getLogger().debug("The user asked to pause the task : "+taskID);
+			cliManager.setPause(pause);
 			}
 		else
 			{
-			Variables.getLogger().debug("The user asked to resume the task");
+			Variables.getLogger().debug("The user asked to resume the task : "+taskID);
+			cliManager.setPause(pause);
 			}
 		}
 
@@ -258,7 +289,9 @@ public class Task extends Thread
 
 	public void setStop(boolean stop)
 		{
+		Variables.getLogger().debug("The user asked to stop the task : "+taskID);
 		this.stop = stop;
+		cliManager.setStop(stop);
 		}
 
 	public boolean isStarted()

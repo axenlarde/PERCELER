@@ -24,6 +24,10 @@ import org.apache.log4j.Level;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.alex.perceler.cli.CliProfile;
+import com.alex.perceler.cli.CliProfile.cliProtocol;
+import com.alex.perceler.cli.OneLine;
+import com.alex.perceler.cli.OneLine.cliType;
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.CollectionTools;
@@ -330,14 +334,8 @@ public class UsefulMethod
 	 */
 	public static void initDatabase() throws Exception
 		{
-		/**
-		 * Then we initialize the device list
-		 */
+		Variables.setCliProfileList(initCliProfileList());
 		Variables.setDeviceList(initDeviceList());
-		
-		/**
-		 * First we initialize the office list
-		 */
 		Variables.setOfficeList(initOfficeList());
 		}
 	
@@ -359,7 +357,9 @@ public class UsefulMethod
 			{
 			try
 				{
-				BasicDevice d = new BasicDevice(getITMType(UsefulMethod.getItemByName("type", s)),
+				itmType type = getITMType(UsefulMethod.getItemByName("type", s));
+				
+				BasicDevice d = new BasicDevice(type,
 						UsefulMethod.getItemByName("name", s),
 						UsefulMethod.getItemByName("ip", s),
 						UsefulMethod.getItemByName("mask", s),
@@ -367,7 +367,11 @@ public class UsefulMethod
 						UsefulMethod.getItemByName("officeid", s),
 						UsefulMethod.getItemByName("newip", s),
 						UsefulMethod.getItemByName("newgateway", s),
-						UsefulMethod.getItemByName("newmask", s));
+						UsefulMethod.getItemByName("newmask", s),
+						UsefulMethod.getItemByName("user", s),
+						UsefulMethod.getItemByName("password", s),
+						getCliProfile(type),
+						cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)));
 				
 				Variables.getLogger().debug("New device added to the device list : "+d.getInfo());
 				deviceList.add(d);
@@ -426,6 +430,73 @@ public class UsefulMethod
 		catch(Exception exc)
 			{
 			throw new Exception("ERROR while initializing the office list : "+exc.getMessage(),exc);
+			}
+		}
+	
+	/**
+	 * Used to initialize CliProfile list
+	 * @throws Exception 
+	 */
+	public static ArrayList<CliProfile> initCliProfileList() throws Exception
+		{	
+		try
+			{
+			Variables.getLogger().info("Initializing the CliProfile list from collection file");
+			ArrayList<CliProfile> cliProfileList = new ArrayList<CliProfile>();
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("profiles");
+			params.add("profile");
+			ArrayList<ArrayList<String[][]>> content = xMLGear.getResultListTabExt(UsefulMethod.getFlatFileContent(Variables.getCliProfileListFileName()), params);
+			
+			for(ArrayList<String[][]> ast : content)
+				{
+				try
+					{
+					CliProfile cp = new CliProfile("", null, null, null, 50);
+					
+					for(int i=0; i<ast.size(); i++)
+						{
+						String[][] s = ast.get(i);
+						if(i==0)//Misc
+							{
+							cp.setName(UsefulMethod.getItemByName("name", s));
+							cp.setType(getITMType(UsefulMethod.getItemByName("type", s)));
+							cp.setDefaultInterCommandTimer(Integer.parseInt(UsefulMethod.getItemByName("defaultintercommandtimer", s)));
+							}
+						else if(i==1)//How to authenticate
+							{
+							ArrayList<OneLine> l = new ArrayList<OneLine>();
+							for(String[] t : s)
+								{
+								l.add(new OneLine(t[1], cliType.valueOf(t[0])));
+								}
+							cp.setHowToAuthenticate(l);
+							}
+						else if(i==2)//Config
+							{
+							ArrayList<OneLine> l = new ArrayList<OneLine>();
+							for(String[] t : s)
+								{
+								l.add(new OneLine(t[1], cliType.valueOf(t[0])));
+								}
+							cp.setCliList(l);
+							}
+						}
+					
+					Variables.getLogger().debug("New CliProfile added to the CliProfile list : "+cp.getName());
+					cliProfileList.add(cp);
+					}
+				catch (Exception e)
+					{
+					Variables.getLogger().error("Could not add the following CliProfile : "+UsefulMethod.getItemByName("name", ast.get(0))+" : "+e.getMessage(), e);
+					}
+				}
+			
+			return cliProfileList;
+			}
+		catch(Exception exc)
+			{
+			throw new Exception("ERROR while initializing the CliProfile list : "+exc.getMessage(),exc);
 			}
 		}
 	
@@ -1025,13 +1096,24 @@ public class UsefulMethod
 		return false;
 		}
 	
-	public static itmType getITMType(String type)
+	public static itmType getITMType(String type) throws Exception
 		{
 		for(itmType t : itmType.values())
 			{
 			if(type.toLowerCase().contains(t.name()))return t;
 			}
-		return null;
+		
+		throw new Exception("No itmType found for type : "+type);
+		}
+	
+	public static CliProfile getCliProfile(itmType type) throws Exception
+		{
+		for(CliProfile clip : Variables.getCliProfileList())
+			{
+			if(clip.getType().equals(type))return clip;
+			}
+		
+		throw new Exception("No CliProfile found for type : "+type.name());
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

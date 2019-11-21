@@ -57,11 +57,75 @@ public class CliInjector extends Thread
 		{
 		try
 			{
+			/**
+			 * Here we send the cli command
+			 */
+			CliLinker clil = new CliLinker(device);
 			
+			for(OneLine l : todo)
+				{
+				try
+					{
+					switch(l.getType())
+						{
+						case connect:
+							{
+							clil.connect(l.getCommand());
+							break;
+							}
+						case disconnect:
+							{
+							clil.disconnect();
+							break;
+							}
+						case wait:
+							{
+							this.sleep(Long.parseLong(l.getCommand()));
+							break;
+							}
+						case waitfor:
+							{
+							clil.waitFor(l.getCommand());
+							break;
+							}
+						case write:
+							{
+							clil.write(l.getCommand());
+							break;
+							}
+						case writeif:
+							{
+							//To be written						
+							break;
+							}
+						case get:
+							{
+							//To be written
+							break;
+							}
+						default:
+							{
+							clil.write(l.getCommand());
+							break;
+							}
+						}
+					this.sleep(cliProfile.getDefaultInterCommandTimer());
+					}
+				catch (ConnectionException ce)
+					{
+					throw new ConnectionException(ce);
+					}
+				catch (Exception e)
+					{
+					Variables.getLogger().error(device.getInfo()+" : CLI : ERROR whith command "+l.getInfo());
+					errorList.add(new ErrorTemplate(device.getInfo()+" : CLI : ERROR whith command "+l.getInfo()));
+					}
+				}
 			}
 		catch (Exception e)
 			{
-			Variables.getLogger().error("ERROR : "+e.getMessage(), e);
+			Variables.getLogger().error(device.getInfo()+" : CLI : Critical ERROR");
+			errorList.add(new ErrorTemplate(device.getInfo()+" : CLI : Critical ERROR"));
 			}
 		}
 
@@ -80,6 +144,17 @@ public class CliInjector extends Thread
 		{
 		return responses;
 		}
+
+	public ArrayList<ErrorTemplate> getErrorList()
+		{
+		return errorList;
+		}
+
+	public void setErrorList(ArrayList<ErrorTemplate> errorList)
+		{
+		this.errorList = errorList;
+		}
+	
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

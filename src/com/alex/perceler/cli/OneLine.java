@@ -42,6 +42,11 @@ public class OneLine
 		{
 		command = CollectionTools.resolveDeviceValue(d, command);
 		}
+	
+	public String getInfo()
+		{
+		return type.name()+" "+command;
+		}
 
 	public String getCommand()
 		{

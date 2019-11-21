@@ -7,15 +7,13 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.alex.perceler.cli.CliInjector;
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.device.misc.BasicDevice;
-import com.alex.perceler.device.misc.Device;
-import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.Task;
 import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.misc.storedUUID;
 import com.alex.perceler.office.misc.BasicOffice;
-import com.alex.perceler.office.misc.Office;
 import com.cisco.schemas.ast.soap.RisPortType;
 
 
@@ -208,6 +206,7 @@ public class Variables
 	private static String matcherFileName;
 	private static String officeListFileName;
 	private static String deviceListFileName;
+	private static String cliProfileListFileName;
 	private static String substitutesFileName;
 	private static ArrayList<String> matcherList;
 	private static ArrayList<ValueMatcher> substituteList;
@@ -243,6 +242,7 @@ public class Variables
 		matcherFileName = "matchers.xml";
 		officeListFileName = "officeList.xml";
 		deviceListFileName = "deviceList.xml";
+		cliProfileListFileName = "cliProfileList.xml";
 		languageFileName = "languages.xml";
 		substitutesFileName = "substitutes.xml";
 		collectionFileName = "database.xlsx";
@@ -293,7 +293,7 @@ public class Variables
 		CUCMVersion = cUCMVersion;
 		}
 
-	public static Logger getLogger()
+	public synchronized static Logger getLogger()
 		{
 		return logger;
 		}
@@ -562,7 +562,7 @@ public class Variables
 		Variables.risConnection = risConnection;
 		}
 
-	public static ArrayList<CliProfile> getCliProfileList()
+	public static ArrayList<CliProfile> getCliProfileList() throws Exception
 		{
 		if(cliProfileList == null)
 			{
@@ -575,7 +575,16 @@ public class Variables
 		{
 		Variables.cliProfileList = cliProfileList;
 		}
-	
+
+	public static String getCliProfileListFileName()
+		{
+		return cliProfileListFileName;
+		}
+
+	public static void setCliProfileListFileName(String cliProfileListFileName)
+		{
+		Variables.cliProfileListFileName = cliProfileListFileName;
+		}
 	
 	
 	/*2019*//*RATEL Alexandre 8)*/

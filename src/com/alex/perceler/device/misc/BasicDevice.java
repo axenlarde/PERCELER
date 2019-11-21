@@ -25,16 +25,21 @@ public class BasicDevice
 	officeid,
 	newip,
 	newgateway,
-	newmask;
+	newmask,
+	user,
+	password;
 	private CliProfile cliProfile;
 	private cliProtocol connexionProtocol;
 
-	public BasicDevice(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip, String newgateway,
-			String newmask, CliProfile cliProfile, cliProtocol connexionProtocol)
+	
+	
+	public BasicDevice(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip,
+			String newgateway, String newmask, String user, String password, CliProfile cliProfile,
+			cliProtocol connexionProtocol)
 		{
 		super();
-		this.name = name;
 		this.type = type;
+		this.name = name;
 		this.ip = ip;
 		this.mask = mask;
 		this.gateway = gateway;
@@ -42,9 +47,13 @@ public class BasicDevice
 		this.newip = newip;
 		this.newgateway = newgateway;
 		this.newmask = newmask;
-		id = DigestUtils.md5Hex(name+ip+officeid);
+		this.user = user;
+		this.password = password;
+		this.cliProfile = cliProfile;
+		this.connexionProtocol = connexionProtocol;
+		this.id = DigestUtils.md5Hex(name+ip+officeid);
 		}
-	
+
 	public String getInfo()
 		{
 		return name+" "+
@@ -170,6 +179,26 @@ public class BasicDevice
 	public void setConnexionProtocol(cliProtocol connexionProtocol)
 		{
 		this.connexionProtocol = connexionProtocol;
+		}
+
+	public String getUser()
+		{
+		return user;
+		}
+
+	public void setUser(String user)
+		{
+		this.user = user;
+		}
+
+	public String getPassword()
+		{
+		return password;
+		}
+
+	public void setPassword(String password)
+		{
+		this.password = password;
 		}
 	
 	
