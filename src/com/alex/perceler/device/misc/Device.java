@@ -35,27 +35,22 @@ public class Device extends ItemToMigrate
 	officeid,
 	newip,
 	newgateway,
-	newmask;
+	newmask,
+	user,
+	password;
 	
 	private boolean reachable;
 	private CliInjector cliInjector;
-	public CliInjector getCliInjector()
-		{
-		return cliInjector;
-		}
-
-	public void setCliInjector(CliInjector cliInjector)
-		{
-		this.cliInjector = cliInjector;
-		}
-
 	private cliProtocol connexionProtocol;
 
 	public Device(itmType type, String id, String name, String ip, String mask, String gateway, String officeid, String newip,
-			String newgateway, String newmask, actionType action, CliProfile cliProfile, cliProtocol connexionProtocol) throws Exception
+			String newgateway, String newmask, actionType action, String user, String password,
+			CliProfile cliProfile, cliProtocol connexionProtocol) throws Exception
 		{
 		super(type, name, id, action);
 		this.officeid = officeid;
+		this.user = user;
+		this.password = password;
 		this.connexionProtocol = connexionProtocol;
 		this.cliInjector = new CliInjector(this, cliProfile);
 		
@@ -86,6 +81,8 @@ public class Device extends ItemToMigrate
 		{
 		super(bd.getType(), bd.getName(), bd.getId(), action);
 		this.officeid = bd.getOfficeid();
+		this.user = bd.getUser();
+		this.password = bd.getPassword();
 		this.connexionProtocol = bd.getConnexionProtocol();
 		this.cliInjector = new CliInjector(this, bd.getCliProfile());
 		
@@ -361,6 +358,36 @@ public class Device extends ItemToMigrate
 	public void setConnexionProtocol(cliProtocol connexionProtocol)
 		{
 		this.connexionProtocol = connexionProtocol;
+		}
+	
+	public CliInjector getCliInjector()
+		{
+		return cliInjector;
+		}
+
+	public void setCliInjector(CliInjector cliInjector)
+		{
+		this.cliInjector = cliInjector;
+		}
+
+	public String getUser()
+		{
+		return user;
+		}
+
+	public void setUser(String user)
+		{
+		this.user = user;
+		}
+
+	public String getPassword()
+		{
+		return password;
+		}
+
+	public void setPassword(String password)
+		{
+		this.password = password;
 		}
 
 		

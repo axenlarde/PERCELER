@@ -24,8 +24,9 @@ public class TaskManager
 		{
 		try
 			{
-			//First we clear finished tasks
+			//First we clear finished tasks and run GC
 			clearStaleTask();
+			System.gc();
 			
 			if(Variables.getTaskList().size() <= Integer.parseInt(UsefulMethod.getTargetOption("maxtaskthread")))
 				{

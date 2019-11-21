@@ -60,55 +60,13 @@ public class CliInjector extends Thread
 			/**
 			 * Here we send the cli command
 			 */
-			CliLinker clil = new CliLinker(device);
+			CliLinker clil = new CliLinker(this);
 			
 			for(OneLine l : todo)
 				{
 				try
 					{
-					switch(l.getType())
-						{
-						case connect:
-							{
-							clil.connect(l.getCommand());
-							break;
-							}
-						case disconnect:
-							{
-							clil.disconnect();
-							break;
-							}
-						case wait:
-							{
-							this.sleep(Long.parseLong(l.getCommand()));
-							break;
-							}
-						case waitfor:
-							{
-							clil.waitFor(l.getCommand());
-							break;
-							}
-						case write:
-							{
-							clil.write(l.getCommand());
-							break;
-							}
-						case writeif:
-							{
-							//To be written						
-							break;
-							}
-						case get:
-							{
-							//To be written
-							break;
-							}
-						default:
-							{
-							clil.write(l.getCommand());
-							break;
-							}
-						}
+					clil.execute(l);
 					this.sleep(cliProfile.getDefaultInterCommandTimer());
 					}
 				catch (ConnectionException ce)
