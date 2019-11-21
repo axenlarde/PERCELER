@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ItemToMigrate;
@@ -226,6 +227,9 @@ public class Variables
 	
     //RISPORT
     private static RisPortType risConnection;
+    
+    //CLI
+    private static ArrayList<CliProfile> cliProfileList;
     
     /**************
      * Constructor
@@ -556,6 +560,20 @@ public class Variables
 	public static void setRisConnection(RisPortType risConnection)
 		{
 		Variables.risConnection = risConnection;
+		}
+
+	public static ArrayList<CliProfile> getCliProfileList()
+		{
+		if(cliProfileList == null)
+			{
+			UsefulMethod.initCliProfileList();
+			}
+		return cliProfileList;
+		}
+
+	public static void setCliProfileList(ArrayList<CliProfile> cliProfileList)
+		{
+		Variables.cliProfileList = cliProfileList;
 		}
 	
 	

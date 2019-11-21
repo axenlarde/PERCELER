@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.utils.ClearFrenchString;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -59,8 +60,7 @@ public class CollectionTools
 			/**
 			 * Special regex
 			 */
-			/*
-			if(Pattern.matches(".*office\\..*", param[i]))
+			/*if(Pattern.matches(".*office\\..*", param[i]))
 				{
 				String result = "";
 				
@@ -88,8 +88,8 @@ public class CollectionTools
 				regex.append(applyRegex(result, param[i]));
 				
 				match = true;
-				}
-			else if(Pattern.matches(".*config\\..*", param[i]))
+				}*/
+			if(Pattern.matches(".*config\\..*", param[i]))
 				{
 				String[] tab = param[i].split("\\.");
 				String result = UsefulMethod.getTargetOption(tab[1]);
@@ -97,12 +97,6 @@ public class CollectionTools
 				
 				match = true;
 				}
-			else if(Pattern.matches(".*cucm.availableline", param[i]))
-				{
-				regex.append(applyRegex(getAvailableInternalNumber(), param[i]));
-				match = true;
-				}
-			*/
 			
 			/***********/
 			
@@ -812,6 +806,52 @@ public class CollectionTools
 			}
 		
 		return list;
+		}
+	
+	public static String resolveDeviceValue(Device d, String pattern) throws Exception
+		{
+		StringBuffer regex = new StringBuffer("");
+		String[] param = getSplittedValue(pattern, UsefulMethod.getTargetOption("splitter"));
+		
+		for(int i = 0; i<param.length; i++)
+			{
+			boolean match = false;
+			
+			String value = d.getString(param[i]);
+			if(value != null)
+				{
+				if(param[i].contains("*"))
+					{
+					//We apply regex
+					Variables.getLogger().debug("Value before "+param[i]+" regex : "+value);
+					value = applyRegex(value, param[i]);
+					Variables.getLogger().debug("Value after applying "+param[i]+" regex : "+value);
+					}
+				regex.append(value);
+				match = true;
+				}
+			else
+				{
+				if(Pattern.matches(".*config\\..*", param[i]))
+					{
+					String[] tab = param[i].split("\\.");
+					String result = UsefulMethod.getTargetOption(tab[1]);
+					regex.append(result);
+					
+					match = true;
+					}
+				}
+			
+			/***********/
+			
+			//Default
+			if(!match)
+				{
+				regex.append(param[i]);
+				}
+			}
+	
+		return regex.toString();
 		}
 	
 	/*2018*//*RATEL Alexandre 8)*/

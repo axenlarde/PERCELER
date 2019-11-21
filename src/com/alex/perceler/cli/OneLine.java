@@ -1,5 +1,7 @@
 package com.alex.perceler.cli;
 
+import com.alex.perceler.device.misc.Device;
+import com.alex.perceler.misc.CollectionTools;
 
 /**
  * Represent one cli command
@@ -11,9 +13,56 @@ public class OneLine
 	/**
 	 * variables
 	 */
-	private String request;
-	private int waitingTime;
-	private String reply;
+	public enum cliType
+		{
+		connect,
+		disconnect,
+		write,
+		wait,
+		waitfor,
+		get,
+		writeif
+		};
+	
+	private String command;
+	private cliType type;
+	
+	public OneLine(String command, cliType type)
+		{
+		super();
+		this.command = command;
+		this.type = type;
+		}
+	
+	/**
+	 * To resolve command content with device values
+	 * @throws Exception 
+	 */
+	public void resolve(Device d) throws Exception
+		{
+		command = CollectionTools.resolveDeviceValue(d, command);
+		}
+
+	public String getCommand()
+		{
+		return command;
+		}
+
+	public void setCommand(String command)
+		{
+		this.command = command;
+		}
+
+	public cliType getType()
+		{
+		return type;
+		}
+
+	public void setType(cliType type)
+		{
+		this.type = type;
+		}
+	
 	
 	
 	

@@ -2,6 +2,8 @@ package com.alex.perceler.device.misc;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.alex.perceler.cli.CliProfile;
+import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.utils.Variables.itmType;
 
 /**
@@ -24,9 +26,11 @@ public class BasicDevice
 	newip,
 	newgateway,
 	newmask;
+	private CliProfile cliProfile;
+	private cliProtocol connexionProtocol;
 
 	public BasicDevice(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip, String newgateway,
-			String newmask)
+			String newmask, CliProfile cliProfile, cliProtocol connexionProtocol)
 		{
 		super();
 		this.name = name;
@@ -146,6 +150,26 @@ public class BasicDevice
 	public void setName(String name)
 		{
 		this.name = name;
+		}
+
+	public CliProfile getCliProfile()
+		{
+		return cliProfile;
+		}
+
+	public void setCliProfile(CliProfile cliProfile)
+		{
+		this.cliProfile = cliProfile;
+		}
+
+	public cliProtocol getConnexionProtocol()
+		{
+		return connexionProtocol;
+		}
+
+	public void setConnexionProtocol(cliProtocol connexionProtocol)
+		{
+		this.connexionProtocol = connexionProtocol;
 		}
 	
 	

@@ -2,106 +2,118 @@
 Gateway config file
 -->
 <xml>
-	<gateways>
-		<gateway>
-			<misc>
-				<name>ISR</name>
-			</misc>
-			<configure>
-				<wait_50>enable</wait_50>
-				<wait_50>configure terminal</wait_50>
-				<wait_50>User</wait_50>
-				<wait_50>Router</wait_50>
-			</configure>
-			<before>
-				<wait_50>aaa new-model</wait_50>
-			</before>
-			<during>
-				<wait_50>aaa new-model</wait_50>
-				<wait_50>aaa authentication login default local</wait_50>
-				<wait_50>aaa authorization console</wait_50>
-			</during>
-			<after>
-				<wait_50>'end'</wait_50>
-				<wait_2000>'copy running-config startup-config'</wait_2000>
-				<wait_50>''</wait_50>
-				<wait_4000>''</wait_4000>
-			</after>
-		</gateway>
-		<gateway>
-			<misc>
-				<name>VG</name>
-			</misc>
-			<configure>
-				<wait_50>enable</wait_50>
-				<wait_50>configure terminal</wait_50>
-				<wait_50>User</wait_50>
-				<wait_50>Router</wait_50>
-			</configure>
-			<before>
-				<wait_50>aaa new-model</wait_50>
-			</before>
-			<during>
-				<wait_50>aaa new-model</wait_50>
-				<wait_50>aaa authentication login default local</wait_50>
-				<wait_50>aaa authorization console</wait_50>
-			</during>
-			<after>
-				<wait_50>'end'</wait_50>
-				<wait_2000>'copy running-config startup-config'</wait_2000>
-				<wait_50>''</wait_50>
-				<wait_4000>''</wait_4000>
-			</after>
-		</gateway>
-		<gateway>
-			<misc>
-				<name>AUDIOCODE</name>
-			</misc>
-			<configure>
-				<wait_50>enable</wait_50>
-				<wait_50>configure terminal</wait_50>
-				<wait_50>User</wait_50>
-				<wait_50>Router</wait_50>
-			</configure>
-			<before>
-				<wait_50>aaa new-model</wait_50>
-			</before>
-			<during>
-				<wait_50>aaa new-model</wait_50>
-				<wait_50>aaa authentication login default local</wait_50>
-				<wait_50>aaa authorization console</wait_50>
-			</during>
-			<after>
-				<wait_50>'end'</wait_50>
-				<wait_2000>'copy running-config startup-config'</wait_2000>
-				<wait_50>''</wait_50>
-				<wait_4000>''</wait_4000>
-			</after>
-		</gateway>
-		<gateway>
-			<misc>
-				<name>ASCOM</name>
-			</misc>
-			<configure>
-				<wait_50>enable</wait_50>
-				<wait_50>configure terminal</wait_50>
-				<wait_50>User</wait_50>
-				<wait_50>Router</wait_50>
-			</configure>
-			<before>
-				<wait_50>aaa new-model</wait_50>
-			</before>
-			<during>
-				<wait_50>aaa new-model</wait_50>
-				<wait_50>aaa authentication login default local</wait_50>
-				<wait_50>aaa authorization console</wait_50>
-			</during>
-			<after>
-				<wait_50>'end'</wait_50>
-				<wait_2000>'copy running-config startup-config'</wait_2000>
-				<wait_50>''</wait_50>
-				<wait_4000>''</wait_4000>
-			</after>
-		</gateway>
-	</gateways>
+	<devices>
+		<device>
+			<type>ISR</type>
+			<howtoconnect><!--Should be used only with telnet connection-->
+				<waitfor>User</waitfor>
+				<write>device.user</write>
+				<write>device.password</write>
+			</howtoconnect>
+			<config>
+				<connect>device.ip</connect>
+				<write>enable</write>
+				<write>configure terminal</write>
+				<write>ntp server 192.168.0.1</write>
+				<write>end</write>
+				<write>copy running-config startup-config</write>
+				<wait>2000</wait>
+				<write></write>
+				<wait>4000</wait>
+				<write>reload in 30</write>
+				<wait>1000</wait>
+				<write></write>
+				<write>configure terminal</write>
+				<write>'ip route 0.0.0.0 0.0.0.0 '+device.newgateway</write>
+				<write>interface gigabitethernet 0/0</write>
+				<write>'ip address '+device.newip</write>
+				<disconnect></disconnect>
+				<connect>device.newip</connect>
+				<write>configure terminal</write>
+				<write>'no ip route 0.0.0.0 0.0.0.0 '+device.gateway</write>
+				<write>end</write>
+				<write>copy running-config startup-config</write>
+				<wait>2000</wait>
+				<write></write>
+				<wait>4000</wait>
+				<write>reload cancel</write>
+				<wait>4000</wait>
+				<write></write>
+			</config>
+		</device>
+		<device>
+			<type>VG</type>
+			<howtoconnect>
+				<waitfor>User</waitfor>
+				<write>device.user</write>
+				<write>device.password</write>
+			</howtoconnect>
+			<config>
+				<connect>device.ip</connect>
+				<write>enable</write>
+				<write>configure terminal</write>
+				<write>ntp server 192.168.0.1</write>
+				<write>end</write>
+				<write>copy running-config startup-config</write>
+				<wait>2000</wait>
+				<write></write>
+				<wait>4000</wait>
+				<write>reload in 30</write>
+				<wait>1000</wait>
+				<write></write>
+				<write>configure terminal</write>
+				<write>'ip route 0.0.0.0 0.0.0.0 '+device.newgateway</write>
+				<write>interface fastethernet 0/0</write>
+				<write>'ip address '+device.newip</write>
+				<disconnect></disconnect>
+				<connect>device.newip</connect>
+				<write>configure terminal</write>
+				<write>'no ip route 0.0.0.0 0.0.0.0 '+device.gateway</write>
+				<write>end</write>
+				<write>copy running-config startup-config</write>
+				<wait>2000</wait>
+				<write></write>
+				<wait>4000</wait>
+				<write>reload cancel</write>
+				<wait>4000</wait>
+				<write></write>
+			</config>
+		</device>
+		<device>
+			<type>AUDIOCODES</type>
+			<howtoconnect>
+				<waitfor>User</waitfor>
+				<write>device.user</write>
+				<write>device.password</write>
+			</howtoconnect>
+			<config>
+				<connect>device.ip</connect>
+				<write></write>
+			</config>
+		</device>
+		<device>
+			<type>ASCOM</type>
+			<howtoconnect>
+				<waitfor>User</waitfor>
+				<write>device.user</write>
+				<write>device.password</write>
+			</howtoconnect>
+			<config>
+				<connect>device.ip</connect>
+				<write></write>
+			</config>
+		</device>
+		<device>
+			<type>SIP</type>
+			<howtoconnect>
+				<waitfor>User</waitfor>
+				<write>device.user</write>
+				<write>device.password</write>
+			</howtoconnect>
+			<config>
+				<connect>device.ip</connect>
+				<write></write>
+			</config>
+		</device>
+	</devices>
 </xml>

@@ -1,10 +1,12 @@
 package com.alex.perceler.device.misc;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import org.apache.commons.validator.routines.InetAddressValidator;
 
-import com.alex.perceler.cli.OneLine;
+import com.alex.perceler.cli.CliProfile;
+import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
@@ -15,7 +17,6 @@ import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
-import com.alex.perceler.utils.Variables.statusType;
 
 /**
  * Represent a device
@@ -36,14 +37,16 @@ public class Device extends ItemToMigrate
 	newmask;
 	
 	private boolean reachable;
-	
-	private ArrayList<OneLine> cliList;
+	private CliProfile cliProfile;
+	private cliProtocol connexionProtocol;
 
 	public Device(itmType type, String id, String name, String ip, String mask, String gateway, String officeid, String newip,
-			String newgateway, String newmask, actionType action) throws Exception
+			String newgateway, String newmask, actionType action, CliProfile cliProfile, cliProtocol connexionProtocol) throws Exception
 		{
 		super(type, name, id, action);
 		this.officeid = officeid;
+		this.cliProfile = cliProfile;
+		this.connexionProtocol = connexionProtocol;
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -72,6 +75,8 @@ public class Device extends ItemToMigrate
 		{
 		super(bd.getType(), bd.getName(), bd.getId(), action);
 		this.officeid = bd.getOfficeid();
+		this.cliProfile = bd.getCliProfile();
+		this.connexionProtocol = bd.getConnexionProtocol();
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -172,9 +177,8 @@ public class Device extends ItemToMigrate
 	public void doUpdate() throws Exception
 		{
 		/**
-		 * here we first used the current values to check that
-		 * the items exists. Now we are about to proceed with the update so
-		 * we change the values with the new ones 
+		 * Before updating we change the values with the new ones
+		 * Example : replace ip with newip 
 		 */
 		for(ItemToInject iti : axlList)
 			{
@@ -191,7 +195,10 @@ public class Device extends ItemToMigrate
 				}
 			}
 		
-		//Same for clid
+		/**
+		 * We now inject the cli command
+		 */
+		
 		}
 	
 	@Override
@@ -229,6 +236,28 @@ public class Device extends ItemToMigrate
 		{
 		//To be Written
 		return "";
+		}
+	
+	/******
+	 * Used to return a value based on the string provided
+	 * @throws Exception 
+	 */
+	public String getString(String s) throws Exception
+		{
+		String tab[] = s.split("\\.");
+		
+		if(tab.length == 2)
+			{
+			for(Field f : this.getClass().getDeclaredFields())
+				{
+				if(f.getName().equals(tab[1]))
+					{
+					return (String) f.get(this);
+					}
+				}
+			}
+		
+		return null;
 		}
 	
 	public String getIp()
@@ -301,16 +330,6 @@ public class Device extends ItemToMigrate
 		this.newmask = newmask;
 		}
 
-	public ArrayList<OneLine> getCliList()
-		{
-		return cliList;
-		}
-
-	public void setCliList(ArrayList<OneLine> cliList)
-		{
-		this.cliList = cliList;
-		}
-
 	public boolean isReachable()
 		{
 		return reachable;
@@ -319,6 +338,26 @@ public class Device extends ItemToMigrate
 	public void setReachable(boolean reachable)
 		{
 		this.reachable = reachable;
+		}
+
+	public CliProfile getCliProfile()
+		{
+		return cliProfile;
+		}
+
+	public void setCliProfile(CliProfile cliProfile)
+		{
+		this.cliProfile = cliProfile;
+		}
+
+	public cliProtocol getConnexionProtocol()
+		{
+		return connexionProtocol;
+		}
+
+	public void setConnexionProtocol(cliProtocol connexionProtocol)
+		{
+		this.connexionProtocol = connexionProtocol;
 		}
 
 		
