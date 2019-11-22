@@ -26,11 +26,20 @@ public class TaskManager
 			{
 			//First we clear finished tasks and run GC
 			Variables.getLogger().debug("Clearing task list");
-			clearStaleTask();
-			System.gc();
+			if(Variables.getTaskList().size()>0)
+				{
+				clearStaleTask();
+				System.gc();
+				}
 			Variables.getLogger().debug("Task list cleared");
 			
-			if(Variables.getTaskList().size() < Integer.parseInt(UsefulMethod.getTargetOption("maxtaskthread")))
+			int sum = 0;
+			for(Task t : Variables.getTaskList())
+				{
+				if(t.isAlive())sum++;
+				}
+			
+			if(sum < Integer.parseInt(UsefulMethod.getTargetOption("maxtaskthread")))
 				{
 				ArrayList<ItemToMigrate> todoList = new ArrayList<ItemToMigrate>();
 				
@@ -72,7 +81,7 @@ public class TaskManager
 				}
 			else
 				{
-				Variables.getLogger().debug("Max concurent task reached. You cannot start more task");
+				throw new Exception("Max concurent task reached. You cannot start more task");
 				}
 			}
 		catch (Exception e)
@@ -116,6 +125,7 @@ public class TaskManager
 				{
 				Variables.getTaskList().remove(t);
 				clearStaleTask();
+				break;
 				}
 			}
 		}

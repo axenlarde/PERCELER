@@ -34,7 +34,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	protected itmStatus status;
 	protected String id,name;
 	protected int index;
-	protected ArrayList<ErrorTemplate> errorList;
+	private ArrayList<ErrorTemplate> errorList;
 	
 	//This List contains the AXL items that should be updated if this item is migrated 
 	protected ArrayList<ItemToInject> axlList;
@@ -167,6 +167,19 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		
 		return result.toString();
 		}
+	
+	/**
+	 * Add an error to the error list and check for duplicate
+	 */
+	public void addError(ErrorTemplate error)
+		{
+		boolean duplicate = false;
+		for(ErrorTemplate e : errorList)
+			{
+			if(e.getErrorDesc().equals(error.getErrorDesc()))duplicate = true;break;//Duplicate found
+			}
+		if(!duplicate)errorList.add(error);
+		}
 
 	public itmType getType()
 		{
@@ -226,16 +239,6 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	public void setIndex(int index)
 		{
 		this.index = index;
-		}
-
-	public ArrayList<ErrorTemplate> getErrorList()
-		{
-		return errorList;
-		}
-
-	public void setErrorList(ArrayList<ErrorTemplate> errorList)
-		{
-		this.errorList = errorList;
 		}
 
 	public actionType getAction()

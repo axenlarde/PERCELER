@@ -265,16 +265,25 @@ public class ManageWebRequest
 			String taskID = UsefulMethod.getItemByName("taskid", tab);
 			taskActionType action = taskActionType.valueOf(UsefulMethod.getItemByName("action", tab));
 			
+			boolean found = false;
 			for(Task t : Variables.getTaskList())
 				{
 				if(t.getTaskId().equals(taskID))
 					{
 					t.act(action);
+					found = true;
 					break;
 					}
 				}
 			
-			return WebRequestBuilder.buildWebRequest(webRequestType.success, taskID);
+			if(found)
+				{
+				return WebRequestBuilder.buildWebRequest(webRequestType.success, taskID);
+				}
+			else
+				{
+				Variables.getLogger().debug("The following task ID was not found : "+taskID);
+				}
 			}
 		catch (Exception e)
 			{

@@ -127,7 +127,7 @@ public class CliConnection implements TelnetNotificationHandler
 	 ***********************************/
 	public void initTelnet() throws Exception
 		{
-		Variables.getLogger().debug(info+" CLI : init SSH connection");
+		Variables.getLogger().debug(info+" CLI : init Telnet connection");
 		
 		telnetConnection = new TelnetClient();
         

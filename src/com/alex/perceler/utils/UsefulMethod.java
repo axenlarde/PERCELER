@@ -600,7 +600,7 @@ public class UsefulMethod
 			/**
 			 * We now check if the CUCM is reachable by asking him its version
 			 */
-			SimpleRequest.getCUCMVersion();
+			Variables.getLogger().debug("CUCM version : "+SimpleRequest.getCUCMVersion());
 			Variables.setCUCMReachable(true);
 			}
 		catch (Exception e)

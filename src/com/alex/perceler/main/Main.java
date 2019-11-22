@@ -55,6 +55,14 @@ public class Main
 			
 			//Database file reading
 			UsefulMethod.initDatabase();
+			
+			/***
+			 * Server connection initialization
+			 * 
+			 * We do it now to avoid latency during real request
+			 */
+			UsefulMethod.initAXLConnectionToCUCM();
+			UsefulMethod.initRISConnectionToCUCM();
 			}
 		catch(Exception exc)
 			{

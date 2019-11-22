@@ -177,7 +177,7 @@ public class Device extends ItemToMigrate
 			 * If the device is not reachable, we should not update the CUCM data. So we disable the entire item
 			 */
 			status = itmStatus.disabled;
-			errorList.add(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
+			addError(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
 			}
 		}
 
@@ -227,7 +227,7 @@ public class Device extends ItemToMigrate
 		catch (Exception e)
 			{
 			Variables.getLogger().error("ERROR while reseting sip trunk for "+type+" "+name+" "+e.getMessage(), e);
-			errorList.add(new ErrorTemplate("Failed to reset the sip trunk for "+type+" "+name));
+			addError(new ErrorTemplate("Failed to reset the sip trunk for "+type+" "+name));
 			}
 		}
 	

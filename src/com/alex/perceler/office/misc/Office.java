@@ -156,7 +156,7 @@ public class Office extends ItemToMigrate
 	public void doStartSurvey() throws Exception
 		{
 		//We check for the office device pool
-		if(!dp.isExisting())errorList.add(new ErrorTemplate(name+" warning the associated device pool has not been found : "+dp.getName()));
+		if(!dp.isExisting())addError(new ErrorTemplate(name+" warning the associated device pool has not been found : "+dp.getName()));
 		
 		//We get the associated phones status
 		ArrayList<BasicPhone> pl = RisportTools.doPhoneSurvey(phoneList);
@@ -203,7 +203,7 @@ public class Office extends ItemToMigrate
 		catch (Exception e)
 			{
 			Variables.getLogger().error("ERROR while reseting devices for "+type+" "+name+" "+e.getMessage(), e);
-			errorList.add(new ErrorTemplate("Failed to reset the device pool for "+type+" "+name));
+			addError(new ErrorTemplate("Failed to reset the device pool for "+type+" "+name));
 			}
 		}
 	
