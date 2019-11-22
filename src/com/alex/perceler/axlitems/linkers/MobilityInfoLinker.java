@@ -131,7 +131,6 @@ public class MobilityInfoLinker extends AXLItemLinker
 		 */
 		req.setName(this.getName());
 		/************/
-		
 		com.cisco.axl.api._10.GetDeviceMobilityRes resp = Variables.getAXLConnectionToCUCMV105().getDeviceMobility(req);//We send the request to the CUCM
 		
 		MobilityInfo myMI = new MobilityInfo(this.getName());

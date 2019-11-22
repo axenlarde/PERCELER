@@ -206,13 +206,15 @@ public class Task extends Thread
 				
 				status = itmStatus.postaudit;
 				setItemStatus(itmStatus.postaudit);
-				while(!stop)
+				int counter = 0;
+				while((!stop) && (counter<12))
 					{
 					/**
-					 * We proceed with the survey as long as the user want
+					 * We proceed with the survey as long as the user want or max 2 minutes
 					 */
 					startSurvey();
-					this.sleep(5000);
+					counter++;
+					this.sleep(10000);
 					}
 				}
 			
@@ -230,7 +232,7 @@ public class Task extends Thread
 			}
 		}
 	
-	public void act(taskActionType action)
+	public void act(taskActionType action) throws Exception
 		{
 		switch(action)
 			{
@@ -266,19 +268,26 @@ public class Task extends Thread
 		return pause;
 		}
 
-	public void setPause(boolean pause)
+	public void setPause(boolean pause) throws Exception
 		{
 		this.pause = pause;
 		
-		if(this.pause)
+		if(this.isAlive())
 			{
-			Variables.getLogger().debug("The user asked to pause the task : "+taskID);
-			cliManager.setPause(pause);
+			if(this.pause)
+				{
+				Variables.getLogger().debug("The user asked to pause the task : "+taskID);
+				if(cliManager != null)cliManager.setPause(pause);
+				}
+			else
+				{
+				Variables.getLogger().debug("The user asked to resume the task : "+taskID);
+				if(cliManager != null)cliManager.setPause(pause);
+				}
 			}
 		else
 			{
-			Variables.getLogger().debug("The user asked to resume the task : "+taskID);
-			cliManager.setPause(pause);
+			throw new Exception("The task is finished and therefore cannot be paused");
 			}
 		}
 
@@ -287,11 +296,18 @@ public class Task extends Thread
 		return stop;
 		}
 
-	public void setStop(boolean stop)
+	public void setStop(boolean stop) throws Exception
 		{
-		Variables.getLogger().debug("The user asked to stop the task : "+taskID);
-		this.stop = stop;
-		cliManager.setStop(stop);
+		if(this.isAlive())
+			{
+			Variables.getLogger().debug("The user asked to stop the task : "+taskID);
+			this.stop = stop;
+			if(cliManager != null)cliManager.setStop(stop);
+			}
+		else
+			{
+			throw new Exception("The task is finished and therefore cannot be stopped again");
+			}
 		}
 
 	public boolean isStarted()

@@ -50,6 +50,7 @@ public class RisportTools
 			sxmlParams.setCmSelectionCriteria(criteria);
 
 			//make selectCmDevice request
+			Variables.getLogger().debug("Sending RIS request");
 			SelectCmDeviceReturn selectResponse = Variables.getRisConnection().selectCmDevice("",criteria);
 			
 			return getDeviceFromRISResponse(selectResponse).get(0);
@@ -69,21 +70,31 @@ public class RisportTools
 		{
 		ArrayList<BasicPhone> pl = new ArrayList<BasicPhone>();
 		
-		for(CmNode node : selectResponse.getSelectCmDeviceResult().getCmNodes().getItem())
+		try
 			{
-			ArrayOfCmDevice dl = node.getCmDevices();
+			Variables.getLogger().debug("Parsing RIS reply");
 			
-			for(CmDevice d : dl.getItem())
+			for(CmNode node : selectResponse.getSelectCmDeviceResult().getCmNodes().getItem())
 				{
-				pl.add(new BasicPhone(d.getName(),
-						d.getDescription(),
-						d.getModel().toString(),
-						d.getIPAddress().getItem().get(0).getIP(),
-						d.getStatus().name()));
+				ArrayOfCmDevice dl = node.getCmDevices();
+				
+				for(CmDevice d : dl.getItem())
+					{
+					pl.add(new BasicPhone(d.getName(),
+							d.getDescription(),
+							d.getModel().toString(),
+							d.getIPAddress().getItem().get(0).getIP(),
+							d.getStatus().name().toLowerCase().replace("_", "")));
+					}
 				}
+			
+			Variables.getLogger().debug(pl.size()+" phone found");
+			return pl;
 			}
-		
-		Variables.getLogger().debug(pl.size()+" phone found");
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR : "+e.getMessage(),e);
+			}
 		
 		return pl;
 		}
@@ -106,15 +117,16 @@ public class RisportTools
 			ArrayList<BasicPhone> result = new ArrayList<BasicPhone>();
 			ArrayList<BasicPhone> temp = new ArrayList<BasicPhone>();
 			int index = 0;
-			while(index <= phoneList.size())
+			while(index < phoneList.size())
 				{
 				temp.add(phoneList.get(index));
 				index++;
 				if((temp.size()==maxPhoneRequest) || (index == phoneList.size()))
 					{
-					CmSelectionCriteria criteria = buildRISRequest(phoneList);
+					CmSelectionCriteria criteria = buildRISRequest(temp);
 					
 					//make selectCmDevice request
+					Variables.getLogger().debug("Sending RIS request");
 					SelectCmDeviceReturn selectResponse = Variables.getRisConnection().selectCmDevice("",criteria);
 					result.addAll(getDeviceFromRISResponse(selectResponse));
 					temp.clear();

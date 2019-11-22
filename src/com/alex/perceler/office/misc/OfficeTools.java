@@ -66,9 +66,11 @@ public class OfficeTools
 	 */
 	public static ArrayList<BasicPhone> getDevicePoolPhoneList(String DevicePoolName)
 		{
+		Variables.getLogger().debug("Looking for devicepool's phone "+DevicePoolName);
+		
 		ArrayList<BasicPhone> l = new ArrayList<BasicPhone>();
 		
-		String request = "select d.name, d.description, tm.name as model from device d, devicepool dp, typemodel tm where dp.pkid=d.fkdevicepool and tm.enum=d.tkmodel and dp.name='"+DevicePoolName+"'";
+		String request = "select d.name, d.description, tm.name as model from device d, devicepool dp, typemodel tm where dp.pkid=d.fkdevicepool and tm.enum=d.tkmodel and d.tkClass='1' and dp.name='"+DevicePoolName+"'";
 		
 		try
 			{
@@ -95,6 +97,7 @@ public class OfficeTools
 						bp.setModel(list.item(i).getTextContent());
 						}
 					}
+				Variables.getLogger().debug("Phone found : "+bp.getName());
 				l.add(bp);
 				}
 			Variables.getLogger().debug("Found "+l.size()+" phones for "+DevicePoolName);

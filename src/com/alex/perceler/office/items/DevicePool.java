@@ -22,7 +22,6 @@ public class DevicePool extends ItemToInject
 	/**
 	 * Variables
 	 */
-	private DevicePoolLinker myDevicePool;
 	private String callManagerGroupName,
 	regionName,
 	locationName,
@@ -55,8 +54,7 @@ public class DevicePool extends ItemToInject
 			String cntdPnTransformationCssName, String redirectingPartyTransformationCSS,
 			String callingPartyTransformationCSS, ArrayList<LocalRouteGroup> localRouteGroupList) throws Exception
 		{
-		super(itemType.devicepool, name);
-		myDevicePool = new DevicePoolLinker(name);
+		super(itemType.devicepool, name, new DevicePoolLinker(name));
 		this.callManagerGroupName = callManagerGroupName;
 		this.regionName = regionName;
 		this.locationName = locationName;
@@ -81,8 +79,7 @@ public class DevicePool extends ItemToInject
 
 	public DevicePool(String name) throws Exception
 		{
-		super(itemType.devicepool, name);
-		myDevicePool = new DevicePoolLinker(name);
+		super(itemType.devicepool, name, new DevicePoolLinker(name));
 		}
 
 	/***********
@@ -91,7 +88,7 @@ public class DevicePool extends ItemToInject
 	 */
 	public void doBuild() throws Exception
 		{
-		this.errorList = myDevicePool.init();
+		this.errorList = linker.init();
 		}
 	
 	
@@ -103,7 +100,7 @@ public class DevicePool extends ItemToInject
 	 */
 	public String doInject() throws Exception
 		{
-		return myDevicePool.inject();//Return UUID
+		return linker.inject();//Return UUID
 		}
 
 	/**
@@ -112,7 +109,7 @@ public class DevicePool extends ItemToInject
 	 */
 	public void doDelete() throws Exception
 		{
-		myDevicePool.delete();
+		linker.delete();
 		}
 
 	/**
@@ -121,7 +118,7 @@ public class DevicePool extends ItemToInject
 	 */
 	public void doUpdate() throws Exception
 		{
-		myDevicePool.update(tuList);
+		linker.update(tuList);
 		}
 	
 	/**
@@ -129,7 +126,7 @@ public class DevicePool extends ItemToInject
 	 */
 	public boolean isExisting() throws Exception
 		{
-		DevicePool myDP = (DevicePool) myDevicePool.get();
+		DevicePool myDP = (DevicePool) linker.get();
 		this.UUID = myDP.getUUID();
 		
 		/*
@@ -189,27 +186,28 @@ public class DevicePool extends ItemToInject
 		/**
 		 * We set the item parameters
 		 */
-		myDevicePool.setName(this.getName());
-		myDevicePool.setCallManagerGroupName(this.callManagerGroupName);
-		myDevicePool.setDateTimeSettingName(this.dateTimeSettingName);
-		myDevicePool.setDevicemobilitycss(this.devicemobilitycss);
-		myDevicePool.setDevicemobilitygroup(this.devicemobilitygroup);
-		myDevicePool.setLocalroutegroupList(this.localRouteGroupList);
-		myDevicePool.setLocationName(this.locationName);
-		myDevicePool.setMediaressourcegrouplist(this.mediaressourcegrouplist);
-		myDevicePool.setNetworkLocale(this.networkLocale);
-		myDevicePool.setPhysicallocation(this.physicallocation);
-		myDevicePool.setRegionName(this.regionName);
-		myDevicePool.setSrstreference(this.srstreference);
-		myDevicePool.setCgpnTransformationCssName(cgpnTransformationCssName);
-		myDevicePool.setCdpnTransformationCssName(cdpnTransformationCssName);
-		myDevicePool.setCallingPartyNationalTransformationCssName(callingPartyNationalTransformationCssName);
-		myDevicePool.setCallingPartyInternationalTransformationCssName(callingPartyInternationalTransformationCssName);
-		myDevicePool.setCallingPartyUnknownTransformationCssName(callingPartyUnknownTransformationCssName);
-		myDevicePool.setCallingPartySubscriberTransformationCssName(callingPartySubscriberTransformationCssName);
-		myDevicePool.setCntdPnTransformationCssName(cntdPnTransformationCssName);
-		myDevicePool.setRedirectingPartyTransformationCSS(redirectingPartyTransformationCSS);
-		myDevicePool.setCallingPartyTransformationCSS(callingPartyTransformationCSS);
+		DevicePoolLinker dpl = ((DevicePoolLinker)linker);
+		dpl.setName(this.getName());
+		dpl.setCallManagerGroupName(this.callManagerGroupName);
+		dpl.setDateTimeSettingName(this.dateTimeSettingName);
+		dpl.setDevicemobilitycss(this.devicemobilitycss);
+		dpl.setDevicemobilitygroup(this.devicemobilitygroup);
+		dpl.setLocalRouteGroupList(this.localRouteGroupList);
+		dpl.setLocationName(this.locationName);
+		dpl.setMediaressourcegrouplist(this.mediaressourcegrouplist);
+		dpl.setNetworkLocale(this.networkLocale);
+		dpl.setPhysicallocation(this.physicallocation);
+		dpl.setRegionName(this.regionName);
+		dpl.setSrstreference(this.srstreference);
+		dpl.setCgpnTransformationCssName(cgpnTransformationCssName);
+		dpl.setCdpnTransformationCssName(cdpnTransformationCssName);
+		dpl.setCallingPartyNationalTransformationCssName(callingPartyNationalTransformationCssName);
+		dpl.setCallingPartyInternationalTransformationCssName(callingPartyInternationalTransformationCssName);
+		dpl.setCallingPartyUnknownTransformationCssName(callingPartyUnknownTransformationCssName);
+		dpl.setCallingPartySubscriberTransformationCssName(callingPartySubscriberTransformationCssName);
+		dpl.setCntdPnTransformationCssName(cntdPnTransformationCssName);
+		dpl.setRedirectingPartyTransformationCSS(redirectingPartyTransformationCSS);
+		dpl.setCallingPartyTransformationCSS(callingPartyTransformationCSS);
 		/*********/
 		}
 	
@@ -257,9 +255,9 @@ public class DevicePool extends ItemToInject
 		{
 		if(this.UUID == null)
 			{
-			myDevicePool.get();
+			linker.get();
 			}	
-		myDevicePool.reset();
+		((DevicePoolLinker)linker).reset();
 		}
 
 	public String getCallManagerGroupName()
@@ -270,6 +268,7 @@ public class DevicePool extends ItemToInject
 	public void setCallManagerGroupName(String callManagerGroupName)
 		{
 		this.callManagerGroupName = callManagerGroupName;
+		((DevicePoolLinker)linker).setCallManagerGroupName(callManagerGroupName);
 		}
 
 	public String getRegionName()
@@ -280,6 +279,7 @@ public class DevicePool extends ItemToInject
 	public void setRegionName(String regionName)
 		{
 		this.regionName = regionName;
+		((DevicePoolLinker)linker).setRegionName(regionName);
 		}
 
 	public String getLocationName()
@@ -290,6 +290,7 @@ public class DevicePool extends ItemToInject
 	public void setLocationName(String locationName)
 		{
 		this.locationName = locationName;
+		((DevicePoolLinker)linker).setLocationName(locationName);
 		}
 
 	public String getNetworkLocale()
@@ -300,6 +301,7 @@ public class DevicePool extends ItemToInject
 	public void setNetworkLocale(String networkLocale)
 		{
 		this.networkLocale = networkLocale;
+		((DevicePoolLinker)linker).setNetworkLocale(networkLocale);
 		}
 
 	public String getDateTimeSettingName()
@@ -310,6 +312,7 @@ public class DevicePool extends ItemToInject
 	public void setDateTimeSettingName(String dateTimeSettingName)
 		{
 		this.dateTimeSettingName = dateTimeSettingName;
+		((DevicePoolLinker)linker).setDateTimeSettingName(dateTimeSettingName);
 		}
 
 	public String getSrstreference()
@@ -320,6 +323,7 @@ public class DevicePool extends ItemToInject
 	public void setSrstreference(String srstreference)
 		{
 		this.srstreference = srstreference;
+		((DevicePoolLinker)linker).setSrstreference(srstreference);
 		}
 
 	public String getMediaressourcegrouplist()
@@ -330,6 +334,7 @@ public class DevicePool extends ItemToInject
 	public void setMediaressourcegrouplist(String mediaressourcegrouplist)
 		{
 		this.mediaressourcegrouplist = mediaressourcegrouplist;
+		((DevicePoolLinker)linker).setMediaressourcegrouplist(mediaressourcegrouplist);
 		}
 
 	public String getPhysicallocation()
@@ -340,6 +345,7 @@ public class DevicePool extends ItemToInject
 	public void setPhysicallocation(String physicallocation)
 		{
 		this.physicallocation = physicallocation;
+		((DevicePoolLinker)linker).setPhysicallocation(physicallocation);
 		}
 
 	public String getDevicemobilitygroup()
@@ -350,6 +356,7 @@ public class DevicePool extends ItemToInject
 	public void setDevicemobilitygroup(String devicemobilitygroup)
 		{
 		this.devicemobilitygroup = devicemobilitygroup;
+		((DevicePoolLinker)linker).setDevicemobilitygroup(devicemobilitygroup);
 		}
 
 	public String getDevicemobilitycss()
@@ -360,6 +367,7 @@ public class DevicePool extends ItemToInject
 	public void setDevicemobilitycss(String devicemobilitycss)
 		{
 		this.devicemobilitycss = devicemobilitycss;
+		((DevicePoolLinker)linker).setDevicemobilitycss(devicemobilitycss);
 		}
 
 	public String getCgpnTransformationCssName()
@@ -370,6 +378,7 @@ public class DevicePool extends ItemToInject
 	public void setCgpnTransformationCssName(String cgpnTransformationCssName)
 		{
 		this.cgpnTransformationCssName = cgpnTransformationCssName;
+		((DevicePoolLinker)linker).setCgpnTransformationCssName(cgpnTransformationCssName);
 		}
 
 	public String getCdpnTransformationCssName()
@@ -380,6 +389,7 @@ public class DevicePool extends ItemToInject
 	public void setCdpnTransformationCssName(String cdpnTransformationCssName)
 		{
 		this.cdpnTransformationCssName = cdpnTransformationCssName;
+		((DevicePoolLinker)linker).setCdpnTransformationCssName(cdpnTransformationCssName);
 		}
 
 	public String getCallingPartyNationalTransformationCssName()
@@ -390,6 +400,7 @@ public class DevicePool extends ItemToInject
 	public void setCallingPartyNationalTransformationCssName(String callingPartyNationalTransformationCssName)
 		{
 		this.callingPartyNationalTransformationCssName = callingPartyNationalTransformationCssName;
+		((DevicePoolLinker)linker).setCallingPartyNationalTransformationCssName(callingPartyNationalTransformationCssName);
 		}
 
 	public String getCallingPartyInternationalTransformationCssName()
@@ -400,6 +411,7 @@ public class DevicePool extends ItemToInject
 	public void setCallingPartyInternationalTransformationCssName(String callingPartyInternationalTransformationCssName)
 		{
 		this.callingPartyInternationalTransformationCssName = callingPartyInternationalTransformationCssName;
+		((DevicePoolLinker)linker).setCallingPartyInternationalTransformationCssName(callingPartyInternationalTransformationCssName);
 		}
 
 	public String getCallingPartyUnknownTransformationCssName()
@@ -410,6 +422,7 @@ public class DevicePool extends ItemToInject
 	public void setCallingPartyUnknownTransformationCssName(String callingPartyUnknownTransformationCssName)
 		{
 		this.callingPartyUnknownTransformationCssName = callingPartyUnknownTransformationCssName;
+		((DevicePoolLinker)linker).setCallingPartyUnknownTransformationCssName(callingPartyUnknownTransformationCssName);
 		}
 
 	public String getCallingPartySubscriberTransformationCssName()
@@ -420,6 +433,7 @@ public class DevicePool extends ItemToInject
 	public void setCallingPartySubscriberTransformationCssName(String callingPartySubscriberTransformationCssName)
 		{
 		this.callingPartySubscriberTransformationCssName = callingPartySubscriberTransformationCssName;
+		((DevicePoolLinker)linker).setCallingPartySubscriberTransformationCssName(callingPartySubscriberTransformationCssName);
 		}
 
 	public String getCntdPnTransformationCssName()
@@ -430,6 +444,7 @@ public class DevicePool extends ItemToInject
 	public void setCntdPnTransformationCssName(String cntdPnTransformationCssName)
 		{
 		this.cntdPnTransformationCssName = cntdPnTransformationCssName;
+		((DevicePoolLinker)linker).setCntdPnTransformationCssName(cntdPnTransformationCssName);
 		}
 
 	public String getRedirectingPartyTransformationCSS()
@@ -440,6 +455,7 @@ public class DevicePool extends ItemToInject
 	public void setRedirectingPartyTransformationCSS(String redirectingPartyTransformationCSS)
 		{
 		this.redirectingPartyTransformationCSS = redirectingPartyTransformationCSS;
+		((DevicePoolLinker)linker).setRedirectingPartyTransformationCSS(redirectingPartyTransformationCSS);
 		}
 
 	public String getCallingPartyTransformationCSS()
@@ -450,6 +466,7 @@ public class DevicePool extends ItemToInject
 	public void setCallingPartyTransformationCSS(String callingPartyTransformationCSS)
 		{
 		this.callingPartyTransformationCSS = callingPartyTransformationCSS;
+		((DevicePoolLinker)linker).setCallingPartyTransformationCSS(callingPartyTransformationCSS);
 		}
 
 	public ArrayList<LocalRouteGroup> getLocalRouteGroupList()
@@ -460,6 +477,7 @@ public class DevicePool extends ItemToInject
 	public void setLocalRouteGroupList(ArrayList<LocalRouteGroup> localRouteGroupList)
 		{
 		this.localRouteGroupList = localRouteGroupList;
+		((DevicePoolLinker)linker).setLocalRouteGroupList(localRouteGroupList);
 		}
 	
 	

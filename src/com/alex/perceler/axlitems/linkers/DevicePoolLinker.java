@@ -452,18 +452,15 @@ public class DevicePoolLinker extends AXLItemLinker
 		this.callingPartyTransformationCSS = callingPartyTransformationCSS;
 		}
 
-	public ArrayList<LocalRouteGroup> getLocalroutegroupList()
+	public ArrayList<LocalRouteGroup> getLocalRouteGroupList()
 		{
 		return localRouteGroupList;
 		}
 
-	public void setLocalroutegroupList(ArrayList<LocalRouteGroup> localroutegroupList)
+	public void setLocalRouteGroupList(ArrayList<LocalRouteGroup> localRouteGroupList)
 		{
-		this.localRouteGroupList = localroutegroupList;
+		this.localRouteGroupList = localRouteGroupList;
 		}
-
-
-
 
 	
 	/*2018*//*RATEL Alexandre 8)*/

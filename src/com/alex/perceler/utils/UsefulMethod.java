@@ -345,44 +345,78 @@ public class UsefulMethod
 	 */
 	public static ArrayList<BasicDevice> initDeviceList() throws Exception
 		{
-		Variables.getLogger().info("Initializing the device list from collection file");
-		ArrayList<BasicDevice> deviceList = new ArrayList<BasicDevice>();
-		ArrayList<String> params = new ArrayList<String>();
-		params.add("devices");
-		params.add("device");
-		
-		ArrayList<String[][]> content = xMLGear.getResultListTab(UsefulMethod.getFlatFileContent(Variables.getDeviceListFileName()), params);
-		
-		for(String[][] s : content)
+		try
 			{
-			try
+			Variables.getLogger().info("Initializing the device list from collection file");
+			ArrayList<BasicDevice> deviceList = new ArrayList<BasicDevice>();
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("devices");
+			params.add("device");
+			
+			ArrayList<String[][]> content = xMLGear.getResultListTab(UsefulMethod.getFlatFileContent(Variables.getDeviceListFileName()), params);
+			
+			for(String[][] s : content)
 				{
-				itmType type = getITMType(UsefulMethod.getItemByName("type", s));
-				
-				BasicDevice d = new BasicDevice(type,
-						UsefulMethod.getItemByName("name", s),
-						UsefulMethod.getItemByName("ip", s),
-						UsefulMethod.getItemByName("mask", s),
-						UsefulMethod.getItemByName("gateway", s),
-						UsefulMethod.getItemByName("officeid", s),
-						UsefulMethod.getItemByName("newip", s),
-						UsefulMethod.getItemByName("newgateway", s),
-						UsefulMethod.getItemByName("newmask", s),
-						UsefulMethod.getItemByName("user", s),
-						UsefulMethod.getItemByName("password", s),
-						getCliProfile(type),
-						cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)));
-				
-				Variables.getLogger().debug("New device added to the device list : "+d.getInfo());
-				deviceList.add(d);
+				try
+					{
+					itmType type = getITMType(UsefulMethod.getItemByName("type", s));
+					
+					BasicDevice d = new BasicDevice(type,
+							UsefulMethod.getItemByName("name", s),
+							UsefulMethod.getItemByName("ip", s),
+							UsefulMethod.getItemByName("mask", s),
+							UsefulMethod.getItemByName("gateway", s),
+							UsefulMethod.getItemByName("officeid", s),
+							UsefulMethod.getItemByName("newip", s),
+							UsefulMethod.getItemByName("newgateway", s),
+							UsefulMethod.getItemByName("newmask", s),
+							UsefulMethod.getItemByName("user", s),
+							UsefulMethod.getItemByName("password", s),
+							getCliProfile(type),
+							cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)));
+					
+					/**
+					 * We avoid duplicate
+					 */
+					boolean found = false;
+					for(BasicDevice bd : deviceList)
+						{
+						if(bd.getIp().equals(d.getIp()))
+							{
+							Variables.getLogger().debug(bd.getInfo()+ " : Device ip duplicate found so we do not add the following new device : "+d.getInfo());
+							found = true;
+							break;
+							}
+						}
+					//We also check for the new ip
+					/*for(BasicDevice bd : deviceList)
+						{
+						if(bd.getNewip().equals(d.getNewip()))
+							{
+							Variables.getLogger().debug(bd.getInfo()+ " : Device new ip duplicate found so we do not add the following new device : "+d.getInfo());
+							found = true;
+							break;
+							}
+						}*/
+					
+					if(!found)
+						{
+						Variables.getLogger().debug("New device added to the device list : "+d.getInfo());
+						deviceList.add(d);
+						}
+					}
+				catch (Exception e)
+					{
+					Variables.getLogger().error("Could not add the following device : "+UsefulMethod.getItemByName("name", s)+" : "+e.getMessage(), e);
+					}
 				}
-			catch (Exception e)
-				{
-				Variables.getLogger().error("Could not add the following device : "+UsefulMethod.getItemByName("name", s)+" : "+e.getMessage(), e);
-				}
+			Variables.getLogger().debug(deviceList.size()+ " devices found in the database");
+			return deviceList;
 			}
-		
-		return deviceList;
+		catch (Exception e)
+			{
+			throw new Exception("ERROR while initializing the device list : "+e.getMessage(),e);
+			}
 		}
 	
 	/************
@@ -416,15 +450,32 @@ public class UsefulMethod
 							UsefulMethod.getItemByName("newvoiceiprange", s),
 							UsefulMethod.getItemByName("newdataiprange", s));
 					
-					Variables.getLogger().debug("New office added to the office list : "+o.getInfo());
-					officeList.add(o);
+					/**
+					 * We avoid duplicate
+					 */
+					boolean found = false;
+					for(BasicOffice bo : officeList)
+						{
+						if(bo.getIdcomu().equals(o.getIdcomu()))
+							{
+							Variables.getLogger().debug(bo.getInfo()+ " : Office duplicate found so we do not add the following new office : "+o.getInfo());
+							found = true;
+							break;
+							}
+						}
+					
+					if(!found)
+						{
+						Variables.getLogger().debug("New office added to the office list : "+o.getInfo());
+						officeList.add(o);
+						}
 					}
 				catch (Exception e)
 					{
 					Variables.getLogger().error("Could not add the following office : "+UsefulMethod.getItemByName("fullname", s)+" : "+e.getMessage(), e);
 					}
 				}
-			
+			Variables.getLogger().debug(officeList.size()+ " offices found in the database");
 			return officeList;
 			}
 		catch(Exception exc)
@@ -483,8 +534,22 @@ public class UsefulMethod
 							}
 						}
 					
-					Variables.getLogger().debug("New CliProfile added to the CliProfile list : "+cp.getName());
-					cliProfileList.add(cp);
+					boolean found = false;
+					for(CliProfile clip : cliProfileList)
+						{
+						if(clip.getName().equals(cp.getName()))
+							{
+							Variables.getLogger().debug(clip.getName()+ " : CliProfile duplicate found so we do not add the following new CliProfile : "+cp.getName());
+							found = true;
+							break;
+							}
+						}
+					
+					if(!found)
+						{
+						Variables.getLogger().debug("New CliProfile added to the CliProfile list : "+cp.getName());
+						cliProfileList.add(cp);
+						}
 					}
 				catch (Exception e)
 					{
@@ -492,6 +557,7 @@ public class UsefulMethod
 					}
 				}
 			
+			Variables.getLogger().debug(cliProfileList.size()+ " cliProfiles found in the database");
 			return cliProfileList;
 			}
 		catch(Exception exc)
@@ -578,7 +644,7 @@ public class UsefulMethod
 			/**
 			 * We now check if the RSI service works by asking a simple request
 			 */
-			if(RisportTools.getPhoneStatus("SEP1234567890EF") == null)throw new Exception("RIS test query return null");
+			//if(RisportTools.getPhoneStatus("LabAlex") == null)throw new Exception("RIS test query return null");
 			}
 		catch (Exception e)
 			{

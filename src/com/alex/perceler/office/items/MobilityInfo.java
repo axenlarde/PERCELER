@@ -21,7 +21,6 @@ public class MobilityInfo extends ItemToInject
 	/**
 	 * Variables
 	 */
-	private MobilityInfoLinker myMobilityInfo;
 	private String subnet,
 	subnetMask;//Has to be a number of bit
 	
@@ -35,8 +34,7 @@ public class MobilityInfo extends ItemToInject
 	public MobilityInfo(String name, String subnet,
 			String subnetMask, ArrayList<String> members) throws Exception
 		{
-		super(itemType.devicemobilityinfo, name);
-		myMobilityInfo = new MobilityInfoLinker(name);
+		super(itemType.devicemobilityinfo, name, new MobilityInfoLinker(name));
 		this.subnet = subnet;
 		this.subnetMask = subnetMask;
 		this.members = members;
@@ -44,8 +42,7 @@ public class MobilityInfo extends ItemToInject
 	
 	public MobilityInfo(String name) throws Exception
 		{
-		super(itemType.devicemobilityinfo, name);
-		myMobilityInfo = new MobilityInfoLinker(name);
+		super(itemType.devicemobilityinfo, name, new MobilityInfoLinker(name));
 		}
 
 	/***********
@@ -54,7 +51,7 @@ public class MobilityInfo extends ItemToInject
 	 */
 	public void doBuild() throws Exception
 		{
-		this.errorList.addAll(myMobilityInfo.init());
+		this.errorList.addAll(linker.init());
 		}
 	
 	
@@ -66,7 +63,7 @@ public class MobilityInfo extends ItemToInject
 	 */
 	public String doInject() throws Exception
 		{
-		return myMobilityInfo.inject();//Return UUID
+		return linker.inject();//Return UUID
 		}
 
 	/**
@@ -75,7 +72,7 @@ public class MobilityInfo extends ItemToInject
 	 */
 	public void doDelete() throws Exception
 		{
-		myMobilityInfo.delete();
+		linker.delete();
 		}
 
 	/**
@@ -84,7 +81,7 @@ public class MobilityInfo extends ItemToInject
 	 */
 	public void doUpdate() throws Exception
 		{
-		myMobilityInfo.update(tuList);
+		linker.update(tuList);
 		}
 	
 	/**
@@ -92,7 +89,7 @@ public class MobilityInfo extends ItemToInject
 	 */
 	public boolean isExisting() throws Exception
 		{
-		MobilityInfo myP = (MobilityInfo) myMobilityInfo.get();
+		MobilityInfo myP = (MobilityInfo) linker.get();
 		this.UUID = myP.getUUID();
 		//Has to be written
 		
@@ -118,10 +115,11 @@ public class MobilityInfo extends ItemToInject
 		/**
 		 * We set the item parameters
 		 */
-		myMobilityInfo.setName(this.getName());
-		myMobilityInfo.setSubnet(this.subnet);
-		myMobilityInfo.setSubnetMask(this.subnetMask);
-		myMobilityInfo.setMembers(this.members);
+		MobilityInfoLinker mil= ((MobilityInfoLinker) linker);
+		mil.setName(this.getName());
+		mil.setSubnet(this.subnet);
+		mil.setSubnetMask(this.subnetMask);
+		mil.setMembers(this.members);
 		/*********/
 		}
 
@@ -140,6 +138,7 @@ public class MobilityInfo extends ItemToInject
 	public void setSubnet(String subnet)
 		{
 		this.subnet = subnet;
+		((MobilityInfoLinker) linker).setSubnet(subnet);
 		}
 
 	public String getSubnetMask()
@@ -150,6 +149,7 @@ public class MobilityInfo extends ItemToInject
 	public void setSubnetMask(String subnetMask)
 		{
 		this.subnetMask = subnetMask;
+		((MobilityInfoLinker) linker).setSubnetMask(subnetMask);
 		}
 
 	public ArrayList<String> getMembers()
@@ -160,13 +160,8 @@ public class MobilityInfo extends ItemToInject
 	public void setMembers(ArrayList<String> members)
 		{
 		this.members = members;
-		}
-
-	
-
-
-	
-	
+		((MobilityInfoLinker) linker).setMembers(members);
+		}	
 	
 	
 	/*2015*//*RATEL Alexandre 8)*/

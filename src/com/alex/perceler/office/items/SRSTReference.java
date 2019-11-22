@@ -18,7 +18,6 @@ public class SRSTReference extends ItemToInject
 	/**
 	 * Variables
 	 */
-	private SRSTReferenceLinker mySRSTReference;
 	private String ipAddress;
 	
 	
@@ -28,15 +27,13 @@ public class SRSTReference extends ItemToInject
 	 ***************/
 	public SRSTReference(String name, String ipAddress) throws Exception
 		{
-		super(itemType.srstreference, name);
-		mySRSTReference = new SRSTReferenceLinker(name);
+		super(itemType.srstreference, name, new SRSTReferenceLinker(name));
 		this.ipAddress = ipAddress;
 		}
 
 	public SRSTReference(String name) throws Exception
 		{
-		super(itemType.srstreference, name);
-		mySRSTReference = new SRSTReferenceLinker(name);
+		super(itemType.srstreference, name, new SRSTReferenceLinker(name));
 		}
 
 	/***********
@@ -45,7 +42,7 @@ public class SRSTReference extends ItemToInject
 	 */
 	public void doBuild() throws Exception
 		{
-		this.errorList.addAll(mySRSTReference.init());
+		this.errorList.addAll(linker.init());
 		}
 	
 	
@@ -57,7 +54,7 @@ public class SRSTReference extends ItemToInject
 	 */
 	public String doInject() throws Exception
 		{
-		return mySRSTReference.inject();//Return UUID
+		return linker.inject();//Return UUID
 		}
 
 	/**
@@ -66,7 +63,7 @@ public class SRSTReference extends ItemToInject
 	 */
 	public void doDelete() throws Exception
 		{
-		mySRSTReference.delete();
+		linker.delete();
 		}
 
 	/**
@@ -75,7 +72,7 @@ public class SRSTReference extends ItemToInject
 	 */
 	public void doUpdate() throws Exception
 		{
-		mySRSTReference.update(tuList);
+		linker.update(tuList);
 		}
 	
 	/**
@@ -83,7 +80,7 @@ public class SRSTReference extends ItemToInject
 	 */
 	public boolean isExisting() throws Exception
 		{
-		SRSTReference myS = (SRSTReference) mySRSTReference.get();
+		SRSTReference myS = (SRSTReference) linker.get();
 		this.UUID = myS.getUUID();
 		this.ipAddress = myS.getIpAddress();
 		
@@ -109,8 +106,9 @@ public class SRSTReference extends ItemToInject
 		/**
 		 * We set the item parameters
 		 */
-		mySRSTReference.setName(this.getName());
-		mySRSTReference.setIpAddress(this.ipAddress);
+		SRSTReferenceLinker sl = (SRSTReferenceLinker)linker;
+		sl.setName(this.getName());
+		sl.setIpAddress(this.ipAddress);
 		/*********/
 		}
 	
@@ -130,6 +128,7 @@ public class SRSTReference extends ItemToInject
 	public void setIpAddress(String ipAddress)
 		{
 		this.ipAddress = ipAddress;
+		((SRSTReferenceLinker)linker).setIpAddress(ipAddress);
 		}
 
 	

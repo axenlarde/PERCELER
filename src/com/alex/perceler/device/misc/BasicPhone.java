@@ -12,11 +12,12 @@ public class BasicPhone
 	 */
 	public enum phoneStatus
 		{
-		Registered,
-		UnRegistered,
-		Rejected,
-		PartiallyRegistered,
-		Unknown
+		any,
+		registered,
+		unregistered,
+		rejected,
+		partiallyregistered,
+		unknown
 		};
 	
 	private String name,
@@ -74,7 +75,7 @@ public class BasicPhone
 		{
 		if(newStatus != null)
 			{
-			if((status.equals(phoneStatus.Registered)) && (!newStatus.equals(phoneStatus.Registered)))
+			if((status.equals(phoneStatus.registered)) && (!newStatus.equals(phoneStatus.registered)))
 				{
 				return false;
 				}

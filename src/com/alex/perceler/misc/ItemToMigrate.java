@@ -49,6 +49,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		this.type = type;
 		this.name = name;
 		this.id = id;
+		axlList = new ArrayList<ItemToInject>();
 		errorList = new ArrayList<ErrorTemplate>();
 		status = itmStatus.init;
 		}
@@ -70,6 +71,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		
 		for(ItemToInject iti : axlList)
 			{
+			iti.setAction(action);
 			iti.build();
 			}
 		}

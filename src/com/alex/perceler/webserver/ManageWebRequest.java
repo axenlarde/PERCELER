@@ -237,7 +237,7 @@ public class ManageWebRequest
 			
 			String taskID = TaskManager.addNewTask(idList, action, ownerid);
 			
-			return WebRequestBuilder.buildWebRequest(webRequestType.getTask, taskID);
+			return WebRequestBuilder.buildWebRequest(webRequestType.newTask, taskID);
 			}
 		catch (Exception e)
 			{
@@ -278,7 +278,7 @@ public class ManageWebRequest
 			}
 		catch (Exception e)
 			{
-			Variables.getLogger().error("ERROR while processing newTask web request : "+e.getMessage(),e);
+			Variables.getLogger().error("ERROR while processing setask web request : "+e.getMessage(),e);
 			}
 		
 		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);

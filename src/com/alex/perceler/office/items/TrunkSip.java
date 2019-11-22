@@ -21,7 +21,6 @@ public class TrunkSip extends ItemToInject
 	/**
 	 * Variables
 	 */
-	private TrunkSipLinker myTrunkSip;
 	private String description,
 	product,//"SIP Trunk"
 	xClass,//Trunk
@@ -66,8 +65,7 @@ public class TrunkSip extends ItemToInject
 			String useDevicePoolCgpnTransformCssUnkn,
 			ArrayList<SipTrunkDestination> myDestinations) throws Exception
 		{
-		super(itemType.trunksip, name);
-		myTrunkSip = new TrunkSipLinker(name);
+		super(itemType.trunksip, name, new TrunkSipLinker(name));
 		this.description = description;
 		this.product = "SIP Trunk";
 		this.xClass = "Trunk";
@@ -95,8 +93,7 @@ public class TrunkSip extends ItemToInject
 
 	public TrunkSip(String name) throws Exception
 		{
-		super(itemType.trunksip, name);
-		myTrunkSip = new TrunkSipLinker(name);
+		super(itemType.trunksip, name, new TrunkSipLinker(name));
 		}
 
 	/***********
@@ -105,7 +102,7 @@ public class TrunkSip extends ItemToInject
 	 */
 	public void doBuild() throws Exception
 		{
-		this.errorList.addAll(myTrunkSip.init());
+		this.errorList.addAll(linker.init());
 		}
 	
 	
@@ -117,7 +114,7 @@ public class TrunkSip extends ItemToInject
 	 */
 	public String doInject() throws Exception
 		{
-		return myTrunkSip.inject();//Return UUID
+		return linker.inject();//Return UUID
 		}
 
 	/**
@@ -126,7 +123,7 @@ public class TrunkSip extends ItemToInject
 	 */
 	public void doDelete() throws Exception
 		{
-		myTrunkSip.delete();
+		linker.delete();
 		}
 
 	/**
@@ -135,7 +132,7 @@ public class TrunkSip extends ItemToInject
 	 */
 	public void doUpdate() throws Exception
 		{
-		myTrunkSip.update(tuList);
+		linker.update(tuList);
 		}
 	
 	/**
@@ -143,7 +140,7 @@ public class TrunkSip extends ItemToInject
 	 */
 	public boolean isExisting() throws Exception
 		{
-		TrunkSip myT = (TrunkSip) myTrunkSip.get();
+		TrunkSip myT = (TrunkSip) linker.get();
 		this.UUID = myT.getUUID();
 		//Has to be written
 		
@@ -211,30 +208,31 @@ public class TrunkSip extends ItemToInject
 		/**
 		 * We set the item parameters
 		 */
-		myTrunkSip.setName(name);
-		myTrunkSip.setDescription(description);
-		myTrunkSip.setCalledPTransformationCssName(calledPTransformationCssName);
-		myTrunkSip.setCallingPTransformationCssName(callingPTransformationCssName);
-		myTrunkSip.setCallingSearchSpaceName(callingSearchSpaceName);
-		myTrunkSip.setCommonDeviceConfigName(commonDeviceConfigName);
-		myTrunkSip.setDevicePoolName(devicePoolName);
-		myTrunkSip.setLocationName(locationName);
-		myTrunkSip.setMyDestinations(myDestinations);
-		myTrunkSip.setProduct(product);
-		myTrunkSip.setProtocol(protocol);
-		myTrunkSip.setProtocolSide(protocolSide);
-		myTrunkSip.setSecurityProfileName(securityProfileName);
-		myTrunkSip.setSipProfileName(sipProfileName);
-		myTrunkSip.setSipTrunkType(sipTrunkType);
-		myTrunkSip.setSubscribeCallingSearchSpaceName(subscribeCallingSearchSpaceName);
-		myTrunkSip.setUseDevicePoolCalledPTransformCss(useDevicePoolCalledPTransformCss);
-		myTrunkSip.setUseDevicePoolCallingPTransformCss(useDevicePoolCallingPTransformCss);
-		myTrunkSip.setxClass(xClass);
-		myTrunkSip.setRerouteCallingSearchSpaceName(rerouteCallingSearchSpaceName);
-		myTrunkSip.setUnknownPrefix(unknownPrefix);
-		myTrunkSip.setUnknownStripDigits(unknownStripDigits);
-		myTrunkSip.setUseDevicePoolCgpnTransformCssUnkn(useDevicePoolCgpnTransformCssUnkn);
-		myTrunkSip.setCgpnTransformationUnknownCssName(cgpnTransformationUnknownCssName);
+		TrunkSipLinker tsl = (TrunkSipLinker)linker;
+		tsl.setName(name);
+		tsl.setDescription(description);
+		tsl.setCalledPTransformationCssName(calledPTransformationCssName);
+		tsl.setCallingPTransformationCssName(callingPTransformationCssName);
+		tsl.setCallingSearchSpaceName(callingSearchSpaceName);
+		tsl.setCommonDeviceConfigName(commonDeviceConfigName);
+		tsl.setDevicePoolName(devicePoolName);
+		tsl.setLocationName(locationName);
+		tsl.setMyDestinations(myDestinations);
+		tsl.setProduct(product);
+		tsl.setProtocol(protocol);
+		tsl.setProtocolSide(protocolSide);
+		tsl.setSecurityProfileName(securityProfileName);
+		tsl.setSipProfileName(sipProfileName);
+		tsl.setSipTrunkType(sipTrunkType);
+		tsl.setSubscribeCallingSearchSpaceName(subscribeCallingSearchSpaceName);
+		tsl.setUseDevicePoolCalledPTransformCss(useDevicePoolCalledPTransformCss);
+		tsl.setUseDevicePoolCallingPTransformCss(useDevicePoolCallingPTransformCss);
+		tsl.setxClass(xClass);
+		tsl.setRerouteCallingSearchSpaceName(rerouteCallingSearchSpaceName);
+		tsl.setUnknownPrefix(unknownPrefix);
+		tsl.setUnknownStripDigits(unknownStripDigits);
+		tsl.setUseDevicePoolCgpnTransformCssUnkn(useDevicePoolCgpnTransformCssUnkn);
+		tsl.setCgpnTransformationUnknownCssName(cgpnTransformationUnknownCssName);
 		/*********/
 		}
 	
@@ -278,9 +276,9 @@ public class TrunkSip extends ItemToInject
 		{
 		if(this.UUID == null)
 			{
-			myTrunkSip.get();
+			linker.get();
 			}	
-		myTrunkSip.reset();
+		((TrunkSipLinker)linker).reset();
 		}
 	
 	public String getDescription()
@@ -291,6 +289,7 @@ public class TrunkSip extends ItemToInject
 	public void setDescription(String description)
 		{
 		this.description = description;
+		((TrunkSipLinker)linker).setDescription(description);
 		}
 
 	public String getProduct()
@@ -301,6 +300,7 @@ public class TrunkSip extends ItemToInject
 	public void setProduct(String product)
 		{
 		this.product = product;
+		((TrunkSipLinker)linker).setProduct(product);
 		}
 
 	public String getxClass()
@@ -311,6 +311,7 @@ public class TrunkSip extends ItemToInject
 	public void setxClass(String xClass)
 		{
 		this.xClass = xClass;
+		((TrunkSipLinker)linker).setxClass(xClass);
 		}
 
 	public String getProtocol()
@@ -321,6 +322,7 @@ public class TrunkSip extends ItemToInject
 	public void setProtocol(String protocol)
 		{
 		this.protocol = protocol;
+		((TrunkSipLinker)linker).setProtocol(protocol);
 		}
 
 	public String getProtocolSide()
@@ -331,6 +333,7 @@ public class TrunkSip extends ItemToInject
 	public void setProtocolSide(String protocolSide)
 		{
 		this.protocolSide = protocolSide;
+		((TrunkSipLinker)linker).setProtocolSide(protocolSide);
 		}
 
 	public String getCallingSearchSpaceName()
@@ -341,6 +344,7 @@ public class TrunkSip extends ItemToInject
 	public void setCallingSearchSpaceName(String callingSearchSpaceName)
 		{
 		this.callingSearchSpaceName = callingSearchSpaceName;
+		((TrunkSipLinker)linker).setCallingSearchSpaceName(callingSearchSpaceName);
 		}
 
 	public String getDevicePoolName()
@@ -351,6 +355,7 @@ public class TrunkSip extends ItemToInject
 	public void setDevicePoolName(String devicePoolName)
 		{
 		this.devicePoolName = devicePoolName;
+		((TrunkSipLinker)linker).setDevicePoolName(devicePoolName);
 		}
 
 	public String getCommonDeviceConfigName()
@@ -361,6 +366,7 @@ public class TrunkSip extends ItemToInject
 	public void setCommonDeviceConfigName(String commonDeviceConfigName)
 		{
 		this.commonDeviceConfigName = commonDeviceConfigName;
+		((TrunkSipLinker)linker).setCommonDeviceConfigName(commonDeviceConfigName);
 		}
 
 	public String getLocationName()
@@ -371,6 +377,7 @@ public class TrunkSip extends ItemToInject
 	public void setLocationName(String locationName)
 		{
 		this.locationName = locationName;
+		((TrunkSipLinker)linker).setLocationName(locationName);
 		}
 
 	public String getSecurityProfileName()
@@ -381,6 +388,7 @@ public class TrunkSip extends ItemToInject
 	public void setSecurityProfileName(String securityProfileName)
 		{
 		this.securityProfileName = securityProfileName;
+		((TrunkSipLinker)linker).setSecurityProfileName(securityProfileName);
 		}
 
 	public String getSipProfileName()
@@ -391,6 +399,7 @@ public class TrunkSip extends ItemToInject
 	public void setSipProfileName(String sipProfileName)
 		{
 		this.sipProfileName = sipProfileName;
+		((TrunkSipLinker)linker).setSipProfileName(sipProfileName);
 		}
 
 	public String getCallingPTransformationCssName()
@@ -402,6 +411,7 @@ public class TrunkSip extends ItemToInject
 			String callingPTransformationCssName)
 		{
 		this.callingPTransformationCssName = callingPTransformationCssName;
+		((TrunkSipLinker)linker).setCallingPTransformationCssName(callingPTransformationCssName);
 		}
 
 	public String getUseDevicePoolCallingPTransformCss()
@@ -413,6 +423,7 @@ public class TrunkSip extends ItemToInject
 			String useDevicePoolCallingPTransformCss)
 		{
 		this.useDevicePoolCallingPTransformCss = useDevicePoolCallingPTransformCss;
+		((TrunkSipLinker)linker).setUseDevicePoolCallingPTransformCss(useDevicePoolCallingPTransformCss);
 		}
 
 	public String getCalledPTransformationCssName()
@@ -423,6 +434,7 @@ public class TrunkSip extends ItemToInject
 	public void setCalledPTransformationCssName(String calledPTransformationCssName)
 		{
 		this.calledPTransformationCssName = calledPTransformationCssName;
+		((TrunkSipLinker)linker).setCalledPTransformationCssName(calledPTransformationCssName);
 		}
 
 	public String getUseDevicePoolCalledPTransformCss()
@@ -434,6 +446,7 @@ public class TrunkSip extends ItemToInject
 			String useDevicePoolCalledPTransformCss)
 		{
 		this.useDevicePoolCalledPTransformCss = useDevicePoolCalledPTransformCss;
+		((TrunkSipLinker)linker).setUseDevicePoolCalledPTransformCss(useDevicePoolCalledPTransformCss);
 		}
 
 	public String getSubscribeCallingSearchSpaceName()
@@ -445,6 +458,7 @@ public class TrunkSip extends ItemToInject
 			String subscribeCallingSearchSpaceName)
 		{
 		this.subscribeCallingSearchSpaceName = subscribeCallingSearchSpaceName;
+		((TrunkSipLinker)linker).setSubscribeCallingSearchSpaceName(subscribeCallingSearchSpaceName);
 		}
 
 	public String getSipTrunkType()
@@ -455,6 +469,7 @@ public class TrunkSip extends ItemToInject
 	public void setSipTrunkType(String sipTrunkType)
 		{
 		this.sipTrunkType = sipTrunkType;
+		((TrunkSipLinker)linker).setSipTrunkType(sipTrunkType);
 		}
 
 	public ArrayList<SipTrunkDestination> getMyDestinations()
@@ -465,6 +480,7 @@ public class TrunkSip extends ItemToInject
 	public void setMyDestinations(ArrayList<SipTrunkDestination> myDestinations)
 		{
 		this.myDestinations = myDestinations;
+		((TrunkSipLinker)linker).setMyDestinations(myDestinations);
 		}
 
 	public String getRerouteCallingSearchSpaceName()
@@ -476,6 +492,7 @@ public class TrunkSip extends ItemToInject
 			String rerouteCallingSearchSpaceName)
 		{
 		this.rerouteCallingSearchSpaceName = rerouteCallingSearchSpaceName;
+		((TrunkSipLinker)linker).setRerouteCallingSearchSpaceName(rerouteCallingSearchSpaceName);
 		}
 
 	public String getUnknownPrefix()
@@ -485,7 +502,8 @@ public class TrunkSip extends ItemToInject
 
 	public void setUnknownPrefix(String unknownPrefix)
 		{
-		unknownPrefix = unknownPrefix;
+		this.unknownPrefix = unknownPrefix;
+		((TrunkSipLinker)linker).setUnknownPrefix(unknownPrefix);
 		}
 
 	public String getUnknownStripDigits()
@@ -495,7 +513,8 @@ public class TrunkSip extends ItemToInject
 
 	public void setUnknownStripDigits(String unknownStripDigits)
 		{
-		unknownStripDigits = unknownStripDigits;
+		this.unknownStripDigits = unknownStripDigits;
+		((TrunkSipLinker)linker).setUnknownStripDigits(unknownStripDigits);
 		}
 
 	public String getCgpnTransformationUnknownCssName()
@@ -506,7 +525,8 @@ public class TrunkSip extends ItemToInject
 	public void setCgpnTransformationUnknownCssName(
 			String cgpnTransformationUnknownCssName)
 		{
-		cgpnTransformationUnknownCssName = cgpnTransformationUnknownCssName;
+		this.cgpnTransformationUnknownCssName = cgpnTransformationUnknownCssName;
+		((TrunkSipLinker)linker).setCgpnTransformationUnknownCssName(cgpnTransformationUnknownCssName);
 		}
 
 	public String getUseDevicePoolCgpnTransformCssUnkn()
@@ -517,12 +537,9 @@ public class TrunkSip extends ItemToInject
 	public void setUseDevicePoolCgpnTransformCssUnkn(
 			String useDevicePoolCgpnTransformCssUnkn)
 		{
-		useDevicePoolCgpnTransformCssUnkn = useDevicePoolCgpnTransformCssUnkn;
+		this.useDevicePoolCgpnTransformCssUnkn = useDevicePoolCgpnTransformCssUnkn;
+		((TrunkSipLinker)linker).setUseDevicePoolCgpnTransformCssUnkn(useDevicePoolCgpnTransformCssUnkn);
 		}
-
-	
-	
-	
 	
 	
 	/*2015*//*RATEL Alexandre 8)*/

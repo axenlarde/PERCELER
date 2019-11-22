@@ -2,6 +2,7 @@ package com.alex.perceler.misc;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.axlitems.misc.AXLItemLinker;
 import com.alex.perceler.axlitems.misc.ToUpdate;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -28,14 +29,16 @@ public abstract class ItemToInject implements ItemToInjectImpl
 	protected ArrayList<ErrorTemplate> errorList;
 	protected ArrayList<Correction> correctionList;
 	protected ArrayList<ToUpdate> tuList;
+	protected AXLItemLinker linker;
 	
 	/***************
 	 * Constructor
 	 ***************/
-	public ItemToInject(itemType type, String name)
+	public ItemToInject(itemType type, String name, AXLItemLinker linker)
 		{
 		this.type = type;
 		this.name = name;
+		this.linker = linker;
 		this.UUID = "";
 		this.status = statusType.init;
 		tuList = new ArrayList<ToUpdate>();
@@ -76,7 +79,7 @@ public abstract class ItemToInject implements ItemToInjectImpl
 			
 			if(exists)
 				{
-				if((action.equals(actionType.delete))||(action.equals(actionType.update)))
+				if((action.equals(actionType.delete))||(action.equals(actionType.update))||(action.equals(actionType.rollback))||(action.equals(actionType.reset)))
 					{
 					this.status = statusType.waiting;
 					}
@@ -97,6 +100,8 @@ public abstract class ItemToInject implements ItemToInjectImpl
 					this.status = statusType.waiting;
 					}
 				}
+			
+			this.errorList.addAll(linker.init());
 			
 			doBuild();
 			}
@@ -269,6 +274,7 @@ public abstract class ItemToInject implements ItemToInjectImpl
 	public void setName(String name)
 		{
 		this.name = name;
+		linker.setName(name);
 		}
 	public ArrayList<ErrorTemplate> getErrorList()
 		{

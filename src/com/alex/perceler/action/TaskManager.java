@@ -25,10 +25,12 @@ public class TaskManager
 		try
 			{
 			//First we clear finished tasks and run GC
+			Variables.getLogger().debug("Clearing task list");
 			clearStaleTask();
 			System.gc();
+			Variables.getLogger().debug("Task list cleared");
 			
-			if(Variables.getTaskList().size() <= Integer.parseInt(UsefulMethod.getTargetOption("maxtaskthread")))
+			if(Variables.getTaskList().size() < Integer.parseInt(UsefulMethod.getTargetOption("maxtaskthread")))
 				{
 				ArrayList<ItemToMigrate> todoList = new ArrayList<ItemToMigrate>();
 				
@@ -108,16 +110,14 @@ public class TaskManager
 	 */
 	private static void clearStaleTask()
 		{
-		Variables.getLogger().debug("Clearing task list");
 		for(Task t : Variables.getTaskList())
 			{
-			if(t.isEnd())
+			if(!t.isAlive())
 				{
 				Variables.getTaskList().remove(t);
 				clearStaleTask();
 				}
 			}
-		Variables.getLogger().debug("Task list cleared");
 		}
 	
 	/**
