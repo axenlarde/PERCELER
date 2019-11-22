@@ -142,6 +142,7 @@ public class Device extends ItemToMigrate
 			ArrayList<TrunkSip> stList = DeviceTools.getSIPTrunk(ip);
 			if(stList != null)
 				{
+				Variables.getLogger().debug(getInfo()+" : Sip trunk found");
 				axlList.addAll(stList);
 				}
 			else
@@ -153,6 +154,7 @@ public class Device extends ItemToMigrate
 			ArrayList<SRSTReference> srstRefList = DeviceTools.getSRSTReference(ip);
 			if(srstRefList != null)
 				{
+				Variables.getLogger().debug(getInfo()+" : SRST reference found");
 				axlList.addAll(srstRefList);
 				}
 			else
@@ -171,14 +173,20 @@ public class Device extends ItemToMigrate
 	public void doStartSurvey() throws Exception
 		{
 		reachable = DeviceTools.ping(ip);
-		if(!reachable)
+		if(reachable)
 			{
-			/**
-			 * If the device is not reachable, we should not update the CUCM data. So we disable the entire item
-			 */
-			status = itmStatus.disabled;
-			addError(new ErrorTemplate(name+" : The device could not been reach (ping failed)"));
+			Variables.getLogger().debug(getInfo()+" : The device is reachable (ping)");
 			}
+		else
+			{
+			Variables.getLogger().debug("The device could not been reach (ping failed)");
+			}
+		/*if(!reachable)
+			{
+			//If the device is not reachable, we should not update the CUCM data. So we disable the entire item
+			status = itmStatus.disabled;
+			addError(new ErrorTemplate(getInfo()+" : The device could not been reach (ping failed)"));
+			}*/
 		}
 
 	@Override
@@ -238,6 +246,8 @@ public class Device extends ItemToMigrate
 	public String doGetDetailedStatus()
 		{
 		StringBuffer s = new StringBuffer("");
+		s.append("Reachable : "+reachable+"\r\n");
+		s.append("\r\n");
 		s.append("Cli error list : \r\n");
 		
 		for(ErrorTemplate e : cliInjector.getErrorList())

@@ -86,8 +86,9 @@ public class Task extends Thread
 	
 	/**
 	 * Start the real process
+	 * @throws Exception 
 	 */
-	private void startUpdate()
+	private void startUpdate() throws Exception
 		{
 		Variables.getLogger().info("Beginning of the update process");
 		
@@ -110,6 +111,17 @@ public class Task extends Thread
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 			}
 		if(cliManager.getCliIList().size() != 0)cliManager.start();
+		
+		/**
+		 * It is better to wait for the cli task to end before starting the AXL ones
+		 * For instance, it is pointless to reset a sip trunk before changing the ISR ip
+		 */
+		Variables.getLogger().debug("We wait for the cli tasks to end");
+		while(cliManager.isAlive())
+			{
+			this.sleep(500);
+			}
+		Variables.getLogger().debug("Cli tasks end so we can start the AXL ones");
 		
 		/**
 		 * Then we start the axl item updates wich is not multithreaded

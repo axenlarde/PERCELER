@@ -22,7 +22,6 @@ public class CliLinker
 	private Device device;
 	private cliProtocol protocol;
 	private CliConnection connection;
-	private boolean connected = false;
 	private CliInjector clii;
 	private BufferedWriter out;
 	private AnswerReceiver receiver;
@@ -36,13 +35,12 @@ public class CliLinker
 		this.device = clii.getDevice();
 		this.protocol = device.getConnexionProtocol();
 		
-		try
+		if(protocol.equals(cliProtocol.ssh))
 			{
-			carrierReturn = UsefulMethod.getTargetOption("clicarrierreturn");
+			this.carrierReturn = "\n";
 			}
-		catch (Exception e)
+		else
 			{
-			Variables.getLogger().error(device.getInfo()+" : CLI : Unable to find carrierreturn so we apply the default value");
 			this.carrierReturn = "\r\n";
 			}
 		
@@ -112,6 +110,12 @@ public class CliLinker
 		
 		Variables.getLogger().debug(device.getInfo()+" : CLI : Waiting for the word :"+s);
 		
+		/**
+		 * We send a carriage return just to activate the connection
+		 */
+		out.write(carrierReturn);
+		out.flush();
+		
 		while(true)
 			{
 			for(int i=0; i<receiver.getExchange().size(); i++)
@@ -125,11 +129,36 @@ public class CliLinker
 					}
 				}
 			
-			clii.sleep(100);
+			clii.sleep(1000);
 			if(timer>10)
 				{
-				connection.close();
-				throw new ConnectionException(device.getInfo()+" : CLI : Command timeout");
+				Variables.getLogger().debug(device.getInfo()+" : CLI : We have been waiting too longfor '"+s+"' so we keep going");
+				break;
+				}
+			timer++;
+			}
+		return null;
+		}
+	
+	/**
+	 * Simply wait for a return from the gateway
+	 * @throws ConnectionException, Exception 
+	 */
+	private void waitForAReturn() throws ConnectionException, Exception
+		{
+		int timer = 0;
+		
+		//Variables.getLogger().debug(device.getInfo()+" : CLI : Waiting for a reply");
+		
+		while(true)
+			{
+			if(receiver.getExchange().size() > 0)break;
+			
+			clii.sleep(1000);
+			if(timer>10)
+				{
+				Variables.getLogger().debug(device.getInfo()+" : CLI : We have been waiting too long so we keep going");
+				break;
 				}
 			timer++;
 			}
@@ -138,11 +167,13 @@ public class CliLinker
 	
 	public void write(String s) throws ConnectionException, Exception
 		{
-		if(!connected)connect();
+		if(!connection.isConnected())connect();
 		
+		receiver.getExchange().clear();
 		out.write(s+carrierReturn);
 		out.flush();
-		Variables.getLogger().debug(device.getInfo()+" : #CLI# "+s);
+		//Variables.getLogger().debug(device.getInfo()+" : #CLI# "+s);
+		waitForAReturn();
 		}
 	
 	
@@ -161,7 +192,7 @@ public class CliLinker
 				{
 				execute(l);
 				}
-			Variables.getLogger().debug(device.getInfo()+" : CLI : Telnet authentication process ends");
+			Variables.getLogger().debug(device.getInfo()+" : CLI : Telnet connection initiated successfully");
 			}
 		catch(Exception exc)
 			{

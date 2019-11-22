@@ -19,6 +19,7 @@ public class AnswerReceiver extends Thread
 	private String info;
 	private BufferedReader in;
 	private ArrayList<String> exchange;//Used to store the entire conversation
+	private int maxBuffer;
 	
 	
 	public AnswerReceiver(String info, BufferedReader in)
@@ -27,6 +28,7 @@ public class AnswerReceiver extends Thread
 		this.in = in;
 		stop = false;
 		exchange = new ArrayList<String>();
+		maxBuffer = 100;
 		}
 	
 	
@@ -39,6 +41,7 @@ public class AnswerReceiver extends Thread
 			while (((row = in.readLine()) != null)&&(!stop))
 		    	{
 		    	//Store one element of conversation
+		    	if(exchange.size()>maxBuffer)exchange.clear();
 		    	exchange.add(row);
 		    	
 		    	if(Pattern.matches(".*Invalid.*",row))
@@ -61,6 +64,7 @@ public class AnswerReceiver extends Thread
 			 * avoid full memory error.
 			 */
 			exchange.clear();
+			Variables.getLogger().debug(info+" : #CLI : End of the receiver thread");
 			}
 		catch(Exception exc)
 			{

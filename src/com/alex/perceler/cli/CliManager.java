@@ -63,7 +63,21 @@ public class CliManager extends Thread
 						break;
 						}
 					}
-				this.sleep(500);
+				this.sleep(100);
+				}
+			
+			/**
+			 * To end this thread we wait for all the cliInjector to end
+			 */
+			boolean alive = true;
+			while(alive)
+				{
+				alive = false;
+				for(CliInjector clii : cliIList)
+					{
+					if(clii.isAlive())alive = true;break;
+					}
+				this.sleep(100);
 				}
 			}
 		catch (Exception e)

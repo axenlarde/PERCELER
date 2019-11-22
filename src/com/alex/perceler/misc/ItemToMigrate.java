@@ -85,9 +85,9 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		
 		for(ItemToInject iti : axlList)
 			{
-			if(!iti.getStatus().equals(statusType.disabled))
+			if(iti.getStatus().equals(statusType.disabled))
 				{
-				errorList.add(new ErrorTemplate(name+" : The following item has not been found and therefore will not be updated : "+iti.getInfo()));
+				addError(new ErrorTemplate(name+" : The following item has not been found and therefore will not be updated : "+iti.getInfo()));
 				}
 			}
 		

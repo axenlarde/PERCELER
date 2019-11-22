@@ -62,6 +62,7 @@ public class CliInjector extends Thread
 			 */
 			CliLinker clil = new CliLinker(this);
 			
+			Variables.getLogger().debug(device.getInfo()+" : CLI : command injection starts");
 			for(OneLine l : todo)
 				{
 				try
@@ -79,6 +80,8 @@ public class CliInjector extends Thread
 					errorList.add(new ErrorTemplate(device.getInfo()+" : CLI : ERROR whith command "+l.getInfo()));
 					}
 				}
+			clil.disconnect();
+			Variables.getLogger().debug(device.getInfo()+" : CLI : command injection ends");
 			}
 		catch (Exception e)
 			{

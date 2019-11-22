@@ -118,6 +118,8 @@ public class CliConnection implements TelnetNotificationHandler
 		
 		((ChannelShell)SSHConnection).setPtyType("vt100");
 		SSHConnection.connect();
+		
+		Variables.getLogger().debug(info+" : CLI : SSH connection initiated successfully");
 		}
 	
 	/***********************************
@@ -144,6 +146,8 @@ public class CliConnection implements TelnetNotificationHandler
         telnetConnection.registerNotifHandler(this);
         out = new BufferedWriter(new OutputStreamWriter(telnetConnection.getOutputStream()));
 		in = new BufferedReader(new InputStreamReader(telnetConnection.getInputStream()));
+		
+		Variables.getLogger().debug(info+" : CLI : First step of telnet connection initiated successfully");
 		}
 	
 	
@@ -185,6 +189,18 @@ public class CliConnection implements TelnetNotificationHandler
 	                                              boolean[] echo){return null;}
 		}
 	
+	public boolean isConnected()
+		{
+		if(protocol.equals(cliProtocol.ssh))
+			{
+			return SSHConnection.isConnected();
+			}
+		else
+			{
+			return telnetConnection.isConnected();
+			}
+		}
+	
 	/**
 	 * To close the connection with the device
 	 */
@@ -193,8 +209,8 @@ public class CliConnection implements TelnetNotificationHandler
 		try
 			{
 			receiver.setStop(true);
-			in.close();
-			out.close();
+			//in.close();
+			//out.close();
 			
 			if(protocol.equals(cliProtocol.ssh))
 				{
