@@ -19,8 +19,9 @@ public class TaskManager
 	
 	/**
 	 * To start new tasks
+	 * @throws Exception 
 	 */
-	public static String addNewTask(ArrayList<String> itemList, actionType action, String ownerID)
+	public static String addNewTask(ArrayList<String> itemList, actionType action, String ownerID) throws Exception
 		{
 		try
 			{
@@ -86,32 +87,8 @@ public class TaskManager
 			}
 		catch (Exception e)
 			{
-			Variables.getLogger().error("ERROR while adding a new migration task : "+e.getMessage(),e);
+			throw new Exception("ERROR while adding a new migration task : "+e.getMessage());
 			}
-		
-		return null;
-		}
-	
-	/**
-	 * Will start a rollback task from a finished migration task
-	 */
-	public static String rollBackMigrationTask(String id, String ownerID)
-		{
-		for(Task t : Variables.getTaskList())
-			{
-			if(t.getTaskId().equals(id))
-				{
-				ArrayList<String> idList = new ArrayList<String>();
-				for(ItemToMigrate itm : t.getTodoList())
-					{
-					idList.add(itm.getId());
-					}
-				return addNewTask(idList, t.getAction(), ownerID);
-				}
-			}
-		Variables.getLogger().debug("No task found to rollback for id : "+id);
-		
-		return null;
 		}
 	
 	/**

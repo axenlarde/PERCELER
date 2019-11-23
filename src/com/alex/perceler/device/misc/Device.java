@@ -8,6 +8,7 @@ import org.apache.commons.validator.routines.InetAddressValidator;
 import com.alex.perceler.cli.CliInjector;
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
+import com.alex.perceler.cli.OneLine;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
@@ -172,7 +173,16 @@ public class Device extends ItemToMigrate
 	@Override
 	public void doStartSurvey() throws Exception
 		{
-		reachable = DeviceTools.ping(ip);
+		if((status.equals(itmStatus.postaudit)) ||
+				(status.equals(itmStatus.done)))
+			{
+			reachable = DeviceTools.ping(newip);
+			}
+		else
+			{
+			reachable = DeviceTools.ping(ip);
+			}
+		
 		if(reachable)
 			{
 			Variables.getLogger().debug(getInfo()+" : The device is reachable (ping)");
@@ -272,6 +282,7 @@ public class Device extends ItemToMigrate
 				{
 				if(f.getName().equals(tab[1]))
 					{
+					String found = (String) f.get(this);
 					return (String) f.get(this);
 					}
 				}

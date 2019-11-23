@@ -61,8 +61,8 @@ public class Main
 			 * 
 			 * We do it now to avoid latency during real request
 			 */
-			UsefulMethod.initAXLConnectionToCUCM();
-			UsefulMethod.initRISConnectionToCUCM();
+			//UsefulMethod.initAXLConnectionToCUCM();
+			//UsefulMethod.initRISConnectionToCUCM();
 			}
 		catch(Exception exc)
 			{

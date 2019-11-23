@@ -76,8 +76,8 @@ public class CliInjector extends Thread
 					}
 				catch (Exception e)
 					{
-					Variables.getLogger().error(device.getInfo()+" : CLI : ERROR whith command "+l.getInfo());
-					errorList.add(new ErrorTemplate(device.getInfo()+" : CLI : ERROR whith command "+l.getInfo()));
+					Variables.getLogger().error(device.getInfo()+" : CLI : ERROR whith command : "+l.getInfo());
+					errorList.add(new ErrorTemplate(device.getInfo()+" : CLI : ERROR whith command : "+l.getInfo()));
 					}
 				}
 			clil.disconnect();
@@ -85,8 +85,8 @@ public class CliInjector extends Thread
 			}
 		catch (Exception e)
 			{
-			Variables.getLogger().error(device.getInfo()+" : CLI : Critical ERROR");
-			errorList.add(new ErrorTemplate(device.getInfo()+" : CLI : Critical ERROR"));
+			Variables.getLogger().error(device.getInfo()+" : CLI : Critical ERROR : "+e.getMessage());
+			errorList.add(new ErrorTemplate(device.getInfo()+" : CLI : Critical ERROR : "+e.getMessage()));
 			}
 		}
 
@@ -114,6 +114,16 @@ public class CliInjector extends Thread
 	public void setErrorList(ArrayList<ErrorTemplate> errorList)
 		{
 		this.errorList = errorList;
+		}
+
+	public ArrayList<OneLine> getTodo()
+		{
+		return todo;
+		}
+
+	public ArrayList<OneLine> getHowToAuthenticate()
+		{
+		return howToAuthenticate;
 		}
 	
 	

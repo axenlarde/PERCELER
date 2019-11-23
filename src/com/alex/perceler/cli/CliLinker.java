@@ -110,11 +110,7 @@ public class CliLinker
 		
 		Variables.getLogger().debug(device.getInfo()+" : CLI : Waiting for the word :"+s);
 		
-		/**
-		 * We send a carriage return just to activate the connection
-		 */
-		out.write(carrierReturn);
-		out.flush();
+		boolean onlyOnce = true;
 		
 		while(true)
 			{
@@ -126,6 +122,16 @@ public class CliLinker
 					String SToReturn = receiver.getExchange().get(i);
 					receiver.getExchange().clear();
 					return SToReturn;
+					}
+				else if(onlyOnce)
+					{
+					/**
+					 * We send a carriage return just to activate the connection
+					 * and only once
+					 */
+					out.write(carrierReturn);
+					out.flush();
+					onlyOnce = false;
 					}
 				}
 			
@@ -188,7 +194,7 @@ public class CliLinker
 			 * Write instruction used to authenticate to gateway using telnet protocol 
 			 */
 			Variables.getLogger().debug(device.getInfo()+" : CLI : Authentication process begin");
-			for(OneLine l : clii.getCliProfile().getHowToAuthenticate())
+			for(OneLine l : clii.getHowToAuthenticate())
 				{
 				execute(l);
 				}
@@ -202,6 +208,7 @@ public class CliLinker
 	
 	public void execute(OneLine l) throws ConnectionException, Exception
 		{
+		//Variables.getLogger().debug(device.getInfo()+" : CLI : Sending : "+l.getCommand());
 		switch(l.getType())
 			{
 			case connect:

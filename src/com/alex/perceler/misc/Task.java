@@ -223,6 +223,10 @@ public class Task extends Thread
 					{
 					/**
 					 * We proceed with the survey as long as the user want or max 2 minutes
+					 * 
+					 * This is necessary to allow phone or device to register after a reset
+					 * Indeed, there is no point at raising a warning about a phone which is just taking a little time to register
+					 * Instead it is better to try several times to reach it 
 					 */
 					startSurvey();
 					counter++;
