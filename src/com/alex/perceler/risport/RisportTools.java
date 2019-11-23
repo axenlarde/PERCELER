@@ -88,7 +88,7 @@ public class RisportTools
 					}
 				}
 			
-			Variables.getLogger().debug(pl.size()+" phone found");
+			Variables.getLogger().debug(pl.size()+" phone found : ");
 			return pl;
 			}
 		catch (Exception e)

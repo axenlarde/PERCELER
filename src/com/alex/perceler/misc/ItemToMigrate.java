@@ -145,24 +145,29 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		{
 		StringBuffer result = new StringBuffer("");
 		
-		result.append("Item error list : \r\n");
-		for(ErrorTemplate e : errorList)
+		if(errorList.size() > 0)
 			{
-			result.append("- "+e.getErrorDesc()+"\r\n");
-			}
-		
-		result.append("\r\n");
-		result.append("CUCM items : \r\n");
-		for(ItemToInject iti : axlList)
-			{
-			result.append("- "+iti.getName()+" : "+iti.getType().name()+" : "+iti.getStatus().name()+" : \r\n");
-			for(ErrorTemplate e : iti.getErrorList())
+			result.append("Item error list : \r\n");
+			for(ErrorTemplate e : errorList)
 				{
-				result.append("	+ "+e+"\r\n");
+				result.append("- "+e.getErrorDesc()+"\r\n");
 				}
+			result.append("\r\n");
 			}
 		
-		result.append("\r\n");
+		if(axlList.size() > 0)
+			{
+			result.append("CUCM items : \r\n");
+			for(ItemToInject iti : axlList)
+				{
+				result.append("- "+iti.getName()+" : "+iti.getType().name()+" : "+iti.getStatus().name()+"\r\n");
+				for(ErrorTemplate e : iti.getErrorList())
+					{
+					result.append("	+ "+e+"\r\n");
+					}
+				}
+			result.append("\r\n");
+			}
 		result.append(doGetDetailedStatus());
 		
 		return result.toString();

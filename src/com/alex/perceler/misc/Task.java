@@ -110,7 +110,7 @@ public class Task extends Thread
 				}
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 			}
-		if(cliManager.getCliIList().size() != 0)cliManager.start();
+		if((cliManager.getCliIList().size() != 0) && (!stop))cliManager.start();
 		
 		/**
 		 * It is better to wait for the cli task to end before starting the AXL ones
@@ -131,6 +131,7 @@ public class Task extends Thread
 			{
 			try
 				{
+				if(stop)break;
 				while(pause)
 					{
 					this.sleep(500);
@@ -161,6 +162,7 @@ public class Task extends Thread
 			{
 			try
 				{
+				if(stop)break;
 				while(pause)
 					{
 					this.sleep(500);
@@ -197,7 +199,7 @@ public class Task extends Thread
 				pause = false;
 				status = itmStatus.reset;
 				setItemStatus(itmStatus.reset);
-				startReset();
+				if(!stop)startReset();
 				}
 			else
 				{
@@ -207,14 +209,14 @@ public class Task extends Thread
 				startSurvey();
 				
 				//We then wait for the user to accept the migration
-				while(pause)
+				while(pause && !stop)
 					{
 					this.sleep(500);
 					}
 				status = itmStatus.update;
 				setItemStatus(itmStatus.update);
-				startUpdate();
-				startReset();
+				if(!stop)startUpdate();
+				if(!stop)startReset();
 				
 				status = itmStatus.postaudit;
 				setItemStatus(itmStatus.postaudit);

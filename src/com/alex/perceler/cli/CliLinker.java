@@ -86,7 +86,7 @@ public class CliLinker
 			}
 		catch (Exception e)
 			{
-			throw new ConnectionException(device.getInfo()+" : CLI : Failed to connect");
+			throw new ConnectionException("Failed to connect");
 			}
 		}
 	

@@ -177,20 +177,16 @@ public class Device extends ItemToMigrate
 				(status.equals(itmStatus.done)))
 			{
 			reachable = DeviceTools.ping(newip);
+			if(reachable)Variables.getLogger().debug(name+" "+newip+" "+type+" : The device is reachable (ping)");
+			else Variables.getLogger().debug(name+" "+newip+" "+type+" : The device could not been reach (ping failed)");
 			}
 		else
 			{
 			reachable = DeviceTools.ping(ip);
+			if(reachable)Variables.getLogger().debug(name+" "+ip+" "+type+" : The device is reachable (ping)");
+			else Variables.getLogger().debug(name+" "+ip+" "+type+" : The device could not been reach (ping failed)");
 			}
 		
-		if(reachable)
-			{
-			Variables.getLogger().debug(getInfo()+" : The device is reachable (ping)");
-			}
-		else
-			{
-			Variables.getLogger().debug("The device could not been reach (ping failed)");
-			}
 		/*if(!reachable)
 			{
 			//If the device is not reachable, we should not update the CUCM data. So we disable the entire item
@@ -257,12 +253,16 @@ public class Device extends ItemToMigrate
 		{
 		StringBuffer s = new StringBuffer("");
 		s.append("Reachable : "+reachable+"\r\n");
-		s.append("\r\n");
-		s.append("Cli error list : \r\n");
 		
-		for(ErrorTemplate e : cliInjector.getErrorList())
+		if(cliInjector.getErrorList().size() > 0)
 			{
-			s.append(e.getErrorDesc()+"\r\n");
+			s.append("\r\n");
+			s.append("Cli error list : \r\n");
+			
+			for(ErrorTemplate e : cliInjector.getErrorList())
+				{
+				s.append(e.getErrorDesc()+"\r\n");
+				}
 			}
 		
 		return s.toString();
