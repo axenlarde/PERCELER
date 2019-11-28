@@ -47,6 +47,7 @@ public class Office extends ItemToMigrate
 		this.shortname = shortname;
 		this.newName = newName;
 		this.officeType = officeType;
+		phoneList = new ArrayList<BasicPhone>();
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -75,6 +76,7 @@ public class Office extends ItemToMigrate
 		this.shortname = bo.getShortname();
 		this.newName = bo.getNewName();
 		this.officeType = bo.getOfficeType();
+		phoneList = new ArrayList<BasicPhone>();
 		
 		/**
 		 * In case of rollback we reverse the following values

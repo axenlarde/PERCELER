@@ -108,7 +108,7 @@ public class OfficeTools
 			Variables.getLogger().error("ERROR while trying to get the devicepool's phones for "+DevicePoolName+" "+e.getMessage(),e);
 			}
 		
-		return null;
+		return new ArrayList<BasicPhone>();
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

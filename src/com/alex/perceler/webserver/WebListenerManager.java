@@ -46,12 +46,12 @@ public class WebListenerManager implements HttpHandler
 		{
 		try
 			{
-			/*
 			HttpServer server = HttpServer.create(new InetSocketAddress(Integer.parseInt(UsefulMethod.getTargetOption("webserverport"))), 0);
 			HttpContext context = server.createContext("/PERCELER", this);
 			server.start();
-			Variables.getLogger().debug("Web Server started !");*/
+			Variables.getLogger().debug("Web Server started !");
 			
+			/*
 			HttpsServer server = HttpsServer.create(new InetSocketAddress(Integer.parseInt(UsefulMethod.getTargetOption("webserverport"))), 0);
 			
 			X509TrustManager xtm = new HttpsTrustManager();
@@ -67,10 +67,6 @@ public class WebListenerManager implements HttpHandler
             // setup the key manager factory
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, password);
-            
-            //setup the trust manager factory
-            //TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-            //tmf.init(ks);
             
             sslContext.init(kmf.getKeyManagers(), mytm, null);
             
@@ -97,7 +93,7 @@ public class WebListenerManager implements HttpHandler
 			
 			HttpContext context = server.createContext("/PERCELER", this);
 			server.start();
-			Variables.getLogger().debug("Web Server started !");
+			Variables.getLogger().debug("Web Server started !");*/
 			}
 		catch (Exception e)
 			{
@@ -138,6 +134,10 @@ public class WebListenerManager implements HttpHandler
 					if(wr.getType().equals(webRequestType.doAuthenticate))
 						{
 						reply = ManageWebRequest.doAuthenticate(content);
+						}
+					else if(wr.getType().equals(webRequestType.search))
+						{
+						reply = ManageWebRequest.search(content);
 						}
 					else if(wr.getType().equals(webRequestType.getOfficeList))
 						{

@@ -74,11 +74,18 @@ public class TaskManager
 					}
 				
 				//We generate a new unique ID
-				String id = DigestUtils.md5Hex(System.currentTimeMillis()+Math.random()+"8)");
-				Task t = new Task(todoList, id, ownerID, action);
-				Variables.getTaskList().add(t);
-				t.start();
-				return id;
+				if(todoList.size() != 0)
+					{
+					String id = DigestUtils.md5Hex(System.currentTimeMillis()+Math.random()+"8)");
+					Task t = new Task(todoList, id, ownerID, action);
+					Variables.getTaskList().add(t);
+					t.start();
+					return id;
+					}
+				else
+					{
+					throw new Exception("The item list was empty. No task could be started");
+					}
 				}
 			else
 				{

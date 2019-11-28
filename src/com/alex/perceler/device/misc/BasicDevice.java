@@ -4,6 +4,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
+import com.alex.perceler.utils.Variables.basicItemStatus;
 import com.alex.perceler.utils.Variables.itmType;
 
 /**
@@ -23,6 +24,7 @@ public class BasicDevice
 	mask,
 	gateway,
 	officeid,
+	officename,
 	newip,
 	newgateway,
 	newmask,
@@ -30,7 +32,7 @@ public class BasicDevice
 	password;
 	private CliProfile cliProfile;
 	private cliProtocol connexionProtocol;
-
+	private basicItemStatus status;
 	
 	
 	public BasicDevice(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip,
@@ -52,6 +54,7 @@ public class BasicDevice
 		this.cliProfile = cliProfile;
 		this.connexionProtocol = connexionProtocol;
 		this.id = DigestUtils.md5Hex(name+ip+officeid);
+		status = basicItemStatus.tomigrate;
 		}
 
 	public String getInfo()
@@ -200,7 +203,26 @@ public class BasicDevice
 		{
 		this.password = password;
 		}
-	
+
+	public String getOfficename()
+		{
+		return officename;
+		}
+
+	public void setOfficename(String officename)
+		{
+		this.officename = officename;
+		}
+
+	public basicItemStatus getStatus()
+		{
+		return status;
+		}
+
+	public void setStatus(basicItemStatus status)
+		{
+		this.status = status;
+		}
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

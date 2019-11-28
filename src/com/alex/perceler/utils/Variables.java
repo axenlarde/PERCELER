@@ -192,6 +192,12 @@ public class Variables
 		PRM
 		};
 		
+	public enum basicItemStatus
+		{
+		tomigrate,
+		migrated
+		};	
+		
 	//Misc
 	private static String softwareName;
 	private static String softwareVersion;

@@ -25,6 +25,7 @@ public class ManageWebRequest
 	public enum webRequestType
 		{
 		doAuthenticate,
+		search,
 		getOfficeList,
 		getDeviceList,
 		getTaskList,
@@ -77,6 +78,31 @@ public class ManageWebRequest
 		catch (Exception e)
 			{
 			Variables.getLogger().error("ERROR while processing doAuthenticate web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * getOfficeList
+	 */
+	public synchronized static WebRequest search(String content)
+		{
+		try
+			{
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("request");
+			params.add("content");
+			
+			ArrayList<String[][]> parsed = xMLGear.getResultListTab(content, params);
+			String[][] t = parsed.get(0);
+			
+			String search = UsefulMethod.getItemByName("search", t);
+			return WebRequestBuilder.buildWebRequest(webRequestType.search, search);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing search web request : "+e.getMessage(),e);
 			}
 		
 		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);

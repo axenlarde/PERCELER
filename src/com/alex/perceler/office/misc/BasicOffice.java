@@ -1,7 +1,11 @@
 package com.alex.perceler.office.misc;
 
+import java.util.ArrayList;
+
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.alex.perceler.device.misc.BasicDevice;
+import com.alex.perceler.utils.Variables.basicItemStatus;
 import com.alex.perceler.utils.Variables.officeType;
 
 /**
@@ -23,6 +27,8 @@ public class BasicOffice
 	
 	private officeType officeType;
 	private IPRange voiceIPRange, dataIPRange, newVoiceIPRange, newDataIPRange;
+	private ArrayList<BasicDevice> deviceList;
+	private basicItemStatus status; 
 	
 	public BasicOffice(String fullname, String idcomu, String idCAF, String shortname, String newName,
 			com.alex.perceler.utils.Variables.officeType officeType, String voiceIPRange, String dataIPRange,
@@ -40,6 +46,8 @@ public class BasicOffice
 		this.newVoiceIPRange = new IPRange(newVoiceIPRange);
 		this.newDataIPRange = new IPRange(newDataIPRange);
 		id = DigestUtils.md5Hex(fullname+idcomu+voiceIPRange);
+		deviceList = new ArrayList<BasicDevice>();
+		status = basicItemStatus.tomigrate;
 		}
 	
 	public String getInfo()
@@ -156,6 +164,26 @@ public class BasicOffice
 	public void setFullname(String fullname)
 		{
 		this.fullname = fullname;
+		}
+
+	public ArrayList<BasicDevice> getDeviceList()
+		{
+		return deviceList;
+		}
+
+	public void setDeviceList(ArrayList<BasicDevice> deviceList)
+		{
+		this.deviceList = deviceList;
+		}
+
+	public basicItemStatus getStatus()
+		{
+		return status;
+		}
+
+	public void setStatus(basicItemStatus status)
+		{
+		this.status = status;
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/
