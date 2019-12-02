@@ -31,7 +31,6 @@ public class SimpleRequest
 			com.cisco.axl.api._10.GetCCMVersionReq req = new com.cisco.axl.api._10.GetCCMVersionReq();
 			com.cisco.axl.api._10.GetCCMVersionRes resp = Variables.getAXLConnectionToCUCMV105().getCCMVersion(req);//We send the request to the CUCM
 			
-			Variables.getLogger().info("CUCM Version : "+resp.getReturn().getComponentVersion().getVersion());
 			return resp.getReturn().getComponentVersion().getVersion();
 			}
 		else

@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 Language configuration file
 -->
 
@@ -15,6 +15,8 @@ Language configuration file
 			<yes>Yes</yes>
 			<no>No</no>
 			<error>Error</error>
+			<emailreportsubject>PERCELER : Task ends</emailreportsubject>
+			<emailreportcontent>The following task ends. Please find here bellow the summary :</emailreportcontent>
 		</values>
 	</language>
 	<language>
@@ -29,6 +31,8 @@ Language configuration file
 			<yes>Yes</yes>
 			<no>No</no>
 			<error>Error</error>
+			<emailreportsubject>PERCELER : Fin de tâche</emailreportsubject>
+			<emailreportcontent>The tâche usivante est terminée. Veuillez trouvez ci-dessous son compte rendu :</emailreportcontent>
 		</values>
 	</language>
 </languages>

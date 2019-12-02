@@ -2,6 +2,7 @@ package com.alex.perceler.cli;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
@@ -10,6 +11,9 @@ import org.apache.commons.net.telnet.SuppressGAOptionHandler;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.TelnetNotificationHandler;
 import org.apache.commons.net.telnet.TerminalTypeOptionHandler;
+import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.channel.ClientChannel;
+import org.apache.sshd.client.session.ClientSession;
 
 import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.utils.Variables;
@@ -17,8 +21,6 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UIKeyboardInteractive;
-import com.jcraft.jsch.UserInfo;
 
 /**
  * Used to establish the connection to a device
@@ -30,6 +32,13 @@ public class CliConnection implements TelnetNotificationHandler
 	/**
 	 * Variables
 	 */
+	public enum connectedTech
+		{
+		sshd,
+		jsch,
+		telnet
+		};
+	
 	private String user,password,ip,info;
 	private BufferedWriter out;
 	private BufferedReader in;
@@ -38,6 +47,10 @@ public class CliConnection implements TelnetNotificationHandler
 	private TelnetClient telnetConnection;
 	private Channel SSHConnection;
 	private int timeout;
+	private SshClient SSHDClient;
+	private Session SSHSession;
+	private ClientChannel SSHDConnection;
+	private connectedTech cTech;
 	
 	public CliConnection(String user, String password, String ip, String info, cliProtocol protocol, int timeout)
 		{
@@ -50,76 +63,144 @@ public class CliConnection implements TelnetNotificationHandler
 		this.timeout = timeout;
 		}
 
-	public void connect() throws Exception
+	/**
+	 * To initialize the connection
+	 */
+	public void connect() throws Exception, ConnectionException
 		{
 		if(protocol.equals(cliProtocol.ssh))
 			{
-			initSSH();	
+			trySSH();
+			}
+		else if(protocol.equals(cliProtocol.telnet))
+			{
+			initTelnet();
+			cTech = connectedTech.telnet;
 			}
 		else
 			{
-			initTelnet();
+			/**
+			 * Only if "auto" is the choosen cli protocol
+			 */
+			Variables.getLogger().debug("CLI : auto connection protocol selected");
+			
+			try
+				{
+				trySSH();
+				}
+			catch(Exception e)
+				{
+				Variables.getLogger().error("CLI : Failed to connect using SSH : "+e.getMessage());
+				try
+					{
+					Variables.getLogger().debug("CLI : Trying with telnet");
+					initTelnet();
+					cTech = connectedTech.telnet;
+					}
+				catch (Exception ex)
+					{
+					Variables.getLogger().error("CLI : Failed to connect using telnet as well : "+ex.getMessage());
+					throw new ConnectionException(ex.getMessage());
+					}
+				}
 			}
+		
 		receiver = new AnswerReceiver(info, in);
 		receiver.start();
 		}
 	
-	/***********************************
-	 * Method used to open and prepare 
-	 * the connection with the gateway
-	 * using SSH protocol
-	 ***********************************/
-	public void initSSH() throws Exception
+	/**
+	 * To initialize a SSH connection using both method
+	 */
+	private void trySSH() throws Exception, ConnectionException
 		{
-		Variables.getLogger().debug(info+" CLI : init SSH connection");
-		
-		JSch jsch = new JSch();
-		Session session=jsch.getSession(user, ip, 22);
-		session.setPassword(password);
-		
-		UserInfo ui = new MyUserInfo()
-			{
-	        public void showMessage(String message)
-	        	{
-	        	//Here we accept all the certificate
-	        	//JOptionPane.showMessageDialog(null, message);
-	        	}
-	        public boolean promptYesNo(String message)
-	        	{
-	        	return true;
-	        	}
-			};
-      	session.setUserInfo(ui);
-		
-		//Connection to the ssh server with timeout
 		try
 			{
-			session.connect(timeout);
+			initSSHD();
+			cTech = connectedTech.sshd;
 			}
-		catch(Exception exc)
+		catch(Exception e)
 			{
-			Variables.getLogger().debug(info+" : CLI : Unable to connect with SSH version 2, trying with version 1");
+			Variables.getLogger().error("CLI : Failed to connect using apache sshd : "+e.getMessage());
 			try
 				{
-				session.setClientVersion("SSH-1.5");
-				session.connect(timeout);
+				Variables.getLogger().debug("CLI : Trying with jsch");
+				initSSH();
+				cTech = connectedTech.jsch;
 				}
-			catch(Exception ex)
+			catch (Exception ex)
 				{
-				throw new Exception(info+" CLI : Unable to connect using SSH : "+ex.getMessage());
+				Variables.getLogger().error("CLI : Failed to connect using apache jsch : "+ex.getMessage());
+				throw new ConnectionException("Failed to connect : "+ex.getMessage());
 				}
 			}
-		//Start the shell session
-		SSHConnection = session.openChannel("shell");
+		}
+	
+	/**
+	 * Initialize SSH connection using apache sshd
+	 * @throws Exception 
+	 */
+	public void initSSHD() throws Exception
+		{
+		Variables.getLogger().debug(info+" CLI : init SSH connection using SSHD");
+		try
+			{
+			SSHDClient = SshClient.setUpDefaultClient();
+			SSHDClient.start();
+			ClientSession session = SSHDClient.connect(user, ip, 22).verify(timeout).getSession();
+			session.addPasswordIdentity(password);
+	        session.auth().verify(timeout);
+	        
+	        SSHDConnection = session.createChannel(ClientChannel.CHANNEL_SHELL);
+	        SSHDConnection.open().verify(timeout);
+	        out = new BufferedWriter(new OutputStreamWriter(SSHDConnection.getInvertedIn()));
+	        in = new BufferedReader(new InputStreamReader(SSHDConnection.getInvertedOut()));
+	        
+	        
+	        Variables.getLogger().debug(info+" : CLI : SSH connection initiated successfully");
+			}
+		catch (Exception e)
+			{
+			throw new ConnectionException(info+" CLI : Unable to connect using SSH : "+e.getMessage());
+			}
+		}
+	
+	
+	/**
+	 * Initialize SSH connection using jsch
+	 * @throws Exception 
+	 */
+	public void initSSH() throws Exception
+		{
+		Variables.getLogger().debug(info+" CLI : init SSH connection using JSCH");
 		
-		//Assign input and output Stream
-		out = new BufferedWriter(new OutputStreamWriter(SSHConnection.getOutputStream()));
-		in = new BufferedReader(new InputStreamReader(SSHConnection.getInputStream()));
-		
-		((ChannelShell)SSHConnection).setPtyType("vt100");
-		SSHConnection.connect();
-		
-		Variables.getLogger().debug(info+" : CLI : SSH connection initiated successfully");
+		try
+			{
+			JSch jsch = new JSch();
+			SSHSession = jsch.getSession(user, ip, 22);
+			SSHSession.setPassword(password);
+			SSHSession.setConfig("StrictHostKeyChecking", "no");
+			
+			//Connection to the ssh server with timeout
+			SSHSession.connect(timeout);
+			
+			//Start the shell session
+			SSHConnection = SSHSession.openChannel("shell");
+			
+			//Assign input and output Stream
+			out = new BufferedWriter(new OutputStreamWriter(SSHConnection.getOutputStream()));
+			in = new BufferedReader(new InputStreamReader(SSHConnection.getInputStream()));
+			
+			((ChannelShell)SSHConnection).setPtyType("vt100");
+			//((ChannelShell)SSHConnection).setPtyType("vt102");
+			SSHConnection.connect();
+			
+			Variables.getLogger().debug(info+" : CLI : SSH connection initiated successfully");
+			}
+		catch (Exception e)
+			{
+			throw new ConnectionException(info+" CLI : Unable to connect using SSH : "+e.getMessage());
+			}
 		}
 	
 	/***********************************
@@ -173,31 +254,14 @@ public class CliConnection implements TelnetNotificationHandler
         Variables.getLogger().debug(info+" CLI : Telnet negociation command received : "+command);
 		}
 	
-	
-	public static abstract class MyUserInfo implements UserInfo, UIKeyboardInteractive
-		{
-	    public String getPassword(){ return null; }
-	    public boolean promptYesNo(String str){ return false; }
-	    public String getPassphrase(){ return null; }
-	    public boolean promptPassphrase(String message){ return false; }
-	    public boolean promptPassword(String message){ return false; }
-	    public void showMessage(String message){ }
-	    public String[] promptKeyboardInteractive(String destination,
-	                                              String name,
-	                                              String instruction,
-	                                              String[] prompt,
-	                                              boolean[] echo){return null;}
-		}
-	
 	public boolean isConnected()
 		{
-		if(protocol.equals(cliProtocol.ssh))
+		switch(cTech)
 			{
-			return SSHConnection.isConnected();
-			}
-		else
-			{
-			return telnetConnection.isConnected();
+			case sshd:return SSHDConnection.isOpen();
+			case jsch:return SSHConnection.isConnected();
+			case telnet:return telnetConnection.isConnected();
+			default:return false;
 			}
 		}
 	
@@ -209,17 +273,27 @@ public class CliConnection implements TelnetNotificationHandler
 		try
 			{
 			receiver.setStop(true);
-			//in.close();
-			//out.close();
 			
-			if(protocol.equals(cliProtocol.ssh))
+			switch(cTech)
 				{
-				SSHConnection.disconnect();
+				case sshd:
+					{
+					SSHDConnection.close();
+					SSHDClient.stop();
+					break;
+					}
+				case jsch:
+					{
+					SSHConnection.disconnect();
+					SSHSession.disconnect();
+					break;
+					}
+				case telnet:
+					{
+					telnetConnection.disconnect();
+					}
 				}
-			else
-				{
-				telnetConnection.disconnect();
-				}
+			
 			Variables.getLogger().debug(info+" : CLI : Device disconnected successfully");
 			}
 		catch (Exception e)
@@ -241,6 +315,11 @@ public class CliConnection implements TelnetNotificationHandler
 	public AnswerReceiver getReceiver()
 		{
 		return receiver;
+		}
+
+	public connectedTech getcTech()
+		{
+		return cTech;
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

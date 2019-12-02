@@ -62,13 +62,15 @@ public class WebRequestBuilder
 						(o.getDataIPRange().getIpRange().contains(search)))
 					{
 					//Then we look for device associated to this office
-					o.getDeviceList().clear();
-					for(BasicDevice d : Variables.getDeviceList())
+					if(o.getDeviceList().size() == 0)
 						{
-						if(d.getOfficeid().equals(o.getIdcomu()))
+						for(BasicDevice d : Variables.getDeviceList())
 							{
-							o.getDeviceList().add(d);
-							lookForDuplicate.add(d.getId());
+							if(d.getOfficeid().equals(o.getIdcomu()))
+								{
+								o.getDeviceList().add(d);
+								lookForDuplicate.add(d.getId());
+								}
 							}
 						}
 					
@@ -195,7 +197,30 @@ public class WebRequestBuilder
 			{
 			for(BasicOffice o : Variables.getOfficeList())
 				{
+				content.append("				<office>\r\n");
 				content.append(getOffice("				", o));
+				content.append("					<devices>\r\n");
+				
+				if(o.getDeviceList().size()!=0)
+					{
+					for(BasicDevice d : o.getDeviceList())
+						{
+						content.append("						<device>\r\n");
+						content.append("							<id>"+d.getId()+"</id>\r\n");
+						content.append("							<name>"+d.getName()+"</name>\r\n");
+						content.append("							<type>"+d.getType()+"</type>\r\n");
+						content.append("							<ip>"+d.getIp()+"</ip>\r\n");
+						content.append("							<status>"+d.getStatus()+"</status>\r\n");
+						content.append("						</device>\r\n");
+						}
+					}
+				else
+					{
+					//content.append("						<device></device>\r\n");
+					}
+				
+				content.append("					</devices>\r\n");
+				content.append("				</office>\r\n");
 				}
 			}
 		catch (Exception e)
@@ -231,7 +256,9 @@ public class WebRequestBuilder
 			{
 			for(BasicDevice d : Variables.getDeviceList())
 				{
+				content.append("				<device>\r\n");
 				content.append(getDevice("				", d));
+				content.append("				</device>\r\n");
 				}
 			}
 		catch (Exception e)
@@ -261,7 +288,6 @@ public class WebRequestBuilder
 		content.append("	<reply>\r\n");
 		content.append("		<type>"+type.name()+"</type>\r\n");
 		content.append("		<content>\r\n");
-		content.append("			<tasks>\r\n");
 		
 		try
 			{
@@ -269,7 +295,9 @@ public class WebRequestBuilder
 			
 			for(Task t : Variables.getTaskList())
 				{
+				content.append("				<task>\r\n");
 				content.append(getTask("				", t));
+				content.append("				</task>\r\n");
 				}
 			}
 		catch (Exception e)
@@ -307,7 +335,42 @@ public class WebRequestBuilder
 				{
 				if(o.getId().equals(officeID))
 					{
+					content.append("			<office>\r\n");
 					content.append(getOffice("			", o));
+					content.append("				<devices>\r\n");
+					
+					//Then we look for device associated to this office
+					if(o.getDeviceList().size() == 0)
+						{
+						for(BasicDevice d : Variables.getDeviceList())
+							{
+							if(d.getOfficeid().equals(o.getIdcomu()))
+								{
+								o.getDeviceList().add(d);
+								}
+							}
+						}
+					
+					if(o.getDeviceList().size()!=0)
+						{
+						for(BasicDevice d : o.getDeviceList())
+							{
+							content.append("					<device>\r\n");
+							content.append("						<id>"+d.getId()+"</id>\r\n");
+							content.append("						<name>"+d.getName()+"</name>\r\n");
+							content.append("						<type>"+d.getType()+"</type>\r\n");
+							content.append("						<ip>"+d.getIp()+"</ip>\r\n");
+							content.append("						<status>"+d.getStatus()+"</status>\r\n");
+							content.append("					</device>\r\n");
+							}
+						}
+					else
+						{
+						//content.append("						<device></device>\r\n");
+						}
+					
+					content.append("				</devices>\r\n");
+					content.append("			</office>\r\n");
 					found = true;
 					break;
 					}
@@ -348,7 +411,9 @@ public class WebRequestBuilder
 				{
 				if(d.getId().equals(deviceID))
 					{
+					content.append("			<device>\r\n");
 					content.append(getDevice("			", d));
+					content.append("			</device>\r\n");
 					found = true;
 					break;
 					}
@@ -390,7 +455,9 @@ public class WebRequestBuilder
 				{
 				if(t.getTaskId().equals(taskID))
 					{
+					content.append("			<task>\r\n");
 					content.append(getTask("			", t));
+					content.append("			</task>\r\n");
 					found = true;
 					break;
 					}
@@ -438,7 +505,6 @@ public class WebRequestBuilder
 		{
 		StringBuffer content = new StringBuffer();
 		
-		content.append(tabs+"<office>\r\n");
 		content.append(tabs+"	<id>"+o.getId()+"</id>\r\n");
 		content.append(tabs+"	<idcomu>"+o.getIdcomu()+"</idcomu>\r\n");
 		content.append(tabs+"	<idcaf>"+o.getIdCAF()+"</idcaf>\r\n");
@@ -450,7 +516,6 @@ public class WebRequestBuilder
 		content.append(tabs+"	<dataiprange>"+o.getDataIPRange().getCIDRFormat()+"</dataiprange>\r\n");
 		content.append(tabs+"	<newvoiceiprange>"+o.getNewVoiceIPRange().getCIDRFormat()+"</newvoiceiprange>\r\n");
 		content.append(tabs+"	<newdataiprange>"+o.getNewDataIPRange().getCIDRFormat()+"</newdataiprange>\r\n");
-		content.append(tabs+"</office>\r\n");
 		
 		return content.toString();
 		}
@@ -463,7 +528,6 @@ public class WebRequestBuilder
 		{
 		StringBuffer content = new StringBuffer();
 		
-		content.append(tabs+"<device>\r\n");
 		content.append(tabs+"	<id>"+d.getId()+"</id>\r\n");
 		content.append(tabs+"	<name>"+d.getName()+"</name>\r\n");
 		content.append(tabs+"	<type>"+d.getType()+"</type>\r\n");
@@ -474,7 +538,6 @@ public class WebRequestBuilder
 		content.append(tabs+"	<newmask>"+d.getNewmask()+"</newmask>\r\n");
 		content.append(tabs+"	<newgateway>"+d.getNewgateway()+"</newgateway>\r\n");
 		content.append(tabs+"	<officeid>"+d.getOfficeid()+"</officeid>\r\n");
-		content.append(tabs+"</device>\r\n");
 		
 		return content.toString();
 		}
@@ -486,7 +549,6 @@ public class WebRequestBuilder
 		{
 		StringBuffer content = new StringBuffer();
 		
-		content.append(tabs+"<task>\r\n");
 		content.append(tabs+"	<overallstatus>"+t.getStatus()+"</overallstatus>\r\n");
 		content.append(tabs+"	<itemlist>\r\n");
 		
@@ -501,7 +563,6 @@ public class WebRequestBuilder
 			}
 		
 		content.append(tabs+"	</itemlist>\r\n");
-		content.append(tabs+"</task>\r\n");
 		
 		return content.toString();
 		}

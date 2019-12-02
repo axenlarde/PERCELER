@@ -11,7 +11,7 @@ import com.alex.perceler.utils.Variables.actionType;
  */
 public interface ItemToMigrateImpl
 	{
-	public ArrayList<String> startSurvey() throws Exception;//To get the status of the item
+	public void startSurvey() throws Exception;//To get the status of the item
 	public void doStartSurvey() throws Exception;//Is called in addition of the main method
 	public void update() throws Exception;//To start the migration process of this item
 	public void doUpdate() throws Exception;//Is called in addition of the main method

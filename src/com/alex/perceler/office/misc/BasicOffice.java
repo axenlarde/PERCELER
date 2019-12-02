@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.alex.perceler.device.misc.BasicDevice;
-import com.alex.perceler.utils.Variables.basicItemStatus;
+import com.alex.perceler.misc.SimpleItem;
 import com.alex.perceler.utils.Variables.officeType;
 
 /**
@@ -13,7 +13,7 @@ import com.alex.perceler.utils.Variables.officeType;
  *
  * @author Alexandre RATEL
  */
-public class BasicOffice
+public class BasicOffice extends SimpleItem
 	{
 	/**
 	 * Variables
@@ -28,13 +28,12 @@ public class BasicOffice
 	private officeType officeType;
 	private IPRange voiceIPRange, dataIPRange, newVoiceIPRange, newDataIPRange;
 	private ArrayList<BasicDevice> deviceList;
-	private basicItemStatus status; 
 	
 	public BasicOffice(String fullname, String idcomu, String idCAF, String shortname, String newName,
 			com.alex.perceler.utils.Variables.officeType officeType, String voiceIPRange, String dataIPRange,
 			String newVoiceIPRange, String newDataIPRange)
 		{
-		super();
+		super(fullname+idcomu);
 		this.fullname = fullname;
 		this.idcomu = idcomu;
 		this.idCAF = idCAF;
@@ -45,9 +44,8 @@ public class BasicOffice
 		this.dataIPRange = new IPRange(dataIPRange);
 		this.newVoiceIPRange = new IPRange(newVoiceIPRange);
 		this.newDataIPRange = new IPRange(newDataIPRange);
-		id = DigestUtils.md5Hex(fullname+idcomu+voiceIPRange);
+		id = DigestUtils.md5Hex(fullname+idcomu);
 		deviceList = new ArrayList<BasicDevice>();
-		status = basicItemStatus.tomigrate;
 		}
 	
 	public String getInfo()
@@ -146,16 +144,6 @@ public class BasicOffice
 		this.newDataIPRange = newDataIPRange;
 		}
 
-	public String getId()
-		{
-		return id;
-		}
-
-	public void setId(String id)
-		{
-		this.id = id;
-		}
-
 	public String getFullname()
 		{
 		return fullname;
@@ -176,15 +164,5 @@ public class BasicOffice
 		this.deviceList = deviceList;
 		}
 
-	public basicItemStatus getStatus()
-		{
-		return status;
-		}
-
-	public void setStatus(basicItemStatus status)
-		{
-		this.status = status;
-		}
-	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

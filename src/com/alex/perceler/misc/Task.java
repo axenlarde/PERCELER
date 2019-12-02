@@ -2,9 +2,13 @@ package com.alex.perceler.misc;
 
 import java.util.ArrayList;
 
+import javax.xml.transform.ErrorListener;
+
 import com.alex.perceler.cli.CliManager;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
+import com.alex.perceler.utils.LanguageManagement;
+import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itmType;
@@ -240,6 +244,11 @@ public class Task extends Thread
 			status = itmStatus.done;
 			end = true;
 			Variables.getLogger().info(action+" task "+taskID+" ends");
+			
+			UsefulMethod.sendEmailToTheAdminList(
+					LanguageManagement.getString("emailreportsubject"),
+					LanguageManagement.getString("emailreportcontent"));
+			
 			Variables.setUuidList(new ArrayList<storedUUID>());//We clean the UUID list
 			Variables.getLogger().info("UUID list cleared");
 			}

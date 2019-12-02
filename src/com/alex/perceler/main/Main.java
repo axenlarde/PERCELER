@@ -1,11 +1,25 @@
 package com.alex.perceler.main;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Level;
 
+import com.alex.perceler.cli.CliConnection;
+import com.alex.perceler.cli.CliInjector;
+import com.alex.perceler.cli.CliProfile;
+import com.alex.perceler.cli.CliProfile.cliProtocol;
+import com.alex.perceler.cli.OneLine;
+import com.alex.perceler.cli.OneLine.cliType;
 import com.alex.perceler.core.LetsParty;
+import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.utils.InitLogging;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.actionType;
+import com.alex.perceler.utils.Variables.itmType;
 
 
 /**
@@ -61,8 +75,8 @@ public class Main
 			 * 
 			 * We do it now to avoid latency during real request
 			 */
-			//UsefulMethod.initAXLConnectionToCUCM();
-			//UsefulMethod.initRISConnectionToCUCM();
+			UsefulMethod.initAXLConnectionToCUCM();
+			UsefulMethod.initRISConnectionToCUCM();
 			}
 		catch(Exception exc)
 			{

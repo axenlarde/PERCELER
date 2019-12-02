@@ -1,9 +1,9 @@
 package com.alex.perceler.cli;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.util.regex.Pattern;
 
+import com.alex.perceler.cli.CliConnection.connectedTech;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.utils.UsefulMethod;
@@ -79,14 +79,14 @@ public class CliLinker
 			 * Instead, we have to send them once connected when prompted
 			 * So we add an extra step
 			 */
-			if(protocol.equals(cliProtocol.telnet))
+			if(connection.getcTech().equals(connectedTech.telnet))
 				{
 				telnetAuth();
 				}
 			}
 		catch (Exception e)
 			{
-			throw new ConnectionException("Failed to connect");
+			throw new ConnectionException("Failed to connect : "+e.getMessage());
 			}
 		}
 	

@@ -86,6 +86,7 @@ public class DeviceTools
 				TrunkSip myST = new TrunkSip("TBD");
 				SipTrunkDestination std = new SipTrunkDestination(IP, "5060");
 				ArrayList<SipTrunkDestination> mydests = new ArrayList<SipTrunkDestination>();
+				mydests.add(std);
 				
 				for(int i = 0; i< list.getLength(); i++)
 					{

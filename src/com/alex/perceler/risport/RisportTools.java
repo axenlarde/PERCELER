@@ -25,45 +25,6 @@ public class RisportTools
 	{
 	
 	/**
-	 * To get a phone status using RIS
-	 */
-	public static BasicPhone getPhoneStatus(String deviceName)
-		{
-		try
-			{
-			SelectCmDevice sxmlParams = new SelectCmDevice();
-			CmSelectionCriteria criteria = new CmSelectionCriteria();
-			long maxNum = 1000;
-			long modelNum = 255;
-			ArrayOfSelectItem items = new ArrayOfSelectItem();
-			
-			SelectItem item = new SelectItem();
-			item.setItem(deviceName);
-			items.getItem().add(item);
-			
-			criteria.setMaxReturnedDevices(maxNum);
-			criteria.setModel(modelNum);
-			criteria.setDeviceClass("Phone");
-			criteria.setStatus("Any");
-			criteria.setSelectBy(CmSelectBy.NAME);
-			criteria.setSelectItems(items);
-			sxmlParams.setCmSelectionCriteria(criteria);
-
-			//make selectCmDevice request
-			Variables.getLogger().debug("Sending RIS request");
-			SelectCmDeviceReturn selectResponse = Variables.getRisConnection().selectCmDevice("",criteria);
-			
-			return getDeviceFromRISResponse(selectResponse).get(0);
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("ERROR while retrieving phone status using RIS for device : "+deviceName);
-			}
-		
-		return null;
-		}
-	
-	/**
 	 * To get the deviceList from the RIS Response
 	 */
 	private static ArrayList<BasicPhone> getDeviceFromRISResponse(SelectCmDeviceReturn selectResponse)
@@ -74,21 +35,44 @@ public class RisportTools
 			{
 			Variables.getLogger().debug("Parsing RIS reply");
 			
-			for(CmNode node : selectResponse.getSelectCmDeviceResult().getCmNodes().getItem())
+			if(selectResponse.getSelectCmDeviceResult().getTotalDevicesFound() != 0)
 				{
-				ArrayOfCmDevice dl = node.getCmDevices();
-				
-				for(CmDevice d : dl.getItem())
+				for(CmNode node : selectResponse.getSelectCmDeviceResult().getCmNodes().getItem())
 					{
-					pl.add(new BasicPhone(d.getName(),
-							d.getDescription(),
-							d.getModel().toString(),
-							d.getIPAddress().getItem().get(0).getIP(),
-							d.getStatus().name().toLowerCase().replace("_", "")));
+					Variables.getLogger().debug("RIS Result for node : "+node.getName());
+					if(node.getCmDevices() != null)
+						{
+						ArrayOfCmDevice dl = node.getCmDevices();
+						if(dl != null)
+							{
+							for(CmDevice d : dl.getItem())
+								{
+								pl.add(new BasicPhone(d.getName(),
+										d.getDescription(),
+										d.getModel().toString(),
+										d.getIPAddress().getItem().get(0).getIP(),
+										d.getStatus().name().toLowerCase().replace("_", "")));
+								
+								Variables.getLogger().debug("Found "+d.getName()+" : "+d.getStatus());
+								}
+							}
+						else
+							{
+							Variables.getLogger().debug("no device for this node");
+							}
+						}
+					else
+						{
+						Variables.getLogger().debug("no device for this node");
+						}
 					}
 				}
+			else
+				{
+				Variables.getLogger().debug("no result found on any node");
+				}
 			
-			Variables.getLogger().debug(pl.size()+" phone found : ");
+			Variables.getLogger().debug(pl.size()+" phone found");
 			return pl;
 			}
 		catch (Exception e)
@@ -148,7 +132,16 @@ public class RisportTools
 		{
 		SelectCmDevice sxmlParams = new SelectCmDevice();
 		CmSelectionCriteria criteria = new CmSelectionCriteria();
-		long maxNum = 1000;
+		long maxNum;
+		try
+			{
+			maxNum = Long.parseLong(UsefulMethod.getTargetOption("rismaxphonerequest"));
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR : "+e.getMessage(),e);
+			maxNum = 500;
+			}
 		long modelNum = 255;
 		ArrayOfSelectItem items = new ArrayOfSelectItem();
 		
@@ -157,6 +150,7 @@ public class RisportTools
 			SelectItem item = new SelectItem();
 			item.setItem(p.getName());
 			items.getItem().add(item);
+			Variables.getLogger().debug("RIS : adding the following phone to the request : "+p.getName());
 			}
 		
 		criteria.setMaxReturnedDevices(maxNum);
@@ -169,8 +163,6 @@ public class RisportTools
 		
 		return criteria;
 		}
-	
-	
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

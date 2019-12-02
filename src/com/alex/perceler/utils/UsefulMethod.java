@@ -1,11 +1,11 @@
 package com.alex.perceler.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -14,36 +14,30 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
 import org.apache.log4j.Level;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.cli.OneLine;
 import com.alex.perceler.cli.OneLine.cliType;
 import com.alex.perceler.device.misc.BasicDevice;
-import com.alex.perceler.device.misc.Device;
-import com.alex.perceler.misc.CollectionTools;
-import com.alex.perceler.misc.ItemToMigrate;
+import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.SimpleRequest;
 import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.IPRange;
-import com.alex.perceler.office.misc.Office;
 import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.Variables.SubstituteType;
 import com.alex.perceler.utils.Variables.cucmAXLVersion;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
 import com.alex.perceler.utils.Variables.officeType;
-import com.cisco.axlapiservice10.AXLError;
 import com.cisco.schemas.ast.soap.RISService70;
 import com.cisco.schemas.ast.soap.RisPortType;
 
@@ -67,7 +61,7 @@ public class UsefulMethod
 		
 		try
 			{
-			file = xMLReader.fileRead(".\\"+fileName);
+			file = xMLReader.fileRead("./"+fileName);
 			
 			listParams.add("config");
 			return xMLGear.getResultListTab(file, listParams);
@@ -322,9 +316,9 @@ public class UsefulMethod
 	 * Used to return the file content regarding the data source (xml file or database file)
 	 * @throws Exception 
 	 */
-	public static String getFlatFileContent(String fileName) throws Exception
+	public static String getFlatFileContent(String fileName) throws Exception, FileNotFoundException
 		{
-		return xMLReader.fileRead(Variables.getMainDirectory()+"\\"+fileName);
+		return xMLReader.fileRead(Variables.getMainDirectory()+"/"+fileName);
 		}
 	
 	/**
@@ -334,6 +328,7 @@ public class UsefulMethod
 	 */
 	public static void initDatabase() throws Exception
 		{
+		Variables.setMigratedItemList(initMigratedItemList());
 		Variables.setCliProfileList(initCliProfileList());
 		Variables.setDeviceList(initDeviceList());
 		Variables.setOfficeList(initOfficeList());
@@ -566,6 +561,36 @@ public class UsefulMethod
 			}
 		}
 	
+	public static ArrayList<String> initMigratedItemList()
+		{
+		Variables.getLogger().info("Initializing the migrated item list from file");
+		ArrayList<String> mil = new ArrayList<String>();
+		ArrayList<String> params = new ArrayList<String>();
+		params.add("items");
+		
+		try
+			{
+			ArrayList<String[][]> content = xMLGear.getResultListTab(UsefulMethod.getFlatFileContent(Variables.getMigratedItemFileName()), params);
+			
+			for(String[] s : content.get(0))
+				{
+				mil.add(s[1]);
+				}
+			
+			Variables.getLogger().debug("Migration item list reading, found "+mil.size()+" items");
+			}
+		catch (FileNotFoundException e)
+			{
+			Variables.getLogger().error("The migration item file '"+Variables.getMigratedItemFileName()+"' was not found");
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while reading the migrated item file : "+e.getMessage(),e);
+			}
+		
+		return mil;
+		}
+	
 	
 	/******
 	 * Method used to initialize the AXL Connection to the CUCM
@@ -639,12 +664,15 @@ public class UsefulMethod
 				Variables.setRisConnection(risPort);
 				}
 			
-			Variables.getLogger().debug("RIS WSDL Initialization done");
-			
 			/**
-			 * We now check if the RSI service works by asking a simple request
+			 * Looking for a fake phone to test the RIS connection
 			 */
-			//if(RisportTools.getPhoneStatus("LabAlex") == null)throw new Exception("RIS test query return null");
+			Variables.getLogger().debug("Looking for a fake phone to test the RIS connection");
+			ArrayList<BasicPhone> phoneList = new ArrayList<BasicPhone>();
+			phoneList.add(new BasicPhone("SEP1234567890EF", "Test", "7961"));
+			RisportTools.doPhoneSurvey(phoneList);
+			
+			Variables.getLogger().debug("RIS WSDL Initialization done");
 			}
 		catch (Exception e)
 			{
@@ -866,14 +894,13 @@ public class UsefulMethod
 	/**
 	 * Method used to send an email to the admin group
 	 */
-	public synchronized static void sendEmailToTheAdminList(String desc, String siteName, String content)
+	public synchronized static void sendEmailToTheAdminList(String subject, String content)
 		{
 		try
 			{
-			String adminEmails = UsefulMethod.getTargetOption("smtpemailadmin");
-			
-			String subject = LanguageManagement.getString("emailreportsubject")+siteName;
-			String eMailDesc = desc+" - "+siteName;
+			Variables.getLogger().debug("Sending emails to the admin group");
+			String adminEmails = UsefulMethod.getTargetOption("smtpemailreceiver");
+			String eMailDesc = "Multiple email sending";
 			
 			if(adminEmails.contains(";"))
 				{
@@ -900,9 +927,7 @@ public class UsefulMethod
 			}
 		catch (Exception e)
 			{
-			e.printStackTrace();
-			Variables.getLogger().error("",e);
-			Variables.getLogger().error("Failed to send emails to the admin list : "+e.getMessage());
+			Variables.getLogger().error("Failed to send emails to the admin list : "+e.getMessage(),e);
 			}
 		}
 	
@@ -1180,6 +1205,66 @@ public class UsefulMethod
 			}
 		
 		throw new Exception("No CliProfile found for type : "+type.name());
+		}
+	
+	/**
+	 * used to add a new entry to the migrated item list
+	 */
+	public static void addEntryToTheMigratedList(String id)
+		{
+		Variables.getLogger().debug("Migrated item file : adding "+id);
+		
+		//We avoid duplicate
+		if(!Variables.getMigratedItemList().contains(id))
+			{
+			Variables.getMigratedItemList().add(id);
+			
+			updateMigratedList();
+			}
+		}
+	
+	/**
+	 * used to add a new entry to the migrated item list
+	 */
+	public static void removeEntryToTheMigratedList(String id)
+		{
+		Variables.getLogger().debug("Migrated item file : removing "+id);
+		if(Variables.getMigratedItemList().contains(id))
+			{
+			Variables.getMigratedItemList().remove(id);
+			
+			updateMigratedList();
+			}
+		}
+	
+	private static void updateMigratedList()
+		{
+		try
+			{
+			BufferedWriter buf = new BufferedWriter(new FileWriter(new File(Variables.getMainDirectory()+"/"+Variables.getMigratedItemFileName()),false));
+			StringBuffer sb = new StringBuffer("");
+			
+			sb.append("<xml>\r\n");
+			sb.append("	<items>\r\n");
+			
+			for(String s : Variables.getMigratedItemList())
+				{
+				sb.append("		<item>"+s+"</item>\r\n");
+				}
+			
+			sb.append("	</items>\r\n");
+			sb.append("</xml>\r\n");
+			
+			buf.write(sb.toString());
+			buf.flush();
+			buf.close();
+			
+			Variables.getLogger().debug("Migrated item file has been updated");
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR wile updating the migrated item file : "+e.getMessage(),e);
+			}
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

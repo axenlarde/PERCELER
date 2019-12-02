@@ -192,12 +192,6 @@ public class Variables
 		PRM
 		};
 		
-	public enum basicItemStatus
-		{
-		tomigrate,
-		migrated
-		};	
-		
 	//Misc
 	private static String softwareName;
 	private static String softwareVersion;
@@ -221,6 +215,8 @@ public class Variables
 	private static String collectionFileName;
 	private static Workbook myWorkbook;
 	private static ArrayList<Task> taskList;
+	private static ArrayList<String> migratedItemList;
+	private static String migratedItemFileName;
 	
 	//Langage management
 	public enum language{english,french};
@@ -252,6 +248,7 @@ public class Variables
 		languageFileName = "languages.xml";
 		substitutesFileName = "substitutes.xml";
 		collectionFileName = "database.xlsx";
+		migratedItemFileName = "migratedItemsList.xml";
 		}
 
 	public static String getSoftwareName()
@@ -590,6 +587,26 @@ public class Variables
 	public static void setCliProfileListFileName(String cliProfileListFileName)
 		{
 		Variables.cliProfileListFileName = cliProfileListFileName;
+		}
+
+	public static ArrayList<String> getMigratedItemList()
+		{
+		return migratedItemList;
+		}
+
+	public static void setMigratedItemList(ArrayList<String> migratedItemList)
+		{
+		Variables.migratedItemList = migratedItemList;
+		}
+
+	public static String getMigratedItemFileName()
+		{
+		return migratedItemFileName;
+		}
+
+	public static void setMigratedItemFileName(String migratedItemFileName)
+		{
+		Variables.migratedItemFileName = migratedItemFileName;
 		}
 	
 	

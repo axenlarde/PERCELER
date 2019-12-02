@@ -101,7 +101,8 @@ public class Office extends ItemToMigrate
 	public String getInfo()
 		{
 		return idcomu+" "+
-			name;
+			name+" "+
+			type;
 		}
 	
 	@Override
@@ -217,22 +218,20 @@ public class Office extends ItemToMigrate
 		{
 		StringBuffer result = new StringBuffer("");
 		
-		result.append("Phones : \r\n");
-		result.append("- Found : "+phoneList.size()+"\r\n");
-		
 		StringBuffer temp = new StringBuffer("");
-		int total = 0;
+		int lost = 0;
 		for(BasicPhone p : phoneList)
 			{
 			if(!p.isOK())
 				{
-				total++;
+				lost++;
 				temp.append("+ "+p.getName()+" "+p.getModel()+" "+p.getDescription()+" : "+p.getNewStatus()+"\r\n");
 				}
 			}
 		
-		result.append("- Lost : "+total+"\r\n");
-		result.append(temp);
+		result.append("Phones : Found "+phoneList.size()+", Lost "+lost);
+		Variables.getLogger().debug(this.name+" : Lost phone found : "+temp);
+		//result.append(temp);
 		
 		return result.toString();
 		}

@@ -4,7 +4,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
-import com.alex.perceler.utils.Variables.basicItemStatus;
+import com.alex.perceler.misc.SimpleItem;
+import com.alex.perceler.misc.SimpleItem.basicItemStatus;
 import com.alex.perceler.utils.Variables.itmType;
 
 /**
@@ -12,7 +13,7 @@ import com.alex.perceler.utils.Variables.itmType;
  *
  * @author Alexandre RATEL
  */
-public class BasicDevice
+public class BasicDevice extends SimpleItem
 	{
 	/**
 	 * Variables
@@ -39,7 +40,7 @@ public class BasicDevice
 			String newgateway, String newmask, String user, String password, CliProfile cliProfile,
 			cliProtocol connexionProtocol)
 		{
-		super();
+		super(name+ip+officeid);
 		this.type = type;
 		this.name = name;
 		this.ip = ip;
@@ -53,8 +54,6 @@ public class BasicDevice
 		this.password = password;
 		this.cliProfile = cliProfile;
 		this.connexionProtocol = connexionProtocol;
-		this.id = DigestUtils.md5Hex(name+ip+officeid);
-		status = basicItemStatus.tomigrate;
 		}
 
 	public String getInfo()
@@ -144,16 +143,6 @@ public class BasicDevice
 		this.newmask = newmask;
 		}
 
-	public String getId()
-		{
-		return id;
-		}
-
-	public void setId(String id)
-		{
-		this.id = id;
-		}
-
 	public String getName()
 		{
 		return name;
@@ -214,15 +203,6 @@ public class BasicDevice
 		this.officename = officename;
 		}
 
-	public basicItemStatus getStatus()
-		{
-		return status;
-		}
-
-	public void setStatus(basicItemStatus status)
-		{
-		this.status = status;
-		}
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

@@ -2,6 +2,7 @@ package com.alex.perceler.misc;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itmType;
@@ -34,7 +35,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	protected itmStatus status;
 	protected String id,name;
 	protected int index;
-	private ArrayList<ErrorTemplate> errorList;
+	protected ArrayList<ErrorTemplate> errorList;
 	
 	//This List contains the AXL items that should be updated if this item is migrated 
 	protected ArrayList<ItemToInject> axlList;
@@ -77,7 +78,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		}
 	
 	@Override
-	public ArrayList<String> startSurvey() throws Exception
+	public void startSurvey() throws Exception
 		{
 		Variables.getLogger().debug("Starting survey for "+type+" "+name);
 		
@@ -91,13 +92,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 				}
 			}
 		
-		ArrayList<String> l = new ArrayList<String>();
-		for(ErrorTemplate e : errorList)
-			{
-			l.add(e.getErrorDesc());
-			}
-		
-		return l;
+		if(errorList.size() != 0)this.status = itmStatus.error;
 		}
 	
 	@Override
@@ -119,6 +114,9 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 				Variables.getLogger().debug("The following item has been disabled so we do not process it : "+iti.getInfo());
 				}
 			}
+		
+		if(action.equals(actionType.update))UsefulMethod.addEntryToTheMigratedList(id);
+		else if(action.equals(actionType.rollback))UsefulMethod.removeEntryToTheMigratedList(id);
 		}
 	
 	@Override
@@ -144,7 +142,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 	public String getDetailedStatus()
 		{
 		StringBuffer result = new StringBuffer("");
-		
+		/*
 		if(errorList.size() > 0)
 			{
 			result.append("Item error list : \r\n");
@@ -167,7 +165,7 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 					}
 				}
 			result.append("\r\n");
-			}
+			}*/
 		result.append(doGetDetailedStatus());
 		
 		return result.toString();

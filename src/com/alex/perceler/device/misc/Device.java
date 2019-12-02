@@ -3,6 +3,8 @@ package com.alex.perceler.device.misc;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import javax.xml.transform.ErrorListener;
+
 import org.apache.commons.validator.routines.InetAddressValidator;
 
 import com.alex.perceler.cli.CliInjector;
@@ -15,6 +17,7 @@ import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.items.SRSTReference;
 import com.alex.perceler.office.items.TrunkSip;
 import com.alex.perceler.soap.items.SipTrunkDestination;
+import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itemType;
@@ -32,11 +35,13 @@ public class Device extends ItemToMigrate
 	 */
 	private String ip,
 	mask,
+	shortmask,
 	gateway,
 	officeid,
 	newip,
 	newgateway,
 	newmask,
+	newshortmask,
 	user,
 	password;
 	
@@ -54,6 +59,7 @@ public class Device extends ItemToMigrate
 		this.password = password;
 		this.connexionProtocol = connexionProtocol;
 		this.cliInjector = new CliInjector(this, cliProfile);
+		this.reachable = true;
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -76,6 +82,9 @@ public class Device extends ItemToMigrate
 			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(newgateway))?newgateway:"";
 			this.newmask = newmask;
 			}
+		
+		shortmask = UsefulMethod.convertlongMaskToShortOne(mask);
+		newshortmask = UsefulMethod.convertlongMaskToShortOne(newmask);
 		}
 	
 	public Device(BasicDevice bd, actionType action)
@@ -86,6 +95,7 @@ public class Device extends ItemToMigrate
 		this.password = bd.getPassword();
 		this.connexionProtocol = bd.getConnexionProtocol();
 		this.cliInjector = new CliInjector(this, bd.getCliProfile());
+		this.reachable = true;
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -108,6 +118,9 @@ public class Device extends ItemToMigrate
 			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewgateway()))?bd.getNewgateway():"";
 			this.newmask = bd.getNewmask();
 			}
+		
+		shortmask = UsefulMethod.convertlongMaskToShortOne(mask);
+		newshortmask = UsefulMethod.convertlongMaskToShortOne(newmask);
 		}
 	
 	@Override
@@ -252,8 +265,10 @@ public class Device extends ItemToMigrate
 	public String doGetDetailedStatus()
 		{
 		StringBuffer s = new StringBuffer("");
-		s.append("Reachable : "+reachable+"\r\n");
 		
+		s.append("Reachable : "+reachable);
+		
+		/*
 		if(cliInjector.getErrorList().size() > 0)
 			{
 			s.append("\r\n");
@@ -263,6 +278,11 @@ public class Device extends ItemToMigrate
 				{
 				s.append(e.getErrorDesc()+"\r\n");
 				}
+			}*/
+		
+		if(errorList.size() + cliInjector.getErrorList().size() > 0)
+			{
+			s.append(", Error found\r\n");
 			}
 		
 		return s.toString();
@@ -309,6 +329,7 @@ public class Device extends ItemToMigrate
 	public void setMask(String mask)
 		{
 		this.mask = mask;
+		shortmask = UsefulMethod.convertlongMaskToShortOne(mask);
 		}
 
 	public String getGateway()
@@ -359,6 +380,7 @@ public class Device extends ItemToMigrate
 	public void setNewmask(String newmask)
 		{
 		this.newmask = newmask;
+		newshortmask = UsefulMethod.convertlongMaskToShortOne(newmask);
 		}
 
 	public boolean isReachable()
@@ -409,6 +431,16 @@ public class Device extends ItemToMigrate
 	public void setPassword(String password)
 		{
 		this.password = password;
+		}
+
+	public String getShortmask()
+		{
+		return shortmask;
+		}
+
+	public String getNewshortmask()
+		{
+		return newshortmask;
 		}
 
 		
