@@ -21,7 +21,7 @@ public class SimpleItem
 		if(Variables.getMigratedItemList().contains(id))status = basicItemStatus.migrated;
 		else status = basicItemStatus.tomigrate;
 		}
-
+	
 	public basicItemStatus getStatus()
 		{
 		return status;

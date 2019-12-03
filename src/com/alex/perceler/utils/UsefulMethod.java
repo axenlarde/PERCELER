@@ -1267,6 +1267,26 @@ public class UsefulMethod
 			}
 		}
 	
+	/**
+	 * used to get an office from the office list
+	 */
+	public static BasicOffice getOffice(String officeID)
+		{
+		try
+			{
+			for(BasicOffice o : Variables.getOfficeList())
+				{
+				if(o.getIdcomu().equals(officeID))return o;
+				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while looking for the office '"+officeID+"' : "+e.getMessage(),e);
+			}
+		
+		return null;
+		}
+	
 	/*2019*//*RATEL Alexandre 8)*/
 	}
 

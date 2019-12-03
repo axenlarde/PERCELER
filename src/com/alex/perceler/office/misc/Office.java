@@ -1,8 +1,11 @@
 package com.alex.perceler.office.misc;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import com.alex.perceler.axlitems.linkers.MobilityInfoLinker;
 import com.alex.perceler.device.misc.BasicPhone;
+import com.alex.perceler.misc.CollectionTools;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
@@ -120,7 +123,7 @@ public class Office extends ItemToMigrate
 		 * Just using the database is unreliable
 		 */
 		voiceMI = OfficeTools.getMobilityInfo(voiceIPRange);
-		dataMI = OfficeTools.getMobilityInfo(dataIPRange);
+		//dataMI = OfficeTools.getMobilityInfo(dataIPRange);
 		
 		if(voiceMI != null)
 			{
@@ -131,6 +134,7 @@ public class Office extends ItemToMigrate
 			{
 			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+voiceIPRange.getInfo());
 			}
+		/*
 		if(dataMI != null)
 			{
 			Variables.getLogger().debug(name+" mobilityInfo found for range "+dataIPRange.getInfo()+" : "+dataMI.getName());
@@ -139,12 +143,36 @@ public class Office extends ItemToMigrate
 		else
 			{
 			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+dataIPRange.getInfo());
-			}
+			}*/
 		
 		/**
 		 * We build the associated device pool
 		 */
 		dp = new DevicePool(UsefulMethod.getTargetOption("devicepoolprefix")+idcomu);
+		
+		/**
+		 * For the data mobility info, we inject a new one or delete it in case of rollback
+		 */
+		ArrayList<String> dpList = new ArrayList<String>();
+		dpList.add(dp.getName());
+		dataMI = new MobilityInfo(CollectionTools.resolveOfficeValue(this, UsefulMethod.getTargetOption("datamobilityinfopattern")),
+				newDataIPRange.getIpRange(),
+				newDataIPRange.getMask(),
+				dpList);
+		
+		if(action.equals(actionType.update))
+			{
+			dataMI.setAction(actionType.inject);
+			}
+		else if(action.equals(actionType.rollback))
+			{
+			dataMI.setAction(actionType.delete);
+			}
+		
+		dataMI.getReady();
+		dataMI.build();
+		
+		//axlList.add(dataMI);//here we do not update but inject, so the item will have to be treated 
 		
 		/**
 		 * We now build the associated phone list
@@ -184,10 +212,24 @@ public class Office extends ItemToMigrate
 		 * the items exists. Now we are about to proceed with the update so
 		 * we change the values with the new ones 
 		 */
-		voiceMI.setSubnet(this.newVoiceIPRange.getIpRange());
-		voiceMI.setSubnetMask(this.newVoiceIPRange.getMask());
+		if(voiceMI != null)
+			{
+			voiceMI.setSubnet(this.newVoiceIPRange.getIpRange());
+			voiceMI.setSubnetMask(this.newVoiceIPRange.getMask());
+			}
+		/*
+		We inject a new one already with the new ip
 		dataMI.setSubnet(this.newDataIPRange.getIpRange());
 		dataMI.setSubnetMask(this.newDataIPRange.getMask());
+		*/
+		if(action.equals(actionType.update))
+			{
+			dataMI.inject();
+			}
+		else if(action.equals(actionType.rollback))
+			{
+			dataMI.delete();
+			}
 		}
 	
 	@Override
@@ -234,6 +276,28 @@ public class Office extends ItemToMigrate
 		//result.append(temp);
 		
 		return result.toString();
+		}
+	
+	/******
+	 * Used to return a value based on the string provided
+	 * @throws Exception 
+	 */
+	public String getString(String s) throws Exception
+		{
+		String tab[] = s.split("\\.");
+		
+		if(tab.length == 2)
+			{
+			for(Field f : this.getClass().getDeclaredFields())
+				{
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
+					{
+					return (String) f.get(this);
+					}
+				}
+			}
+		
+		return null;
 		}
 
 	public String getIdcomu()

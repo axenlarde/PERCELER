@@ -3,14 +3,11 @@ package com.alex.perceler.device.misc;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import javax.xml.transform.ErrorListener;
-
 import org.apache.commons.validator.routines.InetAddressValidator;
 
 import com.alex.perceler.cli.CliInjector;
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
-import com.alex.perceler.cli.OneLine;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
 import com.alex.perceler.misc.ItemToMigrate;
@@ -300,9 +297,8 @@ public class Device extends ItemToMigrate
 			{
 			for(Field f : this.getClass().getDeclaredFields())
 				{
-				if(f.getName().equals(tab[1]))
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
 					{
-					String found = (String) f.get(this);
 					return (String) f.get(this);
 					}
 				}

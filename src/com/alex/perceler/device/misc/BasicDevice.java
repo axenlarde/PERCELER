@@ -1,11 +1,10 @@
 package com.alex.perceler.device.misc;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import java.lang.reflect.Field;
 
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.misc.SimpleItem;
-import com.alex.perceler.misc.SimpleItem.basicItemStatus;
 import com.alex.perceler.utils.Variables.itmType;
 
 /**
@@ -61,6 +60,28 @@ public class BasicDevice extends SimpleItem
 		return name+" "+
 		ip+" "+
 		type;
+		}
+	
+	/******
+	 * Used to return a value based on the string provided
+	 * @throws Exception 
+	 */
+	public String getString(String s) throws Exception
+		{
+		String tab[] = s.split("\\.");
+		
+		if(tab.length == 2)
+			{
+			for(Field f : this.getClass().getDeclaredFields())
+				{
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
+					{
+					return (String) f.get(this);
+					}
+				}
+			}
+		
+		return null;
 		}
 
 	public itmType getType()

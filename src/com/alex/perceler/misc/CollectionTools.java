@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import com.alex.perceler.device.misc.Device;
+import com.alex.perceler.office.misc.Office;
 import com.alex.perceler.utils.ClearFrenchString;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -817,7 +818,24 @@ public class CollectionTools
 			{
 			boolean match = false;
 			
-			String value = d.getString(param[i]);
+			String value = null;
+			if(Pattern.matches(".*device\\..*", param[i]))
+				{
+				value = d.getString(param[i]);
+				}
+			else if(Pattern.matches(".*office\\..*", param[i]))
+				{
+				value = UsefulMethod.getOffice(d.getOfficeid()).getString(param[i]);
+				}
+			else if(Pattern.matches(".*config\\..*", param[i]))
+				{
+				String[] tab = param[i].split("\\.");
+				String result = UsefulMethod.getTargetOption(tab[1]);
+				regex.append(result);
+				
+				match = true;
+				}
+			
 			if(value != null)
 				{
 				if(param[i].contains("*"))
@@ -829,19 +847,54 @@ public class CollectionTools
 					}
 				regex.append(value);
 				match = true;
-				}
-			else
+				}			
+			/***********/
+			
+			//Default
+			if(!match)
 				{
-				if(Pattern.matches(".*config\\..*", param[i]))
-					{
-					String[] tab = param[i].split("\\.");
-					String result = UsefulMethod.getTargetOption(tab[1]);
-					regex.append(result);
-					
-					match = true;
-					}
+				regex.append(param[i]);
+				}
+			}
+	
+		return regex.toString();
+		}
+	
+	public static String resolveOfficeValue(Office o, String pattern) throws Exception
+		{
+		StringBuffer regex = new StringBuffer("");
+		String[] param = getSplittedValue(pattern, UsefulMethod.getTargetOption("splitter"));
+		
+		for(int i = 0; i<param.length; i++)
+			{
+			boolean match = false;
+			
+			String value = null;
+			if(Pattern.matches(".*office\\..*", param[i]))
+				{
+				value = o.getString(param[i]);
+				}
+			else if(Pattern.matches(".*config\\..*", param[i]))
+				{
+				String[] tab = param[i].split("\\.");
+				String result = UsefulMethod.getTargetOption(tab[1]);
+				regex.append(result);
+				
+				match = true;
 				}
 			
+			if(value != null)
+				{
+				if(param[i].contains("*"))
+					{
+					//We apply regex
+					Variables.getLogger().debug("Value before "+param[i]+" regex : "+value);
+					value = applyRegex(value, param[i]);
+					Variables.getLogger().debug("Value after applying "+param[i]+" regex : "+value);
+					}
+				regex.append(value);
+				match = true;
+				}			
 			/***********/
 			
 			//Default

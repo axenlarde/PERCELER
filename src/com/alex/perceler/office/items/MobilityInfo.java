@@ -22,7 +22,7 @@ public class MobilityInfo extends ItemToInject
 	 * Variables
 	 */
 	private String subnet,
-	subnetMask;//Has to be a number of bit
+	subnetMask;//Has to be a number of bit (CIDR format) example 24
 	
 	private ArrayList<String> members;//Devicepool list
 
@@ -122,6 +122,21 @@ public class MobilityInfo extends ItemToInject
 		mil.setMembers(this.members);
 		/*********/
 		}
+	
+	//Temp
+	public void getReady()
+		{
+		/**
+		 * We set the item parameters
+		 */
+		MobilityInfoLinker mil= ((MobilityInfoLinker) linker);
+		mil.setName(this.getName());
+		mil.setSubnet(this.subnet);
+		mil.setSubnetMask(this.subnetMask);
+		mil.setMembers(this.members);
+		/*********/
+		}
+	//temp
 
 	public void manageTuList() throws Exception
 		{

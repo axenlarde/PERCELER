@@ -69,12 +69,19 @@ public class WebRequestBuilder
 							if(d.getOfficeid().equals(o.getIdcomu()))
 								{
 								o.getDeviceList().add(d);
-								lookForDuplicate.add(d.getId());
 								}
 							}
 						}
 					
 					ol.add(o);
+					}
+				}
+			
+			for(BasicOffice o : ol)
+				{
+				for(BasicDevice d : o.getDeviceList())
+					{
+					lookForDuplicate.add(d.getId());
 					}
 				}
 			

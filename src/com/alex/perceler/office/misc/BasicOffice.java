@@ -1,5 +1,6 @@
 package com.alex.perceler.office.misc;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -52,6 +53,28 @@ public class BasicOffice extends SimpleItem
 		{
 		return idcomu+" "+
 			fullname;
+		}
+	
+	/******
+	 * Used to return a value based on the string provided
+	 * @throws Exception 
+	 */
+	public String getString(String s) throws Exception
+		{
+		String tab[] = s.split("\\.");
+		
+		if(tab.length == 2)
+			{
+			for(Field f : this.getClass().getDeclaredFields())
+				{
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
+					{
+					return (String) f.get(this);
+					}
+				}
+			}
+		
+		return null;
 		}
 
 	public String getIdcomu()

@@ -228,6 +228,7 @@ public class Task extends Thread
 			Variables.getLogger().debug("Sending service pilot restart service request");
 			cm.sendRequest(RequestBuilder.buildRestartService());
 			cm.close();
+			Variables.getLogger().debug("Service pilot update done !");
 			}
 		catch (Exception e)
 			{
@@ -286,7 +287,7 @@ public class Task extends Thread
 				/**
 				 * To finish we update service pilot but only if the devices really change there ip
 				 */
-				if(!stop)updateServicePilot();
+				//updateServicePilot();
 				}
 			
 			setItemStatus(itmStatus.done);
