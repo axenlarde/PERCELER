@@ -1,18 +1,18 @@
 package com.alex.perceler.misc;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
-
-import javax.xml.transform.ErrorListener;
 
 import com.alex.perceler.cli.CliManager;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
+import com.alex.perceler.remoteclient.ClientManager;
+import com.alex.perceler.remoteclient.RequestBuilder;
 import com.alex.perceler.utils.LanguageManagement;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
-import com.alex.perceler.utils.Variables.itmType;
-import com.alex.perceler.utils.Variables.statusType;
 
 /**********************************
  * Class used to store a list of todo
@@ -191,6 +191,50 @@ public class Task extends Thread
 			}
 		}
 	
+	private void updateServicePilot()
+		{
+		//We start the connection with client
+		try
+			{
+			ClientManager cm = new ClientManager(UsefulMethod.getTargetOption("remoteclientip"),
+					UsefulMethod.getTargetOption("remoteclientport"));
+			
+			boolean updateAnyWay = Boolean.parseBoolean(UsefulMethod.getTargetOption("updateanyway"));
+			
+			for(ItemToMigrate myToDo : todoList)
+				{
+				if(!myToDo.getStatus().equals(itmStatus.disabled))
+					{
+					if(myToDo instanceof Device)
+						{
+						Device d = (Device)myToDo;
+						if(updateAnyWay || d.isReachable())
+							{
+							Variables.getLogger().debug(d.getInfo()+" : Sending service pilot replace ip request");
+							cm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
+							}
+						else
+							{
+							Variables.getLogger().debug(d.getName()+" is not reachable so we do not update it in service pilot");
+							}
+						}
+					}
+				else
+					{
+					Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
+					}
+				}
+			
+			Variables.getLogger().debug("Sending service pilot restart service request");
+			cm.sendRequest(RequestBuilder.buildRestartService());
+			cm.close();
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while updating service pilot : "+e.getMessage(),e);
+			}
+		}
+	
 	public void run()
 		{
 		try
@@ -238,6 +282,11 @@ public class Task extends Thread
 					counter++;
 					this.sleep(10000);
 					}
+				
+				/**
+				 * To finish we update service pilot but only if the devices really change there ip
+				 */
+				if(!stop)updateServicePilot();
 				}
 			
 			setItemStatus(itmStatus.done);
