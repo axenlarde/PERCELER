@@ -42,7 +42,7 @@ public class Office extends ItemToMigrate
 
 	public Office(String name, String id, String idcomu, String idCAF, String shortname,
 			String newName, officeType officeType, String voiceIPRange,
-			String dataIPRange, String newVoiceIPRange, String newDataIPRange, actionType action)
+			String dataIPRange, String newVoiceIPRange, String newDataIPRange, actionType action) throws Exception
 		{
 		super(itmType.office, name, id, action);
 		this.idcomu = idcomu;
@@ -156,8 +156,8 @@ public class Office extends ItemToMigrate
 		ArrayList<String> dpList = new ArrayList<String>();
 		dpList.add(dp.getName());
 		dataMI = new MobilityInfo(CollectionTools.resolveOfficeValue(this, UsefulMethod.getTargetOption("datamobilityinfopattern")),
-				newDataIPRange.getIpRange(),
-				newDataIPRange.getMask(),
+				newDataIPRange.getSubnet(),
+				newDataIPRange.getShortmask(),
 				dpList);
 		
 		if(action.equals(actionType.update))
@@ -172,7 +172,7 @@ public class Office extends ItemToMigrate
 		dataMI.getReady();
 		dataMI.build();
 		
-		//axlList.add(dataMI);//here we do not update but inject, so the item will have to be treated 
+		//axlList.add(dataMI);//here we do not update but inject, so the item will have to be treated apart
 		
 		/**
 		 * We now build the associated phone list
@@ -214,8 +214,8 @@ public class Office extends ItemToMigrate
 		 */
 		if(voiceMI != null)
 			{
-			voiceMI.setSubnet(this.newVoiceIPRange.getIpRange());
-			voiceMI.setSubnetMask(this.newVoiceIPRange.getMask());
+			voiceMI.setSubnet(this.newVoiceIPRange.getSubnet());
+			voiceMI.setSubnetMask(this.newVoiceIPRange.getShortmask());
 			}
 		/*
 		We inject a new one already with the new ip
@@ -296,8 +296,21 @@ public class Office extends ItemToMigrate
 					}
 				}
 			}
+		else if(tab.length == 3)
+			{
+			for(Field f : this.getClass().getDeclaredFields())
+				{
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
+					{
+					if(f.get(this) instanceof IPRange)
+						{
+						return ((IPRange) f.get(this)).getString(tab[2]);
+						}
+					}
+				}
+			}
 		
-		return null;
+		throw new Exception("String not found");
 		}
 
 	public String getIdcomu()

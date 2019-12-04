@@ -367,7 +367,7 @@ public class UsefulMethod
 							UsefulMethod.getItemByName("newmask", s),
 							UsefulMethod.getItemByName("user", s),
 							UsefulMethod.getItemByName("password", s),
-							getCliProfile(type),
+							getCliProfile(UsefulMethod.getItemByName("cliprofile", s)),
 							cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)));
 					
 					/**
@@ -383,16 +383,6 @@ public class UsefulMethod
 							break;
 							}
 						}
-					//We also check for the new ip
-					/*for(BasicDevice bd : deviceList)
-						{
-						if(bd.getNewip().equals(d.getNewip()))
-							{
-							Variables.getLogger().debug(bd.getInfo()+ " : Device new ip duplicate found so we do not add the following new device : "+d.getInfo());
-							found = true;
-							break;
-							}
-						}*/
 					
 					if(!found)
 						{
@@ -1197,15 +1187,25 @@ public class UsefulMethod
 		throw new Exception("No itmType found for type : "+type);
 		}
 	
-	public static CliProfile getCliProfile(itmType type) throws Exception
+	/*****
+	 * Return a cli profile looking by the profile name then the type
+	 */
+	public static CliProfile getCliProfile(String s) throws Exception
 		{
 		for(CliProfile clip : Variables.getCliProfileList())
 			{
-			if(clip.getType().equals(type))return clip;
+			if(clip.getName().toLowerCase().contains(s.toLowerCase()))return clip;
 			}
 		
-		throw new Exception("No CliProfile found for type : "+type.name());
+		//If we didn't find the pofile by name, we look for the profile type
+		for(CliProfile clip : Variables.getCliProfileList())
+			{
+			if(clip.getType().name().contains(itmType.valueOf(s.toLowerCase()).name()))return clip;
+			}
+		
+		throw new Exception("No CliProfile found for value : "+s);
 		}
+	
 	
 	/**
 	 * used to add a new entry to the migrated item list

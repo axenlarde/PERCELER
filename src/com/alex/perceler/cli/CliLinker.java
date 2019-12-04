@@ -223,6 +223,7 @@ public class CliLinker
 				}
 			case wait:
 				{
+				Variables.getLogger().debug(device.getInfo()+" : CLI : Waiting for "+l.getCommand()+" ms");
 				clii.sleep(Long.parseLong(l.getCommand()));
 				break;
 				}

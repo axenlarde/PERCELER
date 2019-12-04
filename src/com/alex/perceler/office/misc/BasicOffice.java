@@ -32,7 +32,7 @@ public class BasicOffice extends SimpleItem
 	
 	public BasicOffice(String fullname, String idcomu, String idCAF, String shortname, String newName,
 			com.alex.perceler.utils.Variables.officeType officeType, String voiceIPRange, String dataIPRange,
-			String newVoiceIPRange, String newDataIPRange)
+			String newVoiceIPRange, String newDataIPRange) throws Exception
 		{
 		super(fullname+idcomu);
 		this.fullname = fullname;
@@ -73,8 +73,21 @@ public class BasicOffice extends SimpleItem
 					}
 				}
 			}
+		else if(tab.length == 3)
+			{
+			for(Field f : this.getClass().getDeclaredFields())
+				{
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
+					{
+					if(f.get(this) instanceof IPRange)
+						{
+						return ((IPRange) f.get(this)).getString(tab[2]);
+						}
+					}
+				}
+			}
 		
-		return null;
+		throw new Exception("String not found");
 		}
 
 	public String getIdcomu()

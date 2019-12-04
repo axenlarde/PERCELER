@@ -55,7 +55,14 @@ public class Device extends ItemToMigrate
 		this.user = user;
 		this.password = password;
 		this.connexionProtocol = connexionProtocol;
-		this.cliInjector = new CliInjector(this, cliProfile);
+		
+		if((type.equals(itmType.isr)) ||
+				(type.equals(itmType.vg)) ||
+				(type.equals(itmType.audiocode)))
+			{
+			this.cliInjector = new CliInjector(this, cliProfile);
+			}
+		
 		this.reachable = true;
 		
 		/**
@@ -177,7 +184,12 @@ public class Device extends ItemToMigrate
 		/**
 		 * Then we initialize the CLI list
 		 */
-		cliInjector.build();
+		if((type.equals(itmType.isr)) ||
+				(type.equals(itmType.vg)) ||
+				(type.equals(itmType.audiocode)))
+			{
+			cliInjector.build();
+			}
 		}
 
 	@Override
@@ -196,13 +208,6 @@ public class Device extends ItemToMigrate
 			if(reachable)Variables.getLogger().debug(name+" "+ip+" "+type+" : The device is reachable (ping)");
 			else Variables.getLogger().debug(name+" "+ip+" "+type+" : The device could not been reach (ping failed)");
 			}
-		
-		/*if(!reachable)
-			{
-			//If the device is not reachable, we should not update the CUCM data. So we disable the entire item
-			status = itmStatus.disabled;
-			addError(new ErrorTemplate(getInfo()+" : The device could not been reach (ping failed)"));
-			}*/
 		}
 
 	@Override

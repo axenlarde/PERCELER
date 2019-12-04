@@ -25,7 +25,7 @@ public class OfficeTools
 	 */
 	public static MobilityInfo getMobilityInfo(IPRange range)
 		{
-		String request = "select name,pkid from devicemobilityinfo where subnet='"+range.getIpRange()+"' and subnetmasksz='"+range.getMask()+"'";
+		String request = "select name,pkid from devicemobilityinfo where subnet='"+range.getSubnet()+"' and subnetmasksz='"+range.getShortmask()+"'";
 		try
 			{
 			List<Object> reply = SimpleRequest.doSQLQuery(request);
@@ -35,8 +35,8 @@ public class OfficeTools
 				{
 				Element rowElement = (Element) o;
 				NodeList list = rowElement.getChildNodes();
-				mi.setSubnet(range.getIpRange());
-				mi.setSubnetMask(range.getMask());
+				mi.setSubnet(range.getSubnet());
+				mi.setSubnetMask(range.getShortmask());
 				
 				for(int i = 0; i< list.getLength(); i++)
 					{

@@ -58,8 +58,8 @@ public class WebRequestBuilder
 				if((o.getFullname().toLowerCase().contains(search.toLowerCase())) ||
 						(o.getNewName().toLowerCase().contains(search.toLowerCase())) ||
 						(o.getIdcomu().toLowerCase().contains(search.toLowerCase())) ||
-						(o.getVoiceIPRange().getIpRange().contains(search)) ||
-						(o.getDataIPRange().getIpRange().contains(search)))
+						(o.getVoiceIPRange().getSubnet().contains(search)) ||
+						(o.getDataIPRange().getSubnet().contains(search)))
 					{
 					//Then we look for device associated to this office
 					if(o.getDeviceList().size() == 0)
