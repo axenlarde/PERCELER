@@ -26,6 +26,7 @@ import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.cli.OneLine;
 import com.alex.perceler.cli.OneLine.cliType;
+import com.alex.perceler.device.misc.BasicAscom;
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.SimpleRequest;
@@ -34,6 +35,7 @@ import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.IPRange;
 import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.Variables.SubstituteType;
+import com.alex.perceler.utils.Variables.ascomType;
 import com.alex.perceler.utils.Variables.cucmAXLVersion;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
@@ -355,20 +357,41 @@ public class UsefulMethod
 				try
 					{
 					itmType type = getITMType(UsefulMethod.getItemByName("type", s));
+					BasicDevice d;
 					
-					BasicDevice d = new BasicDevice(type,
-							UsefulMethod.getItemByName("name", s),
-							UsefulMethod.getItemByName("ip", s),
-							UsefulMethod.getItemByName("mask", s),
-							UsefulMethod.getItemByName("gateway", s),
-							UsefulMethod.getItemByName("officeid", s),
-							UsefulMethod.getItemByName("newip", s),
-							UsefulMethod.getItemByName("newgateway", s),
-							UsefulMethod.getItemByName("newmask", s),
-							UsefulMethod.getItemByName("user", s),
-							UsefulMethod.getItemByName("password", s),
-							getCliProfile(UsefulMethod.getItemByName("cliprofile", s)),
-							cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)));
+					if(type.equals(itmType.ascom))
+						{
+						d = new BasicAscom(type,
+								UsefulMethod.getItemByName("name", s),
+								UsefulMethod.getItemByName("ip", s),
+								UsefulMethod.getItemByName("mask", s),
+								UsefulMethod.getItemByName("gateway", s),
+								UsefulMethod.getItemByName("officeid", s),
+								UsefulMethod.getItemByName("newip", s),
+								UsefulMethod.getItemByName("newgateway", s),
+								UsefulMethod.getItemByName("newmask", s),
+								UsefulMethod.getItemByName("user", s),
+								UsefulMethod.getItemByName("password", s),
+								getCliProfile(UsefulMethod.getItemByName("cliprofile", s)),
+								cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)),
+								getAscomType(UsefulMethod.getItemByName("ascomtype", s)));
+						}
+					else
+						{
+						d = new BasicDevice(type,
+								UsefulMethod.getItemByName("name", s),
+								UsefulMethod.getItemByName("ip", s),
+								UsefulMethod.getItemByName("mask", s),
+								UsefulMethod.getItemByName("gateway", s),
+								UsefulMethod.getItemByName("officeid", s),
+								UsefulMethod.getItemByName("newip", s),
+								UsefulMethod.getItemByName("newgateway", s),
+								UsefulMethod.getItemByName("newmask", s),
+								UsefulMethod.getItemByName("user", s),
+								UsefulMethod.getItemByName("password", s),
+								getCliProfile(UsefulMethod.getItemByName("cliprofile", s)),
+								cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)));
+						}
 					
 					/**
 					 * We avoid duplicate
@@ -392,7 +415,7 @@ public class UsefulMethod
 					}
 				catch (Exception e)
 					{
-					Variables.getLogger().error("Could not add the following device : "+UsefulMethod.getItemByName("name", s)+" : "+e.getMessage(), e);
+					Variables.getLogger().error("Could not add the following device : "+UsefulMethod.getItemByName("name", s)+" : "+e.getMessage());
 					}
 				}
 			Variables.getLogger().debug(deviceList.size()+ " devices found in the database");
@@ -457,7 +480,7 @@ public class UsefulMethod
 					}
 				catch (Exception e)
 					{
-					Variables.getLogger().error("Could not add the following office : "+UsefulMethod.getItemByName("fullname", s)+" : "+e.getMessage(), e);
+					Variables.getLogger().error("Could not add the following office : "+UsefulMethod.getItemByName("fullname", s)+" : "+e.getMessage());
 					}
 				}
 			Variables.getLogger().debug(officeList.size()+ " offices found in the database");
@@ -1187,6 +1210,16 @@ public class UsefulMethod
 		throw new Exception("No itmType found for type : "+type);
 		}
 	
+	public static ascomType getAscomType(String type) throws Exception
+		{
+		for(ascomType at : ascomType.values())
+			{
+			if(type.toLowerCase().replaceAll(" ", "").contains(at.name()))return at;
+			}
+		
+		throw new Exception("No ascomType found for type : "+type);
+		}
+	
 	/*****
 	 * Return a cli profile looking by the profile name then the type
 	 */
@@ -1194,13 +1227,13 @@ public class UsefulMethod
 		{
 		for(CliProfile clip : Variables.getCliProfileList())
 			{
-			if(clip.getName().toLowerCase().contains(s.toLowerCase()))return clip;
+			if(s.toLowerCase().contains(clip.getName().toLowerCase()))return clip;
 			}
 		
 		//If we didn't find the pofile by name, we look for the profile type
 		for(CliProfile clip : Variables.getCliProfileList())
 			{
-			if(clip.getType().name().contains(itmType.valueOf(s.toLowerCase()).name()))return clip;
+			if(s.toLowerCase().contains(clip.getType().name().toLowerCase()))return clip;
 			}
 		
 		throw new Exception("No CliProfile found for value : "+s);

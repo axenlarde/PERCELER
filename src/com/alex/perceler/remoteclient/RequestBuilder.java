@@ -30,6 +30,16 @@ public class RequestBuilder
 		return r;
 		}
 	
+	/**
+	 * To build a delete ip request
+	 */
+	public synchronized static Request buildDeleteIP(String targetIP)
+		{
+		Request r = new Request(requestType.deleteip, targetIP);
+		
+		return r;
+		}
+	
 	}
 
 /*2019*//*RATEL Alexandre 8)*/

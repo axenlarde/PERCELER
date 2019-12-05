@@ -17,6 +17,7 @@ public class Request implements Serializable
 		{
 		restartservice,
 		replaceip,
+		deleteip,
 		success,
 		error
 		};

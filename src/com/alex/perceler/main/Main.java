@@ -1,25 +1,11 @@
 package com.alex.perceler.main;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-
 import org.apache.log4j.Level;
 
-import com.alex.perceler.cli.CliConnection;
-import com.alex.perceler.cli.CliInjector;
-import com.alex.perceler.cli.CliProfile;
-import com.alex.perceler.cli.CliProfile.cliProtocol;
-import com.alex.perceler.cli.OneLine;
-import com.alex.perceler.cli.OneLine.cliType;
 import com.alex.perceler.core.LetsParty;
-import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.utils.InitLogging;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
-import com.alex.perceler.utils.Variables.actionType;
-import com.alex.perceler.utils.Variables.itmType;
 
 
 /**
@@ -40,7 +26,8 @@ public class Main
 		/****************
 		 * Initialization of the logging
 		 */
-		Variables.setLogger(InitLogging.init(Variables.getSoftwareName()+"_LogFile.txt"));
+		Variables.setLogFileName(Variables.getSoftwareName()+"_LogFile.txt");
+		Variables.setLogger(InitLogging.init(Variables.getLogFileName()));
 		Variables.getLogger().info("\r\n");
 		Variables.getLogger().info("#### Entering application");
 		Variables.getLogger().info("## Welcome to : "+Variables.getSoftwareName()+" version "+Variables.getSoftwareVersion());
@@ -60,14 +47,18 @@ public class Main
 		/***************/
 		
 		/**********************
-		 * Reading of the configuration file
+		 * Reading of the configuration files
 		 */
 		try
 			{
-			//Config file reading
+			/**
+			 * Config file reading
+			 */
 			Variables.setTabConfig(UsefulMethod.readMainConfigFile(Variables.getConfigFileName()));
 			
-			//Database file reading
+			/**
+			 * Database file reading
+			 */
 			UsefulMethod.initDatabase();
 			
 			/***

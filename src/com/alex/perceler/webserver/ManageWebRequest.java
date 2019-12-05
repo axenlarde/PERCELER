@@ -1,10 +1,13 @@
 package com.alex.perceler.webserver;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import org.apache.commons.io.FileUtils;
+
+import com.alex.perceler.action.Task;
 import com.alex.perceler.action.TaskManager;
-import com.alex.perceler.misc.Task;
-import com.alex.perceler.misc.Task.taskActionType;
+import com.alex.perceler.action.Task.taskActionType;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
@@ -34,6 +37,9 @@ public class ManageWebRequest
 		getTask,
 		newTask,
 		setTask,
+		copyLogFile,
+		newDevice,
+		newOffice,
 		success,
 		error
 		}
@@ -314,6 +320,74 @@ public class ManageWebRequest
 		catch (Exception e)
 			{
 			Variables.getLogger().error("ERROR while processing setask web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * copyLogFile
+	 */
+	public synchronized static WebRequest copyLogFile()	
+		{
+		try
+			{
+			File srcFile = new File(Variables.getMainDirectory()+"/"+Variables.getLogFileName());
+			if(srcFile.exists())
+				{
+				Variables.getLogger().debug("Copying the first log file");
+				File dstFile = new File(UsefulMethod.getTargetOption("targetdirectory")+"/"+Variables.getLogFileName());
+				FileUtils.copyFile(srcFile, dstFile);
+				}
+			
+			//We also copy the second log file
+			srcFile = new File(Variables.getMainDirectory()+"/"+Variables.getLogFileName()+".1");
+			if(srcFile.exists())
+				{
+				Variables.getLogger().debug("Copying the second log file");
+				File dstFile = new File(UsefulMethod.getTargetOption("targetdirectory")+"/"+Variables.getLogFileName()+".1");
+				FileUtils.copyFile(srcFile, dstFile);
+				}
+			
+			return WebRequestBuilder.buildWebRequest(webRequestType.success, null);
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing getTask web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * newDevice
+	 */
+	public synchronized static WebRequest newDevice(String content)	
+		{
+		try
+			{
+			//To be written
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing newDevice web request : "+e.getMessage(),e);
+			}
+		
+		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
+		}
+	
+	/**
+	 * newOffice
+	 */
+	public synchronized static WebRequest newOffice(String content)	
+		{
+		try
+			{
+			//To be written
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while processing newOffice web request : "+e.getMessage(),e);
 			}
 		
 		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);

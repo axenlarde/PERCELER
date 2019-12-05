@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.alex.perceler.device.misc.Ascom;
+import com.alex.perceler.device.misc.BasicAscom;
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ItemToMigrate;
-import com.alex.perceler.misc.Task;
 import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.Office;
 import com.alex.perceler.utils.UsefulMethod;
@@ -52,7 +53,8 @@ public class TaskManager
 						{
 						if(d.getId().equals(s))
 							{
-							todoList.add(new Device(d, action));
+							if(d instanceof BasicAscom)todoList.add(new Ascom((BasicAscom)d, action));
+							else todoList.add(new Device(d, action));
 							found = true;
 							break;
 							}

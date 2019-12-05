@@ -1,10 +1,8 @@
 package com.alex.perceler.remoteclient;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import com.alex.perceler.remoteclient.Request.requestType;
 import com.alex.perceler.utils.Variables;
@@ -14,12 +12,12 @@ public class ClientManager
 	/**
 	 * Variables
 	 */
-	private String clientIP, clientPort, Timeout;
+	private String clientIP, clientPort;
 	private Socket socket;
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
 	
-	public ClientManager(String clientIP, String clientPort) throws NumberFormatException, UnknownHostException, IOException
+	public ClientManager(String clientIP, String clientPort) throws Exception
 		{
 		super();
 		this.clientIP = clientIP;
@@ -27,6 +25,8 @@ public class ClientManager
 		
 		this.socket = new Socket(clientIP, Integer.parseInt(clientPort));
 		out = new ObjectOutputStream(socket.getOutputStream());
+		in = new ObjectInputStream(socket.getInputStream());
+		
 		}
 	
 	public void sendRequest(Request r) throws Exception
@@ -37,7 +37,6 @@ public class ClientManager
 			out.writeObject(r);
 			out.flush();
 			
-			in = new ObjectInputStream(socket.getInputStream());
 			Object o = in.readObject();
 			
 			if(o instanceof Request)
@@ -78,6 +77,16 @@ public class ClientManager
 			{
 			Variables.getLogger().error("ERROR whil closing conneciton to client : "+e.getMessage(),e);
 			}
+		}
+
+	public String getClientIP()
+		{
+		return clientIP;
+		}
+
+	public String getClientPort()
+		{
+		return clientPort;
 		}
 	
 	

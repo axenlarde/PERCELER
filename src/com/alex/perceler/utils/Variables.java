@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.alex.perceler.action.Task;
 import com.alex.perceler.cli.CliInjector;
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.device.misc.BasicDevice;
-import com.alex.perceler.misc.Task;
 import com.alex.perceler.misc.ValueMatcher;
 import com.alex.perceler.misc.storedUUID;
 import com.alex.perceler.office.misc.BasicOffice;
@@ -178,6 +178,17 @@ public class Variables
 		phone,
 		sip
 		};
+		
+	/**
+	 * ascom type
+	 */
+	public enum ascomType
+		{
+		master,
+		standby,
+		ims3,
+		slave
+		};
 	
 	/**
 	 * Office Type
@@ -217,6 +228,7 @@ public class Variables
 	private static ArrayList<Task> taskList;
 	private static ArrayList<String> migratedItemList;
 	private static String migratedItemFileName;
+	private static String logFileName;
 	
 	//Langage management
 	public enum language{english,french};
@@ -607,6 +619,16 @@ public class Variables
 	public static void setMigratedItemFileName(String migratedItemFileName)
 		{
 		Variables.migratedItemFileName = migratedItemFileName;
+		}
+
+	public static String getLogFileName()
+		{
+		return logFileName;
+		}
+
+	public static void setLogFileName(String logFileName)
+		{
+		Variables.logFileName = logFileName;
 		}
 	
 	

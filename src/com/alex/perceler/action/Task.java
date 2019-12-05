@@ -1,18 +1,27 @@
-package com.alex.perceler.misc;
+package com.alex.perceler.action;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import com.alex.perceler.cli.CliInjector;
 import com.alex.perceler.cli.CliManager;
+import com.alex.perceler.device.misc.Ascom;
 import com.alex.perceler.device.misc.Device;
+import com.alex.perceler.misc.ItemToMigrate;
+import com.alex.perceler.misc.storedUUID;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
 import com.alex.perceler.remoteclient.ClientManager;
+import com.alex.perceler.remoteclient.MultipleClientManager;
 import com.alex.perceler.remoteclient.RequestBuilder;
 import com.alex.perceler.utils.LanguageManagement;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
+import com.alex.perceler.utils.Variables.ascomType;
+import com.alex.perceler.utils.Variables.itmType;
 
 /**********************************
  * Class used to store a list of todo
@@ -109,7 +118,8 @@ public class Task extends Thread
 				{
 				if(myToDo instanceof Device)
 					{
-					cliManager.getCliIList().add(((Device)myToDo).getCliInjector());
+					CliInjector clii = ((Device)myToDo).getCliInjector();
+					if(clii != null)cliManager.getCliIList().add(clii);
 					}
 				}
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
@@ -191,13 +201,20 @@ public class Task extends Thread
 			}
 		}
 	
+	/**
+	 * Used to send 
+	 */
 	private void updateServicePilot()
 		{
-		//We start the connection with client
 		try
 			{
-			ClientManager cm = new ClientManager(UsefulMethod.getTargetOption("remoteclientip"),
-					UsefulMethod.getTargetOption("remoteclientport"));
+			String[] s = UsefulMethod.getTargetOption("remoteclientip").split(",");
+			ArrayList<String> ipList = new ArrayList<String>(); 
+			ipList.addAll(Arrays.asList(s));
+			s = UsefulMethod.getTargetOption("remoteclientport").split(",");
+			ArrayList<String> portList = new ArrayList<String>(); 
+			portList.addAll(Arrays.asList(s));
+			MultipleClientManager mcm = new MultipleClientManager(ipList, portList);
 			
 			boolean updateAnyWay = Boolean.parseBoolean(UsefulMethod.getTargetOption("updateanyway"));
 			
@@ -210,8 +227,19 @@ public class Task extends Thread
 						Device d = (Device)myToDo;
 						if(updateAnyWay || d.isReachable())
 							{
-							Variables.getLogger().debug(d.getInfo()+" : Sending service pilot replace ip request");
-							cm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
+							if((d instanceof Ascom) && (((Ascom)d).getAscomType().equals(ascomType.slave)))
+								{
+								//Only for ascom slave
+								Variables.getLogger().debug(d.getInfo()+" : Sending service pilot delete ip request");
+								//We delete so no rollback possible
+								if(myToDo.getAction().equals(actionType.update))mcm.sendRequest(RequestBuilder.buildDeleteIP(d.getIp()));
+								}
+							else
+								{
+								Variables.getLogger().debug(d.getInfo()+" : Sending service pilot replace ip request");
+								if(myToDo.getAction().equals(actionType.update))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
+								else if(myToDo.getAction().equals(actionType.rollback))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getNewip(), d.getIp()));
+								}
 							}
 						else
 							{
@@ -226,8 +254,8 @@ public class Task extends Thread
 				}
 			
 			Variables.getLogger().debug("Sending service pilot restart service request");
-			cm.sendRequest(RequestBuilder.buildRestartService());
-			cm.close();
+			mcm.sendRequest(RequestBuilder.buildRestartService());
+			mcm.close();
 			Variables.getLogger().debug("Service pilot update done !");
 			}
 		catch (Exception e)
@@ -287,7 +315,7 @@ public class Task extends Thread
 				/**
 				 * To finish we update service pilot but only if the devices really change there ip
 				 */
-				//updateServicePilot();
+				updateServicePilot();
 				}
 			
 			setItemStatus(itmStatus.done);

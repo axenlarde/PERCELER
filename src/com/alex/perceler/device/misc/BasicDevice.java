@@ -17,8 +17,8 @@ public class BasicDevice extends SimpleItem
 	/**
 	 * Variables
 	 */
-	private itmType type;
-	private String id,
+	protected itmType type;
+	protected String id,
 	name,
 	ip,
 	mask,
@@ -30,9 +30,9 @@ public class BasicDevice extends SimpleItem
 	newmask,
 	user,
 	password;
-	private CliProfile cliProfile;
-	private cliProtocol connexionProtocol;
-	private basicItemStatus status;
+	protected CliProfile cliProfile;
+	protected cliProtocol connexionProtocol;
+	protected basicItemStatus status;
 	
 	
 	public BasicDevice(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip,

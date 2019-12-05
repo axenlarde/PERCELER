@@ -2,9 +2,9 @@ package com.alex.perceler.webserver;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.action.Task;
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.misc.ItemToMigrate;
-import com.alex.perceler.misc.Task;
 import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.webserver.ManageWebRequest.webRequestType;

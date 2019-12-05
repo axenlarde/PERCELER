@@ -171,6 +171,18 @@ public class WebListenerManager implements HttpHandler
 						{
 						reply = ManageWebRequest.setTask(content);
 						}
+					else if(wr.getType().equals(webRequestType.copyLogFile))
+						{
+						reply = ManageWebRequest.copyLogFile();
+						}
+					else if(wr.getType().equals(webRequestType.newDevice))
+						{
+						reply = ManageWebRequest.newDevice(content);
+						}
+					else if(wr.getType().equals(webRequestType.newOffice))
+						{
+						reply = ManageWebRequest.newOffice(content);
+						}
 					
 					OutputStream os = exc.getResponseBody();
 					

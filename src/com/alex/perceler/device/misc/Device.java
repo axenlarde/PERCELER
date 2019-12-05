@@ -98,7 +98,14 @@ public class Device extends ItemToMigrate
 		this.user = bd.getUser();
 		this.password = bd.getPassword();
 		this.connexionProtocol = bd.getConnexionProtocol();
-		this.cliInjector = new CliInjector(this, bd.getCliProfile());
+
+		if((type.equals(itmType.isr)) ||
+				(type.equals(itmType.vg)) ||
+				(type.equals(itmType.audiocode)))
+			{
+			this.cliInjector = new CliInjector(this, bd.getCliProfile());
+			}
+		
 		this.reachable = true;
 		
 		/**
@@ -282,10 +289,8 @@ public class Device extends ItemToMigrate
 				}
 			}*/
 		
-		if(errorList.size() + cliInjector.getErrorList().size() > 0)
-			{
-			s.append(", Error found\r\n");
-			}
+		if((cliInjector != null) && (cliInjector.getErrorList().size() > 0))s.append(", Error found\r\n");
+		else if((errorList != null) && (errorList.size() > 0))s.append(", Error found\r\n");
 		
 		return s.toString();
 		}
