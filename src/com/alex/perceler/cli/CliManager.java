@@ -17,7 +17,7 @@ public class CliManager extends Thread
 	 */
 	private ArrayList<CliInjector> cliIList;
 	private boolean stop, pause;
-	private int maxThread;	
+	private int maxThread;
 	
 	public CliManager()
 		{
@@ -75,7 +75,11 @@ public class CliManager extends Thread
 				alive = false;
 				for(CliInjector clii : cliIList)
 					{
-					if(clii.isAlive())alive = true;break;
+					if(clii.isAlive())
+						{
+						alive = true;
+						break;
+						}
 					}
 				this.sleep(100);
 				}

@@ -83,16 +83,6 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		Variables.getLogger().debug("Starting survey for "+type+" "+name);
 		
 		doStartSurvey();
-		
-		for(ItemToInject iti : axlList)
-			{
-			if(iti.getStatus().equals(statusType.disabled))
-				{
-				addError(new ErrorTemplate(name+" : The following item has not been found and therefore will not be updated : "+iti.getInfo()));
-				}
-			}
-		
-		if(errorList.size() != 0)this.status = itmStatus.error;
 		}
 	
 	@Override
@@ -107,7 +97,11 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 			if(!iti.getStatus().equals(statusType.disabled))
 				{
 				iti.update();
-				if(iti.getStatus().equals(statusType.error))this.status = itmStatus.error;
+				if(iti.getStatus().equals(statusType.error))
+					{
+					this.status = itmStatus.error;
+					addError(new ErrorTemplate(name+" : The following item returned an error : "+iti.getInfo()));
+					}
 				}
 			else
 				{

@@ -14,6 +14,7 @@ import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.items.SRSTReference;
 import com.alex.perceler.office.items.TrunkSip;
 import com.alex.perceler.soap.items.SipTrunkDestination;
+import com.alex.perceler.utils.LanguageManagement;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
@@ -55,15 +56,6 @@ public class Device extends ItemToMigrate
 		this.user = user;
 		this.password = password;
 		this.connexionProtocol = connexionProtocol;
-		
-		/*
-		if((type.equals(itmType.isr)) ||
-				(type.equals(itmType.vg)) ||
-				(type.equals(itmType.audiocode)))
-			{
-			this.cliInjector = new CliInjector(this, cliProfile);
-			}
-		*/
 		if(cliProfile != null)this.cliInjector = new CliInjector(this, cliProfile);
 		
 		this.reachable = true;
@@ -101,14 +93,6 @@ public class Device extends ItemToMigrate
 		this.user = bd.getUser();
 		this.password = bd.getPassword();
 		this.connexionProtocol = bd.getConnexionProtocol();
-
-		/*
-		if((type.equals(itmType.isr)) ||
-				(type.equals(itmType.vg)) ||
-				(type.equals(itmType.audiocode)))
-			{
-			this.cliInjector = new CliInjector(this, bd.getCliProfile());
-			}*/
 		if(bd.getCliProfile() != null)this.cliInjector = new CliInjector(this, bd.getCliProfile());
 		
 		this.reachable = true;
@@ -142,9 +126,29 @@ public class Device extends ItemToMigrate
 	@Override
 	public String getInfo()
 		{
-		return name+" "+
-		ip+" "+
-		type;
+		StringBuffer s = new StringBuffer("");
+		s.append(LanguageManagement.getString(type.name())+" ");
+		s.append(ip+" ");
+		s.append(name);
+		
+		int maxchar = 60;
+		
+		try
+			{
+			maxchar = Integer.parseInt(UsefulMethod.getTargetOption("maxinfochar"));
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("Unable to retrieve maxinfochar");
+			}
+		
+		if(s.length()>maxchar)
+			{
+			String t = s.substring(0, maxchar);
+			t = t+"...";
+			return t;
+			}
+		else return s.toString();
 		}
 	
 	@Override
@@ -196,32 +200,14 @@ public class Device extends ItemToMigrate
 		/**
 		 * Then we initialize the CLI list
 		 */
-		/*
-		if((type.equals(itmType.isr)) ||
-				(type.equals(itmType.vg)) ||
-				(type.equals(itmType.audiocode)))
-			{
-			cliInjector.build();
-			}*/
 		if(cliInjector != null)cliInjector.build();
 		}
 
 	@Override
 	public void doStartSurvey() throws Exception
 		{
-		if((status.equals(itmStatus.postaudit)) ||
-				(status.equals(itmStatus.done)))
-			{
-			reachable = DeviceTools.ping(newip);
-			if(reachable)Variables.getLogger().debug(name+" "+newip+" "+type+" : The device is reachable (ping)");
-			else Variables.getLogger().debug(name+" "+newip+" "+type+" : The device could not been reach (ping failed)");
-			}
-		else
-			{
-			reachable = DeviceTools.ping(ip);
-			if(reachable)Variables.getLogger().debug(name+" "+ip+" "+type+" : The device is reachable (ping)");
-			else Variables.getLogger().debug(name+" "+ip+" "+type+" : The device could not been reach (ping failed)");
-			}
+		if(reachable)Variables.getLogger().debug(name+" "+type+" : The device is reachable (ping)");
+		else Variables.getLogger().debug(name+" "+type+" : The device could not been reach (ping failed)");
 		}
 
 	@Override
@@ -296,8 +282,8 @@ public class Device extends ItemToMigrate
 				}
 			}*/
 		
-		if((cliInjector != null) && (cliInjector.getErrorList().size() > 0))s.append(", Error found\r\n");
-		else if((errorList != null) && (errorList.size() > 0))s.append(", Error found\r\n");
+		//if((cliInjector != null) && (cliInjector.getErrorList().size() > 0))s.append(", Error found\r\n");
+		//else if((errorList != null) && (errorList.size() > 0))s.append(", Error found\r\n");
 		
 		return s.toString();
 		}

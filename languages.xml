@@ -23,6 +23,15 @@ Language configuration file
 			<preaudit>Pre audit</preaudit>
 			<update>Update</update>
 			<postaudit>Post audit</postaudit>
+			<phone>Phones</phone>
+			<found>found</found>
+			<lost>lost</lost>
+			<isr>MG</isr>
+			<vg>VG</vg>
+			<audiocode>Audiocode</audiocode>
+			<office>Office</office>
+			<sip>SIP</sip>
+			<ascom>Ascom</ascom>
 		</values>
 	</language>
 	<language>
@@ -45,6 +54,15 @@ Language configuration file
 			<preaudit>Audit initial</preaudit>
 			<update>Migration en cours</update>
 			<postaudit>Audit final</postaudit>
+			<phone>Téléphones</phone>
+			<found>Trouvés</found>
+			<lost>Perdus</lost>
+			<isr>MG</isr>
+			<vg>VG</vg>
+			<audiocode>Audiocode</audiocode>
+			<office>SITE (CAF ou ANT)</office>
+			<sip>Portier IP</sip>
+			<ascom>Ascom</ascom>
 		</values>
 	</language>
 </languages>

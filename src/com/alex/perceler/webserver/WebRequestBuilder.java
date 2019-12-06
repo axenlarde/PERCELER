@@ -31,7 +31,7 @@ public class WebRequestBuilder
 			case getTask:return buildGetTaskReply((String)obj);
 			case newTask:return buildNewTaskReply((String)obj);
 			case success:return buildSuccess();
-			case error:return buildError();
+			case error:return buildError((String)obj);
 			default:return null;
 			}
 		}
@@ -582,6 +582,7 @@ public class WebRequestBuilder
 			{
 			content.append(tabs+"	<item>\r\n");
 			content.append(tabs+"		<id>"+itm.getId()+"</id>\r\n");
+			content.append(tabs+"		<type>"+itm.getType()+"</type>\r\n");
 			content.append(tabs+"		<info>"+itm.getInfo()+"</info>\r\n");
 			content.append(tabs+"		<status>"+itm.getStatus().name()+"</status>\r\n");
 			content.append(tabs+"		<desc>"+itm.getDetailedStatus()+"</desc>\r\n");
@@ -617,7 +618,7 @@ public class WebRequestBuilder
 	 * To build the requested request
 	 * error
 	 */
-	private static WebRequest buildError()
+	private static WebRequest buildError(String message)
 		{
 		StringBuffer content = new StringBuffer();
 		
@@ -625,7 +626,7 @@ public class WebRequestBuilder
 		content.append("	<reply>\r\n");
 		content.append("		<type>error</type>\r\n");
 		content.append("		<content>\r\n");
-		content.append("			<error></error>\r\n");
+		content.append("			<error>"+message+"</error>\r\n");
 		content.append("		</content>\r\n");
 		content.append("	</reply>\r\n");
 		content.append("</xml>\r\n");

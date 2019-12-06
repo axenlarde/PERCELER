@@ -12,6 +12,7 @@ import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.items.DevicePool;
 import com.alex.perceler.office.items.MobilityInfo;
 import com.alex.perceler.risport.RisportTools;
+import com.alex.perceler.utils.LanguageManagement;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
@@ -33,6 +34,8 @@ public class Office extends ItemToMigrate
 	shortname,
 	newName;
 	
+	private boolean exists;
+	
 	private MobilityInfo voiceMI, dataMI;
 	private DevicePool dp;
 	private ArrayList<BasicPhone> phoneList;
@@ -51,6 +54,7 @@ public class Office extends ItemToMigrate
 		this.newName = newName;
 		this.officeType = officeType;
 		phoneList = new ArrayList<BasicPhone>();
+		exists = false;
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -80,6 +84,7 @@ public class Office extends ItemToMigrate
 		this.newName = bo.getNewName();
 		this.officeType = bo.getOfficeType();
 		phoneList = new ArrayList<BasicPhone>();
+		exists = false;
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -103,9 +108,29 @@ public class Office extends ItemToMigrate
 	@Override
 	public String getInfo()
 		{
-		return idcomu+" "+
-			name+" "+
-			type;
+		StringBuffer s = new StringBuffer("");
+		s.append(LanguageManagement.getString("office")+" ");
+		s.append(idcomu+" ");
+		s.append(name);
+		
+		int maxchar = 50;
+		
+		try
+			{
+			maxchar = Integer.parseInt(UsefulMethod.getTargetOption("maxinfochar"));
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("Unable to retrieve maxinfochar");
+			}
+		
+		if(s.length()>maxchar)
+			{
+			String t = s.substring(0, maxchar);
+			t = t+"...";
+			return t;
+			}
+		else return s.toString();
 		}
 	
 	@Override
@@ -123,7 +148,6 @@ public class Office extends ItemToMigrate
 		 * Just using the database is unreliable
 		 */
 		voiceMI = OfficeTools.getMobilityInfo(voiceIPRange);
-		//dataMI = OfficeTools.getMobilityInfo(dataIPRange);
 		
 		if(voiceMI != null)
 			{
@@ -134,21 +158,21 @@ public class Office extends ItemToMigrate
 			{
 			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+voiceIPRange.getInfo());
 			}
-		/*
-		if(dataMI != null)
-			{
-			Variables.getLogger().debug(name+" mobilityInfo found for range "+dataIPRange.getInfo()+" : "+dataMI.getName());
-			axlList.add(dataMI);
-			}
-		else
-			{
-			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+dataIPRange.getInfo());
-			}*/
 		
 		/**
 		 * We build the associated device pool
 		 */
 		dp = new DevicePool(UsefulMethod.getTargetOption("devicepoolprefix")+idcomu);
+		//We check for the office device pool
+		try
+			{
+			exists = dp.isExisting();
+			}
+		catch(Exception e)
+			{
+			Variables.getLogger().error(name+" warning : The associated device pool was not found : "+dp.getName());
+			addError(new ErrorTemplate(name+" warning the associated device pool was not found : "+dp.getName()));
+			}
 		
 		/**
 		 * For the data mobility info, we inject a new one or delete it in case of rollback
@@ -172,8 +196,6 @@ public class Office extends ItemToMigrate
 		dataMI.getReady();
 		dataMI.build();
 		
-		//axlList.add(dataMI);//here we do not update but inject, so the item will have to be treated apart
-		
 		/**
 		 * We now build the associated phone list
 		 */
@@ -186,28 +208,31 @@ public class Office extends ItemToMigrate
 	@Override
 	public void doStartSurvey() throws Exception
 		{
-		//We check for the office device pool
-		if(!dp.isExisting())addError(new ErrorTemplate(name+" warning the associated device pool has not been found : "+dp.getName()));
-		
-		//We get the associated phones status
-		ArrayList<BasicPhone> pl = RisportTools.doPhoneSurvey(phoneList);
-		try
+		/**
+		 * We get the associated phones status only if the device pool exists
+		 * otherwise the result would have been empty anyway
+		 */
+		if(exists)
 			{
-			for(BasicPhone bp : pl)
+			ArrayList<BasicPhone> pl = RisportTools.doPhoneSurvey(phoneList);
+			try
 				{
-				for(BasicPhone p : phoneList)
+				for(BasicPhone bp : pl)
 					{
-					if(p.getName().equals(bp.getName()))
+					for(BasicPhone p : phoneList)
 						{
-						p.newStatus(bp.getStatus());
-						p.newIP(bp.getIp());
+						if(p.getName().equals(bp.getName()))
+							{
+							p.newStatus(bp.getStatus());
+							p.newIP(bp.getIp());
+							}
 						}
 					}
 				}
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("ERROR : "+e.getMessage());
+			catch (Exception e)
+				{
+				Variables.getLogger().error("ERROR : "+e.getMessage());
+				}
 			}
 		}
 
@@ -224,18 +249,17 @@ public class Office extends ItemToMigrate
 			voiceMI.setSubnet(this.newVoiceIPRange.getSubnet());
 			voiceMI.setSubnetMask(this.newVoiceIPRange.getShortmask());
 			}
-		/*
-		We inject a new one already with the new ip
-		dataMI.setSubnet(this.newDataIPRange.getIpRange());
-		dataMI.setSubnetMask(this.newDataIPRange.getMask());
-		*/
-		if(action.equals(actionType.update))
+		
+		if(exists)//Only if the device pool exists
 			{
-			dataMI.inject();
-			}
-		else if(action.equals(actionType.rollback))
-			{
-			dataMI.delete();
+			if(action.equals(actionType.update))
+				{
+				dataMI.inject();
+				}
+			else if(action.equals(actionType.rollback))
+				{
+				dataMI.delete();
+				}
 			}
 		}
 	
@@ -268,17 +292,21 @@ public class Office extends ItemToMigrate
 		StringBuffer result = new StringBuffer("");
 		
 		StringBuffer temp = new StringBuffer("");
-		int lost = 0;
+		int lostPhone = 0;
 		for(BasicPhone p : phoneList)
 			{
 			if(!p.isOK())
 				{
-				lost++;
+				lostPhone++;
 				temp.append("+ "+p.getName()+" "+p.getModel()+" "+p.getDescription()+" : "+p.getNewStatus()+"\r\n");
 				}
 			}
 		
-		result.append("Phones : Found "+phoneList.size()+", Lost "+lost);
+		String phone = LanguageManagement.getString("phone");
+		String found = LanguageManagement.getString("found");
+		String lost = LanguageManagement.getString("lost");
+		
+		result.append(phone+" : "+found+" "+phoneList.size()+", "+lost+" "+lostPhone);
 		Variables.getLogger().debug(this.name+" : Lost phone found : "+temp);
 		//result.append(temp);
 		

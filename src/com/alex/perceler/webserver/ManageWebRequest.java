@@ -274,9 +274,8 @@ public class ManageWebRequest
 		catch (Exception e)
 			{
 			Variables.getLogger().error("ERROR while processing newTask web request : "+e.getMessage(),e);
+			return WebRequestBuilder.buildWebRequest(webRequestType.error, e.getMessage());
 			}
-		
-		return WebRequestBuilder.buildWebRequest(webRequestType.error, null);
 		}
 	
 	/**

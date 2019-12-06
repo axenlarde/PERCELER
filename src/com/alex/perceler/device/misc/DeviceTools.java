@@ -160,26 +160,6 @@ public class DeviceTools
 	
 	
 	/**
-	 * Method used to "ping" a host to see if it is reachable
-	 * Warning : Requires root privilege to work
-	 */
-	public static boolean ping(String ip)
-		{
-		try
-			{
-			InetAddress inet = InetAddress.getByName(ip);
-			return inet.isReachable(Integer.parseInt(UsefulMethod.getTargetOption("pingtimeout")));
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("ERROR while trying to ping host : "+e.getMessage(),e);
-			}
-		
-		return false;
-		}
-	
-	
-	/**
 	 * Will return Devices filtered by IP Range
 	 * @throws Exception 
 	 */

@@ -2,6 +2,9 @@ package com.alex.perceler.device.misc;
 
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
+import com.alex.perceler.utils.LanguageManagement;
+import com.alex.perceler.utils.UsefulMethod;
+import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.ascomType;
 import com.alex.perceler.utils.Variables.itmType;
@@ -36,10 +39,30 @@ public class Ascom extends Device
 	@Override
 	public String getInfo()
 		{
-		return name+" "+
-		ip+" "+
-		type+" "+
-		deviceType;
+		StringBuffer s = new StringBuffer("");
+		s.append(LanguageManagement.getString(type.name())+" ");
+		s.append(ip+" ");
+		s.append(deviceType+" ");
+		s.append(name);
+		
+		int maxchar = 50;
+		
+		try
+			{
+			maxchar = Integer.parseInt(UsefulMethod.getTargetOption("maxinfochar"));
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("Unable to retrieve maxinfochar");
+			}
+		
+		if(s.length()>maxchar)
+			{
+			String t = s.substring(0, maxchar);
+			t = t+"...";
+			return t;
+			}
+		else return s.toString();
 		}
 	
 	public ascomType getAscomType()

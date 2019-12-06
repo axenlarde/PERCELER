@@ -1,19 +1,17 @@
 package com.alex.perceler.action;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.alex.perceler.cli.CliInjector;
 import com.alex.perceler.cli.CliManager;
 import com.alex.perceler.device.misc.Ascom;
 import com.alex.perceler.device.misc.Device;
+import com.alex.perceler.device.misc.PingManager;
+import com.alex.perceler.device.misc.PingProcess;
 import com.alex.perceler.misc.ItemToMigrate;
-import com.alex.perceler.misc.storedUUID;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
-import com.alex.perceler.remoteclient.ClientManager;
+import com.alex.perceler.misc.storedUUID;
 import com.alex.perceler.remoteclient.MultipleClientManager;
 import com.alex.perceler.remoteclient.RequestBuilder;
 import com.alex.perceler.utils.LanguageManagement;
@@ -21,7 +19,6 @@ import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.ascomType;
-import com.alex.perceler.utils.Variables.itmType;
 
 /**********************************
  * Class used to store a list of todo
@@ -48,6 +45,7 @@ public class Task extends Thread
 	private String taskID, ownerID;
 	private actionType action;
 	private CliManager cliManager;
+	private PingManager pingManager;
 	
 	/***************
 	 * Constructor
@@ -75,6 +73,7 @@ public class Task extends Thread
 		Variables.getLogger().info("Beginning of the build process");
 		for(ItemToMigrate todo : todoList)
 			{
+			if(stop)break;
 			todo.build();
 			}
 		Variables.getLogger().info("End of the build process");
@@ -86,14 +85,46 @@ public class Task extends Thread
 	private void startSurvey() throws Exception
 		{
 		Variables.getLogger().info("Beginning of the survey process");
+		/**
+		 * First we take all the devices and start the ping manager process
+		 * Because each ping process is a different thread we can start them all
+		 * simultaneously to save time
+		 */
+		PingManager pm = new PingManager();
+		
 		for(ItemToMigrate myToDo : todoList)
 			{
+			if(!myToDo.getStatus().equals(itmStatus.disabled))
+				{
+				if(myToDo instanceof Device)
+					{
+					pm.getPingList().add(new PingProcess((Device)myToDo));
+					}
+				}
+			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
+			}
+		if((pm.getPingList().size() != 0) && (!stop))pm.start();
+		
+		/**
+		 * It is better to wait for the ping manager to end before continue
+		 */
+		Variables.getLogger().debug("We wait for the ping manager to end");
+		while(pm.isAlive() && (!stop))
+			{
+			this.sleep(500);
+			}
+		Variables.getLogger().debug("Ping manager ends");
+		
+		for(ItemToMigrate myToDo : todoList)
+			{
+			if(stop)break;
 			if(!myToDo.getStatus().equals(itmStatus.disabled))
 				{
 				myToDo.startSurvey();
 				}
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 			}
+		
 		Variables.getLogger().info("End of the survey process");
 		}
 	
@@ -131,7 +162,7 @@ public class Task extends Thread
 		 * For instance, it is pointless to reset a sip trunk before changing the ISR ip
 		 */
 		Variables.getLogger().debug("We wait for the cli tasks to end");
-		while(cliManager.isAlive())
+		while(cliManager.isAlive() && (!stop))
 			{
 			this.sleep(500);
 			}
@@ -236,19 +267,9 @@ public class Task extends Thread
 						Device d = (Device)myToDo;
 						if(updateAnyWay || d.isReachable())
 							{
-							if((d instanceof Ascom) && (((Ascom)d).getAscomType().equals(ascomType.slave)))
-								{
-								//Only for ascom slave
-								Variables.getLogger().debug(d.getInfo()+" : Sending service pilot delete ip request");
-								//We delete so no rollback possible
-								if(myToDo.getAction().equals(actionType.update))mcm.sendRequest(RequestBuilder.buildDeleteIP(d.getIp()));
-								}
-							else
-								{
-								Variables.getLogger().debug(d.getInfo()+" : Sending service pilot replace ip request");
-								if(myToDo.getAction().equals(actionType.update))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
-								else if(myToDo.getAction().equals(actionType.rollback))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getNewip(), d.getIp()));
-								}
+							Variables.getLogger().debug(d.getInfo()+" : Sending service pilot replace ip request");
+							if(myToDo.getAction().equals(actionType.update))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
+							else if(myToDo.getAction().equals(actionType.rollback))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getNewip(), d.getIp()));
 							}
 						else
 							{
@@ -291,22 +312,32 @@ public class Task extends Thread
 				{
 				status = itmStatus.preaudit;
 				setItemStatus(itmStatus.preaudit);
-				startBuildProcess();
-				startSurvey();
+				if(!stop)startBuildProcess();
+				if(!stop)startSurvey();
 				
 				//We then wait for the user to accept the migration
-				while(pause && !stop)
+				int counter = 0;
+				while(pause && (!stop))
 					{
 					this.sleep(500);
+					counter++;
+					if(counter > 240)//240 = 2 minutes
+						{
+						Variables.getLogger().debug("Max time reached, we end the task");
+						stop = true;
+						}
 					}
-				status = itmStatus.update;
-				setItemStatus(itmStatus.update);
+				if((pause == false) && (stop == false))Variables.getLogger().info(action+" task "+taskID+" starts");
+				
+				if(!stop)status = itmStatus.update;
+				if(!stop)setItemStatus(itmStatus.update);
 				if(!stop)startUpdate();
 				if(!stop)startReset();
 				
-				status = itmStatus.postaudit;
-				setItemStatus(itmStatus.postaudit);
-				int counter = 0;
+				if(!stop)status = itmStatus.postaudit;
+				if(!stop)setItemStatus(itmStatus.postaudit);
+				
+				counter = 0;
 				while((!stop) && (counter<12))
 					{
 					/**
@@ -324,7 +355,7 @@ public class Task extends Thread
 				/**
 				 * To finish we update service pilot but only if the devices really change there ip
 				 */
-				updateServicePilot();
+				if(status.equals(itmStatus.postaudit))updateServicePilot();
 				}
 			
 			setItemStatus(itmStatus.done);
@@ -332,7 +363,7 @@ public class Task extends Thread
 			end = true;
 			Variables.getLogger().info(action+" task "+taskID+" ends");
 			
-			sendReportEmail();
+			if(status.equals(itmStatus.postaudit))sendReportEmail();
 			
 			Variables.setUuidList(new ArrayList<storedUUID>());//We clean the UUID list
 			Variables.getLogger().info("UUID list cleared");
