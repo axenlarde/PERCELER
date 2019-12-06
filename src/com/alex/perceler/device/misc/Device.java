@@ -30,7 +30,7 @@ public class Device extends ItemToMigrate
 	/**
 	 * Variables
 	 */
-	private String ip,
+	protected String ip,
 	mask,
 	shortmask,
 	gateway,
@@ -42,9 +42,9 @@ public class Device extends ItemToMigrate
 	user,
 	password;
 	
-	private boolean reachable;
-	private CliInjector cliInjector;
-	private cliProtocol connexionProtocol;
+	protected boolean reachable;
+	protected CliInjector cliInjector;
+	protected cliProtocol connexionProtocol;
 
 	public Device(itmType type, String id, String name, String ip, String mask, String gateway, String officeid, String newip,
 			String newgateway, String newmask, actionType action, String user, String password,
@@ -56,12 +56,15 @@ public class Device extends ItemToMigrate
 		this.password = password;
 		this.connexionProtocol = connexionProtocol;
 		
+		/*
 		if((type.equals(itmType.isr)) ||
 				(type.equals(itmType.vg)) ||
 				(type.equals(itmType.audiocode)))
 			{
 			this.cliInjector = new CliInjector(this, cliProfile);
 			}
+		*/
+		if(cliProfile != null)this.cliInjector = new CliInjector(this, cliProfile);
 		
 		this.reachable = true;
 		
@@ -99,12 +102,14 @@ public class Device extends ItemToMigrate
 		this.password = bd.getPassword();
 		this.connexionProtocol = bd.getConnexionProtocol();
 
+		/*
 		if((type.equals(itmType.isr)) ||
 				(type.equals(itmType.vg)) ||
 				(type.equals(itmType.audiocode)))
 			{
 			this.cliInjector = new CliInjector(this, bd.getCliProfile());
-			}
+			}*/
+		if(bd.getCliProfile() != null)this.cliInjector = new CliInjector(this, bd.getCliProfile());
 		
 		this.reachable = true;
 		
@@ -191,12 +196,14 @@ public class Device extends ItemToMigrate
 		/**
 		 * Then we initialize the CLI list
 		 */
+		/*
 		if((type.equals(itmType.isr)) ||
 				(type.equals(itmType.vg)) ||
 				(type.equals(itmType.audiocode)))
 			{
 			cliInjector.build();
-			}
+			}*/
+		if(cliInjector != null)cliInjector.build();
 		}
 
 	@Override

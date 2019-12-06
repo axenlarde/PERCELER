@@ -6,6 +6,7 @@ import com.alex.perceler.action.Task;
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.misc.BasicOffice;
+import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.webserver.ManageWebRequest.webRequestType;
 
@@ -124,7 +125,7 @@ public class WebRequestBuilder
 				content.append("					<idcomu>"+o.getIdcomu()+"</idcomu>\r\n");
 				content.append("					<fullname>"+o.getFullname()+"</fullname>\r\n");
 				content.append("					<newname>"+o.getNewName()+"</newname>\r\n");
-				content.append("					<status>"+o.getStatus()+"</status>\r\n");
+				content.append("					<status>"+o.getStatus().name()+"</status>\r\n");
 				content.append("					<devices>\r\n");
 				
 				if(o.getDeviceList().size()!=0)
@@ -136,7 +137,7 @@ public class WebRequestBuilder
 						content.append("							<name>"+d.getName()+"</name>\r\n");
 						content.append("							<type>"+d.getType()+"</type>\r\n");
 						content.append("							<ip>"+d.getIp()+"</ip>\r\n");
-						content.append("							<status>"+d.getStatus()+"</status>\r\n");
+						content.append("							<status>"+d.getStatus().name()+"</status>\r\n");
 						content.append("						</device>\r\n");
 						}
 					}
@@ -169,7 +170,7 @@ public class WebRequestBuilder
 				content.append("					<ip>"+d.getIp()+"</ip>\r\n");
 				content.append("					<officeid>"+d.getOfficeid()+"</officeid>\r\n");
 				content.append("					<officename>"+d.getOfficename()+"</officename>\r\n");
-				content.append("					<status>"+d.getStatus()+"</status>\r\n");
+				content.append("					<status>"+d.getStatus().name()+"</status>\r\n");
 				content.append("				</device>\r\n");
 				}
 			}
@@ -217,7 +218,7 @@ public class WebRequestBuilder
 						content.append("							<name>"+d.getName()+"</name>\r\n");
 						content.append("							<type>"+d.getType()+"</type>\r\n");
 						content.append("							<ip>"+d.getIp()+"</ip>\r\n");
-						content.append("							<status>"+d.getStatus()+"</status>\r\n");
+						content.append("							<status>"+d.getStatus().name()+"</status>\r\n");
 						content.append("						</device>\r\n");
 						}
 					}
@@ -367,7 +368,7 @@ public class WebRequestBuilder
 							content.append("						<name>"+d.getName()+"</name>\r\n");
 							content.append("						<type>"+d.getType()+"</type>\r\n");
 							content.append("						<ip>"+d.getIp()+"</ip>\r\n");
-							content.append("						<status>"+d.getStatus()+"</status>\r\n");
+							content.append("						<status>"+d.getStatus().name()+"</status>\r\n");
 							content.append("					</device>\r\n");
 							}
 						}
@@ -458,18 +459,35 @@ public class WebRequestBuilder
 		
 		try
 			{
-			for(Task t : Variables.getTaskList())
+			if(taskID.equals(""))
 				{
-				if(t.getTaskId().equals(taskID))
+				//We return the current task
+				if(Variables.getTaskList().size() != 0)
 					{
 					content.append("			<task>\r\n");
-					content.append(getTask("			", t));
+					content.append(getTask("			", Variables.getTaskList().get(0)));
 					content.append("			</task>\r\n");
-					found = true;
-					break;
+					}
+				else
+					{
+					throw new Exception("No task in progress to return");
 					}
 				}
-			if(!found)throw new Exception("The following task was not found : "+taskID);
+			else
+				{
+				for(Task t : Variables.getTaskList())
+					{
+					if(t.getTaskId().equals(taskID))
+						{
+						content.append("			<task>\r\n");
+						content.append(getTask("			", t));
+						content.append("			</task>\r\n");
+						found = true;
+						break;
+						}
+					}
+				if(!found)throw new Exception("The following task was not found : "+taskID);
+				}
 			}
 		catch (Exception e)
 			{
@@ -556,6 +574,7 @@ public class WebRequestBuilder
 		{
 		StringBuffer content = new StringBuffer();
 		
+		content.append(tabs+"	<id>"+t.getTaskId()+"</id>\r\n");
 		content.append(tabs+"	<overallstatus>"+t.getStatus()+"</overallstatus>\r\n");
 		content.append(tabs+"	<itemlist>\r\n");
 		

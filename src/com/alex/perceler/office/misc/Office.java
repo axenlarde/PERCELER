@@ -191,16 +191,23 @@ public class Office extends ItemToMigrate
 		
 		//We get the associated phones status
 		ArrayList<BasicPhone> pl = RisportTools.doPhoneSurvey(phoneList);
-		for(BasicPhone bp : pl)
+		try
 			{
-			for(BasicPhone p : phoneList)
+			for(BasicPhone bp : pl)
 				{
-				if(p.getName().equals(bp.getName()))
+				for(BasicPhone p : phoneList)
 					{
-					p.newStatus(bp.getStatus());
-					p.newIP(bp.getIp());
+					if(p.getName().equals(bp.getName()))
+						{
+						p.newStatus(bp.getStatus());
+						p.newIP(bp.getIp());
+						}
 					}
 				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR : "+e.getMessage());
 			}
 		}
 
@@ -323,16 +330,6 @@ public class Office extends ItemToMigrate
 		this.idcomu = idcomu;
 		}
 
-	public String getId()
-		{
-		return idCAF;
-		}
-
-	public void setId(String id)
-		{
-		this.idCAF = id;
-		}
-
 	public String getShortname()
 		{
 		return shortname;
@@ -360,7 +357,7 @@ public class Office extends ItemToMigrate
 
 	public void setOfficeType(officeType type)
 		{
-		this.officeType = officeType;
+		this.officeType = type;
 		}
 
 	public IPRange getVoiceIPRange()

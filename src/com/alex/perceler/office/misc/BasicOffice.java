@@ -3,8 +3,6 @@ package com.alex.perceler.office.misc;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.misc.SimpleItem;
 import com.alex.perceler.utils.Variables.officeType;
@@ -19,8 +17,7 @@ public class BasicOffice extends SimpleItem
 	/**
 	 * Variables
 	 */
-	private String id,
-	idcomu,
+	private String idcomu,
 	idCAF,
 	fullname,
 	shortname,
@@ -45,7 +42,6 @@ public class BasicOffice extends SimpleItem
 		this.dataIPRange = new IPRange(dataIPRange);
 		this.newVoiceIPRange = new IPRange(newVoiceIPRange);
 		this.newDataIPRange = new IPRange(newDataIPRange);
-		id = DigestUtils.md5Hex(fullname+idcomu);
 		deviceList = new ArrayList<BasicDevice>();
 		}
 	

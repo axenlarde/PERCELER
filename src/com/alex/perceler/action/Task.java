@@ -197,7 +197,16 @@ public class Task extends Thread
 		{
 		for(ItemToMigrate myToDo : todoList)
 			{
-			myToDo.setStatus(status);
+			if((myToDo.getStatus().equals(itmStatus.error)) ||
+					(myToDo.getStatus().equals(itmStatus.disabled)))
+				{
+				Variables.getLogger().debug(myToDo.getInfo()+" : In this status '"+myToDo.getStatus()+"' we do not modify the item status");
+				}
+			else
+				{
+				myToDo.setStatus(status);
+				}
+					
 			}
 		}
 	
@@ -323,9 +332,7 @@ public class Task extends Thread
 			end = true;
 			Variables.getLogger().info(action+" task "+taskID+" ends");
 			
-			UsefulMethod.sendEmailToTheAdminList(
-					LanguageManagement.getString("emailreportsubject"),
-					LanguageManagement.getString("emailreportcontent"));
+			sendReportEmail();
 			
 			Variables.setUuidList(new ArrayList<storedUUID>());//We clean the UUID list
 			Variables.getLogger().info("UUID list cleared");
@@ -345,6 +352,28 @@ public class Task extends Thread
 			case start:setPause(false);break;
 			case stop:setStop(true);break;
 			default:break;
+			}
+		}
+	
+	private void sendReportEmail()
+		{
+		try
+			{
+			StringBuffer content = new StringBuffer("");
+			content.append(LanguageManagement.getString("emailreportcontent"));
+			for(ItemToMigrate itm : todoList)
+				{
+				content.append(itm.getInfo()+" : "+itm.getStatus()+"\r\n");
+				}
+			content.append(LanguageManagement.getString("emailfooter"));
+
+			UsefulMethod.sendEmailToTheAdminList(
+					LanguageManagement.getString("emailreportsubject"),
+					content.toString());
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while sending email : "+e.getMessage());
 			}
 		}
 

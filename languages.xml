@@ -16,7 +16,13 @@ Language configuration file
 			<no>No</no>
 			<error>Error</error>
 			<emailreportsubject>PERCELER : Task ends</emailreportsubject>
-			<emailreportcontent>The following task ends. Please find here bellow the summary :</emailreportcontent>
+			<emailreportcontent>The following task ends. Please find here bellow its summary :</emailreportcontent>
+			<emailfooter>\r\nPERCELER : CNAF : Version 1.0</emailfooter>
+			<migrated>migrated</migrated>
+			<tomigrate>To migrate</tomigrate>
+			<preaudit>Pre audit</preaudit>
+			<update>Update</update>
+			<postaudit>Post audit</postaudit>
 		</values>
 	</language>
 	<language>
@@ -25,14 +31,20 @@ Language configuration file
 		</misc>
 		<values>
 			<!--Misc-->
-			<selectbutton>Select</selectbutton>
-			<submitbutton>Submit</submitbutton>
-			<cancelbutton>Cancel</cancelbutton>
-			<yes>Yes</yes>
-			<no>No</no>
-			<error>Error</error>
-			<emailreportsubject>PERCELER : Fin de tâche</emailreportsubject>
-			<emailreportcontent>The tâche usivante est terminée. Veuillez trouvez ci-dessous son compte rendu :</emailreportcontent>
+			<selectbutton>Sélectionner</selectbutton>
+			<submitbutton>Valider</submitbutton>
+			<cancelbutton>Annuler</cancelbutton>
+			<yes>Oui</yes>
+			<no>Non</no>
+			<error>Erreur</error>
+			<emailreportsubject>PERCELER : Action terminée</emailreportsubject>
+			<emailreportcontent>Une action de migration vient de se terminer.\r\nVeuillez trouvez ci-dessous son compte rendu :\r\n</emailreportcontent>
+			<emailfooter>\r\nPERCELER : CNAF : Version 1.0</emailfooter>
+			<migrated>Migré</migrated>
+			<tomigrate>A migrer</tomigrate>
+			<preaudit>Audit initial</preaudit>
+			<update>Migration en cours</update>
+			<postaudit>Audit final</postaudit>
 		</values>
 	</language>
 </languages>

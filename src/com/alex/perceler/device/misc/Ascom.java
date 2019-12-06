@@ -33,6 +33,15 @@ public class Ascom extends Device
 		this.deviceType = ba.getAscomType();
 		}
 	
+	@Override
+	public String getInfo()
+		{
+		return name+" "+
+		ip+" "+
+		type+" "+
+		deviceType;
+		}
+	
 	public ascomType getAscomType()
 		{
 		return deviceType;

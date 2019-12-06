@@ -31,6 +31,7 @@ import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.SimpleRequest;
 import com.alex.perceler.misc.ValueMatcher;
+import com.alex.perceler.misc.SimpleItem.basicItemStatus;
 import com.alex.perceler.office.misc.BasicOffice;
 import com.alex.perceler.office.misc.IPRange;
 import com.alex.perceler.risport.RisportTools;
@@ -40,6 +41,7 @@ import com.alex.perceler.utils.Variables.cucmAXLVersion;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
 import com.alex.perceler.utils.Variables.officeType;
+import com.alex.perceler.utils.Variables.statusType;
 import com.cisco.schemas.ast.soap.RISService70;
 import com.cisco.schemas.ast.soap.RisPortType;
 
@@ -1236,7 +1238,8 @@ public class UsefulMethod
 			if(s.toLowerCase().contains(clip.getType().name().toLowerCase()))return clip;
 			}
 		
-		throw new Exception("No CliProfile found for value : "+s);
+		//throw new Exception("No CliProfile found for value : "+s);
+		return null;
 		}
 	
 	
@@ -1318,6 +1321,37 @@ public class UsefulMethod
 			}
 		
 		return null;
+		}
+	
+	/**
+	 * Convert status to verbose String status
+	 */
+	public static String convertStatusToVerboseString(String status)
+		{
+		try
+			{
+			for(statusType s : statusType.values())
+				{
+				if(status.toLowerCase().equals(s.name().toLowerCase()))
+					{
+					return LanguageManagement.getString(s.name());
+					}
+				}
+			
+			for(basicItemStatus s : basicItemStatus.values())
+				{
+				if(status.toLowerCase().equals(s.name().toLowerCase()))
+					{
+					return LanguageManagement.getString(s.name());
+					}
+				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("Unable to find a verbose equivalent for status : "+status);
+			}
+		
+		return status;
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/
