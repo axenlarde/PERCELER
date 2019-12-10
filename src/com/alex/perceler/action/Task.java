@@ -269,8 +269,7 @@ public class Task extends Thread
 						if(updateAnyWay || d.isReachable())
 							{
 							Variables.getLogger().debug(d.getInfo()+" : Sending service pilot replace ip request");
-							if(myToDo.getAction().equals(actionType.update))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
-							else if(myToDo.getAction().equals(actionType.rollback))mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getNewip(), d.getIp()));
+							mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
 							}
 						else
 							{
@@ -359,7 +358,7 @@ public class Task extends Thread
 				if(status.equals(itmStatus.postaudit))updateServicePilot();
 				}
 			
-			if(status.equals(itmStatus.postaudit))new EmailManager(todoList);
+			if(status.equals(itmStatus.postaudit) && (UsefulMethod.getTargetOption("smtpemailenable").equals("true")))new EmailManager(todoList);
 			
 			setItemStatus(itmStatus.done);
 			status = itmStatus.done;

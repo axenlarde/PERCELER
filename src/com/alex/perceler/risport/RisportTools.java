@@ -156,7 +156,7 @@ public class RisportTools
 		criteria.setMaxReturnedDevices(maxNum);
 		criteria.setModel(modelNum);
 		criteria.setDeviceClass("Phone");
-		criteria.setStatus("Any");
+		criteria.setStatus("Registered");
 		criteria.setSelectBy(CmSelectBy.NAME);
 		criteria.setSelectItems(items);
 		sxmlParams.setCmSelectionCriteria(criteria);

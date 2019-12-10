@@ -3,8 +3,8 @@ package com.alex.perceler.office.misc;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import com.alex.perceler.axlitems.linkers.MobilityInfoLinker;
 import com.alex.perceler.device.misc.BasicPhone;
+import com.alex.perceler.device.misc.BasicPhone.phoneStatus;
 import com.alex.perceler.misc.CollectionTools;
 import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToInject;
@@ -217,16 +217,18 @@ public class Office extends ItemToMigrate
 			ArrayList<BasicPhone> pl = RisportTools.doPhoneSurvey(phoneList);
 			try
 				{
-				for(BasicPhone bp : pl)
+				for(BasicPhone p : phoneList)
 					{
-					for(BasicPhone p : phoneList)
+					boolean found = false;
+					for(BasicPhone bp : pl)
 						{
 						if(p.getName().equals(bp.getName()))
 							{
-							p.newStatus(bp.getStatus());
-							p.newIP(bp.getIp());
+							found = true;
+							break;
 							}
 						}
+					p.newStatus(found?phoneStatus.registered:phoneStatus.unregistered);
 					}
 				}
 			catch (Exception e)
@@ -274,7 +276,8 @@ public class Office extends ItemToMigrate
 		{
 		try
 			{
-			dp.reset();
+			if(exists)dp.reset();
+			else Variables.getLogger().debug(getIndex()+" Reset could not be performed beacause the device pool was not found");
 			}
 		catch (Exception e)
 			{

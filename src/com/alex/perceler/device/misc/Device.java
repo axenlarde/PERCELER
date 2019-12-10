@@ -138,9 +138,20 @@ public class Device extends ItemToMigrate
 	public String getInfo()
 		{
 		StringBuffer s = new StringBuffer("");
-		s.append(LanguageManagement.getString(type.name())+" ");
-		s.append(ip+" ");
-		s.append(name);
+		
+		if(action.equals(actionType.reset))
+			{
+			s.append(LanguageManagement.getString(type.name())+" ");
+			s.append(ip+" ");
+			s.append(name);
+			}
+		else
+			{
+			s.append(LanguageManagement.getString(type.name())+" ");
+			s.append(ip+" > ");
+			s.append(newip+" ");
+			s.append(name);
+			}
 		
 		int maxchar = 60;
 		
@@ -311,8 +322,8 @@ public class Device extends ItemToMigrate
 				}
 			}*/
 		
-		//if((cliInjector != null) && (cliInjector.getErrorList().size() > 0))s.append(", Error found\r\n");
-		//else if((errorList != null) && (errorList.size() > 0))s.append(", Error found\r\n");
+		if((cliInjector != null) && (cliInjector.getErrorList().size() > 0))s.append(", Error found");
+		else if((errorList != null) && (errorList.size() > 0))s.append(", Error found");
 		
 		return s.toString();
 		}

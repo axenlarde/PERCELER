@@ -3,13 +3,9 @@ package com.alex.perceler.main;
 import org.apache.log4j.Level;
 
 import com.alex.perceler.core.LetsParty;
-import com.alex.perceler.device.misc.Device;
-import com.alex.perceler.misc.CollectionTools;
-import com.alex.perceler.office.misc.Office;
 import com.alex.perceler.utils.InitLogging;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
-import com.alex.perceler.utils.Variables.actionType;
 
 /**
  * Perceler main class
