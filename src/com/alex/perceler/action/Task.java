@@ -9,6 +9,7 @@ import com.alex.perceler.device.misc.Ascom;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.device.misc.PingManager;
 import com.alex.perceler.device.misc.PingProcess;
+import com.alex.perceler.misc.EmailManager;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
 import com.alex.perceler.misc.storedUUID;
@@ -90,7 +91,7 @@ public class Task extends Thread
 		 * Because each ping process is a different thread we can start them all
 		 * simultaneously to save time
 		 */
-		PingManager pm = new PingManager();
+		pingManager = new PingManager();
 		
 		for(ItemToMigrate myToDo : todoList)
 			{
@@ -98,18 +99,18 @@ public class Task extends Thread
 				{
 				if(myToDo instanceof Device)
 					{
-					pm.getPingList().add(new PingProcess((Device)myToDo));
+					pingManager.getPingList().add(new PingProcess((Device)myToDo));
 					}
 				}
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 			}
-		if((pm.getPingList().size() != 0) && (!stop))pm.start();
+		if((pingManager.getPingList().size() != 0) && (!stop))pingManager.start();
 		
 		/**
 		 * It is better to wait for the ping manager to end before continue
 		 */
 		Variables.getLogger().debug("We wait for the ping manager to end");
-		while(pm.isAlive() && (!stop))
+		while(pingManager.isAlive() && (!stop))
 			{
 			this.sleep(500);
 			}
@@ -141,7 +142,7 @@ public class Task extends Thread
 		 * Because each cliInjector is a different thread we can start them all
 		 * simultaneously to save time
 		 */
-		cliManager = new CliManager();
+		CliManager cliManager = new CliManager();
 		
 		for(ItemToMigrate myToDo : todoList)
 			{
@@ -358,12 +359,12 @@ public class Task extends Thread
 				if(status.equals(itmStatus.postaudit))updateServicePilot();
 				}
 			
+			if(status.equals(itmStatus.postaudit))new EmailManager(todoList);
+			
 			setItemStatus(itmStatus.done);
 			status = itmStatus.done;
 			end = true;
 			Variables.getLogger().info(action+" task "+taskID+" ends");
-			
-			if(status.equals(itmStatus.postaudit))sendReportEmail();
 			
 			Variables.setUuidList(new ArrayList<storedUUID>());//We clean the UUID list
 			Variables.getLogger().info("UUID list cleared");
@@ -383,28 +384,6 @@ public class Task extends Thread
 			case start:setPause(false);break;
 			case stop:setStop(true);break;
 			default:break;
-			}
-		}
-	
-	private void sendReportEmail()
-		{
-		try
-			{
-			StringBuffer content = new StringBuffer("");
-			content.append(LanguageManagement.getString("emailreportcontent"));
-			for(ItemToMigrate itm : todoList)
-				{
-				content.append(itm.getInfo()+" : "+itm.getStatus()+"\r\n");
-				}
-			content.append(LanguageManagement.getString("emailfooter"));
-
-			UsefulMethod.sendEmailToTheAdminList(
-					LanguageManagement.getString("emailreportsubject"),
-					content.toString());
-			}
-		catch (Exception e)
-			{
-			Variables.getLogger().error("ERROR while sending email : "+e.getMessage());
 			}
 		}
 
@@ -443,11 +422,13 @@ public class Task extends Thread
 				{
 				Variables.getLogger().debug("The user asked to pause the task : "+taskID);
 				if(cliManager != null)cliManager.setPause(pause);
+				if(pingManager != null)pingManager.setPause(pause);
 				}
 			else
 				{
 				Variables.getLogger().debug("The user asked to resume the task : "+taskID);
 				if(cliManager != null)cliManager.setPause(pause);
+				if(pingManager != null)pingManager.setPause(pause);
 				}
 			}
 		else
@@ -468,6 +449,7 @@ public class Task extends Thread
 			Variables.getLogger().debug("The user asked to stop the task : "+taskID);
 			this.stop = stop;
 			if(cliManager != null)cliManager.setStop(stop);
+			if(pingManager != null)pingManager.setStop(stop);
 			}
 		else
 			{

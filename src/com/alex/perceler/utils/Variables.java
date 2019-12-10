@@ -203,6 +203,13 @@ public class Variables
 		PRM
 		};
 		
+	public enum reachableStatus
+		{
+		reachable,
+		unreachable,
+		unknown
+		};
+		
 	//Misc
 	private static String softwareName;
 	private static String softwareVersion;

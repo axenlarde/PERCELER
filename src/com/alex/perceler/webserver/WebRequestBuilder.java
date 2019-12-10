@@ -56,7 +56,7 @@ public class WebRequestBuilder
 			{
 			for(BasicOffice o : Variables.getOfficeList())
 				{
-				if((o.getFullname().toLowerCase().contains(search.toLowerCase())) ||
+				if((o.getName().toLowerCase().contains(search.toLowerCase())) ||
 						(o.getNewName().toLowerCase().contains(search.toLowerCase())) ||
 						(o.getIdcomu().toLowerCase().contains(search.toLowerCase())) ||
 						(o.getVoiceIPRange().getSubnet().contains(search)) ||
@@ -96,7 +96,7 @@ public class WebRequestBuilder
 						{
 						if(d.getOfficeid().equals(o.getIdcomu()))
 							{
-							d.setOfficename(o.getFullname());
+							d.setOfficename(o.getName());
 							break;
 							}
 						}
@@ -123,7 +123,7 @@ public class WebRequestBuilder
 				content.append("				<office>\r\n");
 				content.append("					<id>"+o.getId()+"</id>\r\n");
 				content.append("					<idcomu>"+o.getIdcomu()+"</idcomu>\r\n");
-				content.append("					<fullname>"+o.getFullname()+"</fullname>\r\n");
+				content.append("					<name>"+o.getName()+"</name>\r\n");
 				content.append("					<newname>"+o.getNewName()+"</newname>\r\n");
 				content.append("					<status>"+o.getStatus().name()+"</status>\r\n");
 				content.append("					<devices>\r\n");
@@ -533,7 +533,7 @@ public class WebRequestBuilder
 		content.append(tabs+"	<id>"+o.getId()+"</id>\r\n");
 		content.append(tabs+"	<idcomu>"+o.getIdcomu()+"</idcomu>\r\n");
 		content.append(tabs+"	<idcaf>"+o.getIdCAF()+"</idcaf>\r\n");
-		content.append(tabs+"	<fullname>"+o.getFullname()+"</fullname>\r\n");
+		content.append(tabs+"	<name>"+o.getName()+"</name>\r\n");
 		content.append(tabs+"	<shortname>"+o.getShortname()+"</shortname>\r\n");
 		content.append(tabs+"	<newname>"+o.getNewName()+"</newname>\r\n");
 		content.append(tabs+"	<officetype>"+o.getOfficeType()+"</officetype>\r\n");

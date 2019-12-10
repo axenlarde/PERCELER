@@ -20,6 +20,7 @@ import com.alex.perceler.utils.Variables;
 import com.alex.perceler.utils.Variables.actionType;
 import com.alex.perceler.utils.Variables.itemType;
 import com.alex.perceler.utils.Variables.itmType;
+import com.alex.perceler.utils.Variables.reachableStatus;
 
 /**
  * Represent a device
@@ -43,7 +44,7 @@ public class Device extends ItemToMigrate
 	user,
 	password;
 	
-	protected boolean reachable;
+	protected reachableStatus reachable;
 	protected CliInjector cliInjector;
 	protected cliProtocol connexionProtocol;
 
@@ -58,7 +59,7 @@ public class Device extends ItemToMigrate
 		this.connexionProtocol = connexionProtocol;
 		if(cliProfile != null)this.cliInjector = new CliInjector(this, cliProfile);
 		
-		this.reachable = true;
+		this.reachable = reachableStatus.unknown;
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -66,27 +67,32 @@ public class Device extends ItemToMigrate
 		if(action.equals(actionType.rollback))
 			{
 			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(newip))?newip:"";
-			this.mask = newmask;
+			this.mask = (InetAddressValidator.getInstance().isValidInet4Address(newmask))?newmask:"";
 			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(newgateway))?newgateway:"";
 			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(ip))?ip:"";
 			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(gateway))?gateway:"";
-			this.newmask = mask;
+			this.newmask = (InetAddressValidator.getInstance().isValidInet4Address(mask))?mask:"";
 			}
 		else
 			{
 			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(ip))?ip:"";
-			this.mask = mask;
+			this.mask = (InetAddressValidator.getInstance().isValidInet4Address(mask))?mask:"";
 			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(gateway))?gateway:"";
 			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(newip))?newip:"";
 			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(newgateway))?newgateway:"";
-			this.newmask = newmask;
+			this.newmask = (InetAddressValidator.getInstance().isValidInet4Address(newmask))?newmask:"";
 			}
 		
-		shortmask = UsefulMethod.convertlongMaskToShortOne(mask);
-		newshortmask = UsefulMethod.convertlongMaskToShortOne(newmask);
+		if(ip.isEmpty() || mask.isEmpty() || gateway.isEmpty() || newip.isEmpty() || newmask.isEmpty() || newgateway.isEmpty())
+			{
+			throw new Exception("A mandatory field was empty");
+			}
+		
+		shortmask = UsefulMethod.convertlongMaskToShortOne(this.mask);
+		newshortmask = UsefulMethod.convertlongMaskToShortOne(this.newmask);
 		}
 	
-	public Device(BasicDevice bd, actionType action)
+	public Device(BasicDevice bd, actionType action) throws Exception
 		{
 		super(bd.getType(), bd.getName(), bd.getId(), action);
 		this.officeid = bd.getOfficeid();
@@ -95,7 +101,7 @@ public class Device extends ItemToMigrate
 		this.connexionProtocol = bd.getConnexionProtocol();
 		if(bd.getCliProfile() != null)this.cliInjector = new CliInjector(this, bd.getCliProfile());
 		
-		this.reachable = true;
+		this.reachable = reachableStatus.unknown;
 		
 		/**
 		 * In case of rollback we reverse the following values
@@ -103,24 +109,29 @@ public class Device extends ItemToMigrate
 		if(action.equals(actionType.rollback))
 			{
 			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewip()))?bd.getNewip():"";
-			this.mask = bd.getNewmask();
+			this.mask = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewmask()))?bd.getNewmask():"";
 			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewgateway()))?bd.getNewgateway():"";
 			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getIp()))?bd.getIp():"";
 			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getGateway()))?bd.getGateway():"";
-			this.newmask = bd.getMask();
+			this.newmask = (InetAddressValidator.getInstance().isValidInet4Address(bd.getMask()))?bd.getMask():"";
 			}
 		else
 			{
 			this.ip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getIp()))?bd.getIp():"";
-			this.mask = bd.getMask();
+			this.mask = (InetAddressValidator.getInstance().isValidInet4Address(bd.getMask()))?bd.getMask():"";
 			this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getGateway()))?bd.getGateway():"";
 			this.newip = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewip()))?bd.getNewip():"";
 			this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewgateway()))?bd.getNewgateway():"";
-			this.newmask = bd.getNewmask();
+			this.newmask = (InetAddressValidator.getInstance().isValidInet4Address(bd.getNewmask()))?bd.getNewmask():"";
 			}
 		
-		shortmask = UsefulMethod.convertlongMaskToShortOne(mask);
-		newshortmask = UsefulMethod.convertlongMaskToShortOne(newmask);
+		if(ip.isEmpty() || mask.isEmpty() || gateway.isEmpty() || newip.isEmpty() || newmask.isEmpty() || newgateway.isEmpty())
+			{
+			throw new Exception("A mandatory field was empty");
+			}
+		
+		shortmask = UsefulMethod.convertlongMaskToShortOne(this.mask);
+		newshortmask = UsefulMethod.convertlongMaskToShortOne(this.newmask);
 		}
 	
 	@Override
@@ -206,7 +217,8 @@ public class Device extends ItemToMigrate
 	@Override
 	public void doStartSurvey() throws Exception
 		{
-		if(reachable)Variables.getLogger().debug(name+" "+type+" : The device is reachable (ping)");
+		if(reachable.equals(reachableStatus.reachable))Variables.getLogger().debug(name+" "+type+" : The device is reachable (ping)");
+		else if(reachable.equals(reachableStatus.unknown))Variables.getLogger().debug(name+" "+type+" : The device reachability is currently unknown (ping)");
 		else Variables.getLogger().debug(name+" "+type+" : The device could not been reach (ping failed)");
 		}
 
@@ -268,7 +280,24 @@ public class Device extends ItemToMigrate
 		{
 		StringBuffer s = new StringBuffer("");
 		
-		s.append("Reachable : "+reachable);
+		switch(reachable)
+			{
+			case reachable:
+				{
+				s.append("Reachable : true");
+				break;
+				}
+			case unreachable:
+				{
+				s.append("Reachable : false");
+				break;
+				}
+			default:
+				{
+				s.append("Reachable : unknown");
+				break;
+				}
+			}
 		
 		/*
 		if(cliInjector.getErrorList().size() > 0)
@@ -299,6 +328,14 @@ public class Device extends ItemToMigrate
 		if(tab.length == 2)
 			{
 			for(Field f : this.getClass().getDeclaredFields())
+				{
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
+					{
+					return (String) f.get(this);
+					}
+				}
+			//We try also in the super class
+			for(Field f : this.getClass().getSuperclass().getDeclaredFields())
 				{
 				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
 					{
@@ -384,10 +421,11 @@ public class Device extends ItemToMigrate
 
 	public boolean isReachable()
 		{
-		return reachable;
+		if(this.reachable.equals(reachableStatus.reachable))return true;
+		else return false;
 		}
 
-	public void setReachable(boolean reachable)
+	public void setReachable(reachableStatus reachable)
 		{
 		this.reachable = reachable;
 		}

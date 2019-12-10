@@ -77,7 +77,7 @@ public class Office extends ItemToMigrate
 	
 	public Office(BasicOffice bo, actionType action)
 		{
-		super(itmType.office, bo.getFullname(), bo.getId(), action);
+		super(itmType.office, bo.getName(), bo.getId(), action);
 		this.idcomu = bo.getIdcomu();
 		this.idCAF = bo.getIdCAF();
 		this.shortname = bo.getShortname();
@@ -330,6 +330,14 @@ public class Office extends ItemToMigrate
 					return (String) f.get(this);
 					}
 				}
+			//We try also in the super class
+			for(Field f : this.getClass().getSuperclass().getDeclaredFields())
+				{
+				if(f.getName().toLowerCase().equals(tab[1].toLowerCase()))
+					{
+					return (String) f.get(this);
+					}
+				}
 			}
 		else if(tab.length == 3)
 			{
@@ -345,7 +353,7 @@ public class Office extends ItemToMigrate
 				}
 			}
 		
-		throw new Exception("String not found");
+		return null;
 		}
 
 	public String getIdcomu()

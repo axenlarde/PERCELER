@@ -222,7 +222,7 @@ public class CliConnection implements TelnetNotificationHandler
         telnetConnection.addOptionHandler(ttopt);
         telnetConnection.addOptionHandler(echoopt);
         telnetConnection.addOptionHandler(gaopt);
-        
+        telnetConnection.setConnectTimeout(timeout);
         telnetConnection.connect(ip,23);
         telnetConnection.registerNotifHandler(this);
         out = new BufferedWriter(new OutputStreamWriter(telnetConnection.getOutputStream()));

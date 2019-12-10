@@ -19,7 +19,7 @@ public class BasicAscom extends BasicDevice
 
 	public BasicAscom(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip,
 			String newgateway, String newmask, String user, String password, CliProfile cliProfile,
-			cliProtocol connexionProtocol, ascomType deviceType)
+			cliProtocol connexionProtocol, ascomType deviceType) throws Exception
 		{
 		super(type, name, ip, mask, gateway, officeid, newip, newgateway, newmask, user, password, cliProfile,
 				connexionProtocol);

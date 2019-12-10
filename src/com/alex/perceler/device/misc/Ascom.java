@@ -30,7 +30,7 @@ public class Ascom extends Device
 		this.deviceType = deviceType;
 		}
 
-	public Ascom(BasicAscom ba, actionType action)
+	public Ascom(BasicAscom ba, actionType action) throws Exception
 		{
 		super(ba, action);
 		this.deviceType = ba.getAscomType();

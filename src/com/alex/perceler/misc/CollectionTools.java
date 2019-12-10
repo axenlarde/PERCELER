@@ -365,7 +365,7 @@ public class CollectionTools
 			/*********
 			 * Number before
 			 **/
-			if(Pattern.matches("\\*\\d+_\\*.*", param))
+			if(Pattern.matches(".*\\*\\d+_\\*.*", param))
 				{
 				int number = howMany("\\*\\d+_\\*", param);
 				if(newValue.length() >= number)
@@ -380,7 +380,7 @@ public class CollectionTools
 			/*********
 			 * Number after
 			 **/
-			if(Pattern.matches("\\*_\\d+\\*.*", param))
+			if(Pattern.matches(".*\\*_\\d+\\*.*", param))
 				{
 				int number = howMany("\\*_\\d+\\*", param);
 				if(newValue.length() >= number)
@@ -816,26 +816,33 @@ public class CollectionTools
 		
 		for(int i = 0; i<param.length; i++)
 			{
-			boolean match = false;
-			
 			String value = null;
-			if(Pattern.matches(".*device\\..*", param[i]))
+			String pat = null;
+			
+			if(param[i].contains("*"))
 				{
-				value = d.getString(param[i]);
+				String[] rornot = param[i].split("\\*");
+				pat = rornot[rornot.length-1];//To remove the regex and keep the pattern
 				}
-			else if(Pattern.matches(".*office\\..*", param[i]))
+			else
 				{
-				value = UsefulMethod.getOffice(d.getOfficeid()).getString(param[i]);
-				}
-			else if(Pattern.matches(".*config\\..*", param[i]))
-				{
-				String[] tab = param[i].split("\\.");
-				String result = UsefulMethod.getTargetOption(tab[1]);
-				regex.append(result);
-				
-				match = true;
+				pat = param[i];
 				}
 			
+			if(Pattern.matches(".*device\\..*", pat))
+				{
+				value = d.getString(pat);
+				}
+			else if(Pattern.matches(".*office\\..*", pat))
+				{
+				value = UsefulMethod.getOffice(d.getOfficeid()).getString(pat);
+				}
+			else if(Pattern.matches(".*config\\..*", pat))
+				{
+				String[] tab = pat.split("\\.");
+				value = UsefulMethod.getTargetOption(tab[1]);
+				}
+						
 			if(value != null)
 				{
 				if(param[i].contains("*"))
@@ -846,12 +853,8 @@ public class CollectionTools
 					Variables.getLogger().debug("Value after applying "+param[i]+" regex : "+value);
 					}
 				regex.append(value);
-				match = true;
-				}			
-			/***********/
-			
-			//Default
-			if(!match)
+				}
+			else
 				{
 				regex.append(param[i]);
 				}
@@ -867,20 +870,27 @@ public class CollectionTools
 		
 		for(int i = 0; i<param.length; i++)
 			{
-			boolean match = false;
-			
 			String value = null;
-			if(Pattern.matches(".*office\\..*", param[i]))
+			String pat = null;
+			
+			if(param[i].contains("*"))
 				{
-				value = o.getString(param[i]);
+				String[] rornot = param[i].split("\\*");
+				pat = rornot[rornot.length-1];//To remove the regex and keep the pattern
 				}
-			else if(Pattern.matches(".*config\\..*", param[i]))
+			else
 				{
-				String[] tab = param[i].split("\\.");
-				String result = UsefulMethod.getTargetOption(tab[1]);
-				regex.append(result);
-				
-				match = true;
+				pat = param[i];
+				}
+			
+			if(Pattern.matches(".*office\\..*", pat))
+				{
+				value = o.getString(pat);
+				}
+			else if(Pattern.matches(".*config\\..*", pat))
+				{
+				String[] tab = pat.split("\\.");
+				value = UsefulMethod.getTargetOption(tab[1]);
 				}
 			
 			if(value != null)
@@ -893,12 +903,8 @@ public class CollectionTools
 					Variables.getLogger().debug("Value after applying "+param[i]+" regex : "+value);
 					}
 				regex.append(value);
-				match = true;
 				}			
-			/***********/
-			
-			//Default
-			if(!match)
+			else
 				{
 				regex.append(param[i]);
 				}

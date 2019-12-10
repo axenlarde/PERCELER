@@ -2,6 +2,8 @@ package com.alex.perceler.device.misc;
 
 import java.lang.reflect.Field;
 
+import org.apache.commons.validator.routines.InetAddressValidator;
+
 import com.alex.perceler.cli.CliProfile;
 import com.alex.perceler.cli.CliProfile.cliProtocol;
 import com.alex.perceler.misc.SimpleItem;
@@ -37,29 +39,35 @@ public class BasicDevice extends SimpleItem
 	
 	public BasicDevice(itmType type, String name, String ip, String mask, String gateway, String officeid, String newip,
 			String newgateway, String newmask, String user, String password, CliProfile cliProfile,
-			cliProtocol connexionProtocol)
+			cliProtocol connexionProtocol) throws Exception
 		{
 		super(name+ip+officeid);
 		this.type = type;
 		this.name = name;
-		this.ip = ip;
-		this.mask = mask;
-		this.gateway = gateway;
 		this.officeid = officeid;
-		this.newip = newip;
-		this.newgateway = newgateway;
-		this.newmask = newmask;
 		this.user = user;
 		this.password = password;
 		this.cliProfile = cliProfile;
 		this.connexionProtocol = connexionProtocol;
+		
+		this.ip = (InetAddressValidator.getInstance().isValidInet4Address(ip))?ip:"";
+		this.mask = (InetAddressValidator.getInstance().isValidInet4Address(mask))?mask:"";
+		this.gateway = (InetAddressValidator.getInstance().isValidInet4Address(gateway))?gateway:"";
+		this.newip = (InetAddressValidator.getInstance().isValidInet4Address(newip))?newip:"";
+		this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(newgateway))?newgateway:"";
+		this.newmask = (InetAddressValidator.getInstance().isValidInet4Address(newmask))?newmask:"";
+		
+		if(ip.isEmpty() || mask.isEmpty() || gateway.isEmpty() || newip.isEmpty() || newmask.isEmpty() || newgateway.isEmpty())
+			{
+			throw new Exception("A mandatory field was empty");
+			}
 		}
 
 	public String getInfo()
 		{
-		return name+" "+
+		return type+" "+
 		ip+" "+
-		type;
+		name;
 		}
 	
 	/******

@@ -135,8 +135,8 @@ public class CliLinker
 					}
 				}
 			
-			clii.sleep(1000);
-			if(timer>10)
+			clii.sleep(100);
+			if(timer>100)
 				{
 				Variables.getLogger().debug(device.getInfo()+" : CLI : We have been waiting too longfor '"+s+"' so we keep going");
 				break;
@@ -160,8 +160,8 @@ public class CliLinker
 			{
 			if(receiver.getExchange().size() > 0)break;
 			
-			clii.sleep(1000);
-			if(timer>10)
+			clii.sleep(100);
+			if(timer>100)
 				{
 				Variables.getLogger().debug(device.getInfo()+" : CLI : We have been waiting too long so we keep going");
 				break;

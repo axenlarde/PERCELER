@@ -20,6 +20,7 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.log4j.Level;
 
 import com.alex.perceler.cli.CliProfile;
@@ -375,7 +376,7 @@ public class UsefulMethod
 								UsefulMethod.getItemByName("user", s),
 								UsefulMethod.getItemByName("password", s),
 								getCliProfile(UsefulMethod.getItemByName("cliprofile", s)),
-								cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)),
+								getProtocolType(UsefulMethod.getItemByName("protocol", s)),
 								getAscomType(UsefulMethod.getItemByName("ascomtype", s)));
 						}
 					else
@@ -392,7 +393,7 @@ public class UsefulMethod
 								UsefulMethod.getItemByName("user", s),
 								UsefulMethod.getItemByName("password", s),
 								getCliProfile(UsefulMethod.getItemByName("cliprofile", s)),
-								cliProtocol.valueOf(UsefulMethod.getItemByName("protocol", s)));
+								getProtocolType(UsefulMethod.getItemByName("protocol", s)));
 						}
 					
 					/**
@@ -447,9 +448,10 @@ public class UsefulMethod
 			
 			for(String[][] s : content)
 				{
+				String name = UsefulMethod.getItemByName("name", s);
 				try
 					{
-					BasicOffice o = new BasicOffice(UsefulMethod.getItemByName("fullname", s),
+					BasicOffice o = new BasicOffice(name,
 							UsefulMethod.getItemByName("idcomu", s),
 							UsefulMethod.getItemByName("idcaf", s),
 							UsefulMethod.getItemByName("shortname", s),
@@ -482,7 +484,7 @@ public class UsefulMethod
 					}
 				catch (Exception e)
 					{
-					Variables.getLogger().error("Could not add the following office : "+UsefulMethod.getItemByName("fullname", s)+" : "+e.getMessage());
+					Variables.getLogger().error("Could not add the following office : "+name+" : "+e.getMessage());
 					}
 				}
 			Variables.getLogger().debug(officeList.size()+ " offices found in the database");
@@ -830,7 +832,7 @@ public class UsefulMethod
 	public static String convertlongMaskToShortOne(String mask)
 		{
 		//We check if mask is a long or a CIDR one
-		if(!Tester.IPValide(mask))return mask;
+		if(!InetAddressValidator.getInstance().isValidInet4Address(mask))return mask;
 		
 		SubnetUtils subnet = new SubnetUtils("192.168.1.0", mask.trim());
 		return subnet.getInfo().getCidrSignature().split("/")[1];
@@ -846,7 +848,7 @@ public class UsefulMethod
 	public static String convertShortMaskToLongOne(String mask)
 		{
 		//We check if mask is a long or a CIDR one
-		if(mask.length()<3)return mask;
+		if(mask.length()>2)return mask;
 		
 		SubnetUtils subnet = new SubnetUtils("192.168.1.0/"+mask);
 		return subnet.getInfo().getNetmask();
@@ -917,28 +919,25 @@ public class UsefulMethod
 			String adminEmails = UsefulMethod.getTargetOption("smtpemailreceiver");
 			String eMailDesc = "Multiple email sending";
 			
-			if(adminEmails.contains(";"))
+			String[] adminList = adminEmails.split(";");
+			for(String s : adminList)
 				{
-				//There are many emails to send
-				String[] adminList = adminEmails.split(";");
-				for(String s : adminList)
+				Variables.getLogger().debug("Sending to "+s);
+				try
 					{
 					Variables.geteMSender().send(s,
 							subject,
 							content,
 							eMailDesc);
+					Variables.getLogger().debug("Email sent for "+s);
+					}
+				catch (Exception e)
+					{
+					Variables.getLogger().debug("Failed to send email to "+s+" : "+e.getMessage());
 					}
 				}
-			else
-				{
-				//There is only one email to send
-				Variables.geteMSender().send(adminEmails,
-						subject,
-						content,
-						eMailDesc);
-				}
 			
-			JOptionPane.showMessageDialog(null,LanguageManagement.getString("emailsentsuccess"),"",JOptionPane.INFORMATION_MESSAGE);
+			Variables.getLogger().debug("Email sent to the admin group");
 			}
 		catch (Exception e)
 			{
@@ -1206,7 +1205,7 @@ public class UsefulMethod
 		{
 		for(itmType t : itmType.values())
 			{
-			if(type.toLowerCase().contains(t.name()))return t;
+			if(type.toLowerCase().replaceAll(" ", "").contains(t.name()))return t;
 			}
 		
 		throw new Exception("No itmType found for type : "+type);
@@ -1216,10 +1215,20 @@ public class UsefulMethod
 		{
 		for(ascomType at : ascomType.values())
 			{
-			if(type.toLowerCase().replaceAll(" ", "").contains(at.name()))return at;
+			if(type.toLowerCase().replaceAll(" ", "").equals(at.name()))return at;
 			}
 		
 		throw new Exception("No ascomType found for type : "+type);
+		}
+	
+	public static cliProtocol getProtocolType(String protocol) throws Exception
+		{
+		for(cliProtocol p : cliProtocol.values())
+			{
+			if(protocol.toLowerCase().replaceAll(" ", "").equals(p.name()))return p;
+			}
+		
+		throw new Exception("No cliProtocol found for protocol : "+protocol);
 		}
 	
 	/*****
@@ -1229,13 +1238,13 @@ public class UsefulMethod
 		{
 		for(CliProfile clip : Variables.getCliProfileList())
 			{
-			if(s.toLowerCase().contains(clip.getName().toLowerCase()))return clip;
+			if(s.toLowerCase().replaceAll(" ", "").equals(clip.getName().toLowerCase()))return clip;
 			}
 		
 		//If we didn't find the pofile by name, we look for the profile type
 		for(CliProfile clip : Variables.getCliProfileList())
 			{
-			if(s.toLowerCase().contains(clip.getType().name().toLowerCase()))return clip;
+			if(s.toLowerCase().replaceAll(" ", "").equals(clip.getType().name().toLowerCase()))return clip;
 			}
 		
 		//throw new Exception("No CliProfile found for value : "+s);
@@ -1250,12 +1259,44 @@ public class UsefulMethod
 		{
 		Variables.getLogger().debug("Migrated item file : adding "+id);
 		
-		//We avoid duplicate
-		if(!Variables.getMigratedItemList().contains(id))
+		try
 			{
-			Variables.getMigratedItemList().add(id);
+			//We avoid duplicate
+			if(!Variables.getMigratedItemList().contains(id))
+				{
+				Variables.getMigratedItemList().add(id);
+				
+				updateMigratedList();
+				}
 			
-			updateMigratedList();
+			/**
+			 * We also update real time status of simple items
+			 */
+			boolean found = false;
+			for(BasicOffice o : Variables.getOfficeList())
+				{
+				if(o.getId().equals(id))
+					{
+					o.setStatus(basicItemStatus.migrated);
+					found = true;
+					break;
+					}
+				}
+			if(!found)
+				{
+				for(BasicDevice d : Variables.getDeviceList())
+					{
+					if(d.getId().equals(id))
+						{
+						d.setStatus(basicItemStatus.migrated);
+						break;
+						}
+					}
+				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("Failed to add the entry "+id+" to the migrated list : "+e.getMessage());
 			}
 		}
 	
@@ -1265,11 +1306,43 @@ public class UsefulMethod
 	public static void removeEntryToTheMigratedList(String id)
 		{
 		Variables.getLogger().debug("Migrated item file : removing "+id);
-		if(Variables.getMigratedItemList().contains(id))
+		try
 			{
-			Variables.getMigratedItemList().remove(id);
+			if(Variables.getMigratedItemList().contains(id))
+				{
+				Variables.getMigratedItemList().remove(id);
+				
+				updateMigratedList();
+				}
 			
-			updateMigratedList();
+			/**
+			 * We also update real time status of simple items
+			 */
+			boolean found = false;
+			for(BasicOffice o : Variables.getOfficeList())
+				{
+				if(o.getId().equals(id))
+					{
+					o.setStatus(basicItemStatus.tomigrate);
+					found = true;
+					break;
+					}
+				}
+			if(!found)
+				{
+				for(BasicDevice d : Variables.getDeviceList())
+					{
+					if(d.getId().equals(id))
+						{
+						d.setStatus(basicItemStatus.tomigrate);
+						break;
+						}
+					}
+				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("Failed to remove the entry "+id+" of the migrated list : "+e.getMessage());
 			}
 		}
 	

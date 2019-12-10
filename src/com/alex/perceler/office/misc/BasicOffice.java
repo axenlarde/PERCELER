@@ -19,7 +19,7 @@ public class BasicOffice extends SimpleItem
 	 */
 	private String idcomu,
 	idCAF,
-	fullname,
+	name,
 	shortname,
 	newName;
 	
@@ -27,12 +27,12 @@ public class BasicOffice extends SimpleItem
 	private IPRange voiceIPRange, dataIPRange, newVoiceIPRange, newDataIPRange;
 	private ArrayList<BasicDevice> deviceList;
 	
-	public BasicOffice(String fullname, String idcomu, String idCAF, String shortname, String newName,
+	public BasicOffice(String name, String idcomu, String idCAF, String shortname, String newName,
 			com.alex.perceler.utils.Variables.officeType officeType, String voiceIPRange, String dataIPRange,
 			String newVoiceIPRange, String newDataIPRange) throws Exception
 		{
-		super(fullname+idcomu);
-		this.fullname = fullname;
+		super(name+idcomu);
+		this.name = name;
 		this.idcomu = idcomu;
 		this.idCAF = idCAF;
 		this.shortname = shortname;
@@ -48,7 +48,7 @@ public class BasicOffice extends SimpleItem
 	public String getInfo()
 		{
 		return idcomu+" "+
-			fullname;
+			name;
 		}
 	
 	/******
@@ -176,14 +176,14 @@ public class BasicOffice extends SimpleItem
 		this.newDataIPRange = newDataIPRange;
 		}
 
-	public String getFullname()
+	public String getName()
 		{
-		return fullname;
+		return name;
 		}
 
-	public void setFullname(String fullname)
+	public void setName(String name)
 		{
-		this.fullname = fullname;
+		this.name = name;
 		}
 
 	public ArrayList<BasicDevice> getDeviceList()

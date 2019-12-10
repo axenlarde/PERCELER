@@ -4,6 +4,7 @@ import java.net.InetAddress;
 
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
 import com.alex.perceler.utils.Variables;
+import com.alex.perceler.utils.Variables.reachableStatus;
 
 /**
  * used to ping a device
@@ -30,11 +31,11 @@ public class PingProcess extends Thread
 		if((device.getStatus().equals(itmStatus.postaudit)) ||
 				(device.getStatus().equals(itmStatus.done)))
 			{
-			device.setReachable(ping(device.getNewip()));
+			device.setReachable(ping(device.getNewip())?reachableStatus.reachable:reachableStatus.unreachable);
 			}
 		else
 			{
-			device.setReachable(ping(device.getIp()));
+			device.setReachable(ping(device.getIp())?reachableStatus.reachable:reachableStatus.unreachable);
 			}
 		}
 	

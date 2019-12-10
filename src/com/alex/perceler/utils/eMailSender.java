@@ -89,10 +89,8 @@ public class eMailSender
 			}
 		catch(Exception exc)
 			{
-			exc.printStackTrace();
-			Variables.getLogger().error(exc);
-			
-			throw new Exception("Error while sending the email : "+exc.getMessage());
+			Variables.getLogger().error("ERROR while sending email : "+exc.getMessage(),exc);
+			throw new Exception("Error while sending email : "+exc.getMessage());
 			}
 		}
 
