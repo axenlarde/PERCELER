@@ -1,11 +1,15 @@
 package com.alex.perceler.webserver;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import com.alex.perceler.action.Task;
 import com.alex.perceler.device.misc.BasicDevice;
+import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.office.misc.BasicOffice;
+import com.alex.perceler.office.misc.OfficeTools;
+import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 import com.alex.perceler.webserver.ManageWebRequest.webRequestType;
@@ -45,15 +49,16 @@ public class WebRequestBuilder
 		StringBuffer content = new StringBuffer();
 		webRequestType type = webRequestType.search;
 		
-		/**
-		 * First we look for offices
-		 */
 		ArrayList<BasicOffice> ol = new ArrayList<BasicOffice>();
 		ArrayList<String> lookForDuplicate = new ArrayList<String>();
 		ArrayList<BasicDevice> dl = new ArrayList<BasicDevice>();
 		
 		try
 			{
+			/**
+			 * First we look for offices
+			 */
+			Variables.getLogger().debug("We look for office matching : "+search);
 			for(BasicOffice o : Variables.getOfficeList())
 				{
 				if((o.getName().toLowerCase().contains(search.toLowerCase())) ||
@@ -62,6 +67,8 @@ public class WebRequestBuilder
 						(o.getVoiceIPRange().getSubnet().contains(search)) ||
 						(o.getDataIPRange().getSubnet().contains(search)))
 					{
+					Variables.getLogger().debug("Office found : "+o.getInfo());
+					
 					//Then we look for device associated to this office
 					if(o.getDeviceList().size() == 0)
 						{
@@ -78,6 +85,71 @@ public class WebRequestBuilder
 					}
 				}
 			
+			/**
+			 * If no office were found we search for phones using IP
+			 */
+			if(ol.isEmpty())
+				{
+				Variables.getLogger().debug("No office found so we look for phone using IP");
+				/**
+				 * We fetch the phone using the given IP
+				 * 
+				 * We ask the CUCM only if it looks like an IP
+				 * (At least 2 number : ex : 10.0.)
+				 */
+				
+				if(Pattern.matches("\\d{1,3}\\.\\d{1,3}.*", search.toLowerCase()))
+					{
+					ArrayList<BasicPhone> phoneList = RisportTools.getDeviceByIP(search.toLowerCase());
+					for(BasicPhone bp : phoneList)
+						{
+						//We ask the CUCM for the phone's device pool
+						String devicePoolName = OfficeTools.getDevicePoolFromPhoneName(bp.getName());
+						if(devicePoolName != null)
+							{
+							Variables.getLogger().debug("Looking for the office corresponding to devicePool "+devicePoolName);
+							
+							String officeID = devicePoolName.replaceAll(UsefulMethod.getTargetOption("devicepoolprefix"), "");//We strip the device pool prefix to get the office ID
+							//Then we look for the corresponding office
+							for(BasicOffice o : Variables.getOfficeList())
+								{
+								if(o.getIdcomu().equals(officeID))
+									{
+									Variables.getLogger().debug("Office found : "+o.getInfo());
+									
+									//Then we look for device associated to this office
+									if(o.getDeviceList().size() == 0)
+										{
+										for(BasicDevice d : Variables.getDeviceList())
+											{
+											if(d.getOfficeid().equals(o.getIdcomu()))
+												{
+												o.getDeviceList().add(d);
+												}
+											}
+										}
+									
+									ol.add(o);
+									}
+								}
+							if(ol.isEmpty())Variables.getLogger().debug("No office found");
+							}
+						else
+							{
+							Variables.getLogger().debug("Phone "+bp.getName()+" returned a null device pool");
+							}
+						}
+					}
+				else
+					{
+					Variables.getLogger().debug("The search word was not an IP address so we do not ask the CUCM to look for it : "+search );
+					}
+				}
+			else
+				{
+				Variables.getLogger().debug("At least one office were found so we do not look for phones using IP");
+				}
+			
 			for(BasicOffice o : ol)
 				{
 				for(BasicDevice d : o.getDeviceList())
@@ -86,6 +158,10 @@ public class WebRequestBuilder
 					}
 				}
 			
+			/**
+			 * Then we look for devices
+			 */
+			Variables.getLogger().debug("Then we look for unique device matching : "+search);
 			for(BasicDevice d : Variables.getDeviceList())
 				{
 				if(((d.getName().toLowerCase().contains(search.toLowerCase())) ||
@@ -101,8 +177,10 @@ public class WebRequestBuilder
 							}
 						}
 					dl.add(d);
+					Variables.getLogger().debug("Device found : "+d.getInfo());
 					}
 				}
+			if(dl.isEmpty())Variables.getLogger().debug("No device found");
 			}
 		catch (Exception e)
 			{

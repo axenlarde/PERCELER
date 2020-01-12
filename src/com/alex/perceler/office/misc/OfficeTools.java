@@ -111,5 +111,40 @@ public class OfficeTools
 		return new ArrayList<BasicPhone>();
 		}
 	
+	/**
+	 * Return the device pool name of the given phone
+	 */
+	public static String getDevicePoolFromPhoneName(String phoneName)
+		{
+		Variables.getLogger().debug("Looking for phone's devicePool : "+phoneName);
+		
+		String request = "select dp.name from device d, devicepool dp where dp.pkid=d.fkdevicepool and d.name='"+phoneName+"'";
+		
+		try
+			{
+			List<Object> reply = SimpleRequest.doSQLQuery(request);
+			
+			for(Object o : reply)
+				{
+				Element rowElement = (Element) o;
+				NodeList list = rowElement.getChildNodes();
+				
+				for(int i = 0; i< list.getLength(); i++)
+					{
+					if(list.item(i).getNodeName().equals("name"))
+						{
+						Variables.getLogger().debug("Found devicePool "+list.item(i).getTextContent()+" for phone "+phoneName);
+						return list.item(i).getTextContent();
+						}
+					}
+				}
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while trying to get the phone's devicePool for phone "+phoneName+" : "+e.getMessage(),e);
+			}
+		return null;
+		}
+	
 	/*2019*//*RATEL Alexandre 8)*/
 	}

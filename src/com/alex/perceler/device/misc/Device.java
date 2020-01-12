@@ -127,7 +127,7 @@ public class Device extends ItemToMigrate
 		
 		if(ip.isEmpty() || mask.isEmpty() || gateway.isEmpty() || newip.isEmpty() || newmask.isEmpty() || newgateway.isEmpty())
 			{
-			throw new Exception("A mandatory field was empty");
+			throw new Exception(getInfo()+" : A mandatory field was either incorrect or empty");
 			}
 		
 		shortmask = UsefulMethod.convertlongMaskToShortOne(this.mask);

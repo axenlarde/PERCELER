@@ -4,6 +4,7 @@ import org.apache.log4j.Level;
 
 import com.alex.perceler.core.LetsParty;
 import com.alex.perceler.utils.InitLogging;
+import com.alex.perceler.utils.LanguageManagement;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
 

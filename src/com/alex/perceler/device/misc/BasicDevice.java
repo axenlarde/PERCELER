@@ -57,9 +57,9 @@ public class BasicDevice extends SimpleItem
 		this.newgateway = (InetAddressValidator.getInstance().isValidInet4Address(newgateway))?newgateway:"";
 		this.newmask = (InetAddressValidator.getInstance().isValidInet4Address(newmask))?newmask:"";
 		
-		if(ip.isEmpty() || mask.isEmpty() || gateway.isEmpty() || newip.isEmpty() || newmask.isEmpty() || newgateway.isEmpty())
+		if(this.ip.isEmpty() || this.mask.isEmpty() || this.gateway.isEmpty() || this.newip.isEmpty() || this.newmask.isEmpty() || this.newgateway.isEmpty())
 			{
-			throw new Exception("A mandatory field was empty");
+			throw new Exception(getInfo()+" : A mandatory field was either incorrect or empty");
 			}
 		}
 

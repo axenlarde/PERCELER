@@ -2,6 +2,9 @@ package com.alex.perceler.risport;
 
 import java.util.ArrayList;
 
+import org.apache.commons.validator.routines.InetAddressValidator;
+import org.bouncycastle.util.IPAddress;
+
 import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -162,6 +165,62 @@ public class RisportTools
 		sxmlParams.setCmSelectionCriteria(criteria);
 		
 		return criteria;
+		}
+	
+	
+	public static ArrayList<BasicPhone> getDeviceByIP(String IP)
+		{
+		ArrayList<BasicPhone> result = new ArrayList<BasicPhone>();
+		
+		try
+			{
+			/***
+			 * If the given IP is a correct one we keep it unchanged,
+			 * but if it is an incomplete one, we add a * to create a search mask
+			 */
+			String IPToAdd = (InetAddressValidator.getInstance().isValidInet4Address(IP))?IP:IP+"*";
+			
+			SelectCmDevice sxmlParams = new SelectCmDevice();
+			CmSelectionCriteria criteria = new CmSelectionCriteria();
+			long maxNum;
+			
+			try
+				{
+				maxNum = Long.parseLong(UsefulMethod.getTargetOption("rismaxphonerequest"));
+				}
+			catch (Exception e)
+				{
+				Variables.getLogger().error("ERROR : "+e.getMessage(),e);
+				maxNum = 500;
+				}
+			
+			long modelNum = 255;
+			ArrayOfSelectItem items = new ArrayOfSelectItem();
+			SelectItem item = new SelectItem();
+			item.setItem(IPToAdd);
+			items.getItem().add(item);
+			Variables.getLogger().debug("RIS : adding the following IP to the request : "+IPToAdd);
+				
+			criteria.setMaxReturnedDevices(maxNum);
+			criteria.setModel(modelNum);
+			criteria.setDeviceClass("Phone");
+			criteria.setStatus("Registered");
+			criteria.setSelectBy(CmSelectBy.IPV_4_ADDRESS);
+			criteria.setSelectItems(items);
+			sxmlParams.setCmSelectionCriteria(criteria);
+			
+			Variables.getLogger().debug("Sending RIS request");
+			SelectCmDeviceReturn selectResponse = Variables.getRisConnection().selectCmDevice("",criteria);
+			result.addAll(getDeviceFromRISResponse(selectResponse));
+			
+			if(result.size() == maxNum)Variables.getLogger().warn("The phone list returned for the IP "+IPToAdd+" returned exactly "+maxNum+" phones, so the result is maybe trunkated and therefore we are maybe missing some phones");
+			}
+		catch (Exception e)
+			{
+			Variables.getLogger().error("ERROR while making a phone search by IP using RIS : "+e.getMessage(), e);
+			}
+		
+		return result;
 		}
 	
 	/*2019*//*RATEL Alexandre 8)*/

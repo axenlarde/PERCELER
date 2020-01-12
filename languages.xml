@@ -47,8 +47,8 @@ Language configuration file
 			<no>Non</no>
 			<error>Erreur</error>
 			<emailreportsubject>PERCELER : Action terminée</emailreportsubject>
-			<emailreportcontent>Une action de migration vient de se terminer.\r\nVeuillez trouvez ci-dessous son compte rendu :\r\n</emailreportcontent>
-			<emailfooter>\r\nPERCELER : CNAF : Version 1.0</emailfooter>
+			<emailreportcontent>Bonjour,\r\nUne action de migration vient de se terminer.\r\nVeuillez trouvez ci-dessous son compte rendu :\r\n</emailreportcontent>
+			<emailfooter>CNAF</emailfooter>
 			<migrated>Migré</migrated>
 			<tomigrate>A migrer</tomigrate>
 			<preaudit>Audit initial</preaudit>

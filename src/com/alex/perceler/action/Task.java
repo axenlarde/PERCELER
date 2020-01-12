@@ -258,6 +258,7 @@ public class Task extends Thread
 			MultipleClientManager mcm = new MultipleClientManager(ipList, portList);
 			
 			boolean updateAnyWay = Boolean.parseBoolean(UsefulMethod.getTargetOption("updateanyway"));
+			boolean atLeastOne = false;
 			
 			for(ItemToMigrate myToDo : todoList)
 				{
@@ -270,6 +271,7 @@ public class Task extends Thread
 							{
 							Variables.getLogger().debug(d.getInfo()+" : Sending service pilot replace ip request");
 							mcm.sendRequest(RequestBuilder.buildReplaceIP(d.getIp(), d.getNewip()));
+							atLeastOne = true;
 							}
 						else
 							{
@@ -283,10 +285,17 @@ public class Task extends Thread
 					}
 				}
 			
-			Variables.getLogger().debug("Sending service pilot restart service request");
-			mcm.sendRequest(RequestBuilder.buildRestartService());
-			mcm.close();
-			Variables.getLogger().debug("Service pilot update done !");
+			if(atLeastOne)
+				{
+				Variables.getLogger().debug("Sending service pilot restart service request");
+				mcm.sendRequest(RequestBuilder.buildRestartService());
+				mcm.close();
+				Variables.getLogger().debug("Service pilot update done !");
+				}
+			else
+				{
+				Variables.getLogger().debug("No device updated for this task so we do not restart service pilot, it is pointless");
+				}
 			}
 		catch (Exception e)
 			{
@@ -345,7 +354,7 @@ public class Task extends Thread
 					 * 
 					 * This is necessary to allow phone or device to register after a reset
 					 * Indeed, there is no point at raising a warning about a phone which is just taking a little time to register
-					 * Instead it is better to try several times to reach it 
+					 * Instead it is better to try several times to reach it
 					 */
 					startSurvey();
 					counter++;

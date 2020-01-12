@@ -77,7 +77,7 @@ public class eMailSender
 			message.setFrom(new InternetAddress(user));
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(sendTo));
 			message.setSubject(subject,"utf-8");
-			message.setText(content+"\r\n\r\nEmail sent with "+Variables.getSoftwareName()+" "+Variables.getSoftwareVersion(),"utf-8");
+			message.setText(content+"\r\n\r\nEmail sent with "+Variables.getSoftwareName()+" "+Variables.getSoftwareVersion()+"\t","utf-8");
 			
 			//Connection
 			transport.connect(server, Integer.parseInt(port), user, password);

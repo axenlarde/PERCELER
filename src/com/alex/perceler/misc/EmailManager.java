@@ -37,12 +37,13 @@ public class EmailManager extends Thread
 			Variables.getLogger().debug("Preparing email content");
 			
 			StringBuffer content = new StringBuffer("");
-			content.append(LanguageManagement.getString("emailreportcontent"));
+			content.append(LanguageManagement.getString("emailreportcontent").replaceAll("\\\\r\\\\n", "\t\r\n"));
 			for(ItemToMigrate itm : itmList)
 				{
-				content.append(itm.getInfo()+" : "+itm.getStatus()+"\r\n");
+				content.append(itm.getInfo()+" : "+itm.getStatus()+"\t\r\n");
 				}
-			content.append(LanguageManagement.getString("emailfooter"));
+			content.append("\t\r\n");
+			content.append(LanguageManagement.getString("emailfooter").replaceAll("\\\\r\\\\n", "\t\r\n"));
 
 			//Variables.getLogger().debug("Email content ready to be sent : "+content.toString());
 			

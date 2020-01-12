@@ -32,17 +32,24 @@ public class BasicOffice extends SimpleItem
 			String newVoiceIPRange, String newDataIPRange) throws Exception
 		{
 		super(name+idcomu);
-		this.name = name;
-		this.idcomu = idcomu;
-		this.idCAF = idCAF;
-		this.shortname = shortname;
-		this.newName = newName;
-		this.officeType = officeType;
-		this.voiceIPRange = new IPRange(voiceIPRange);
-		this.dataIPRange = new IPRange(dataIPRange);
-		this.newVoiceIPRange = new IPRange(newVoiceIPRange);
-		this.newDataIPRange = new IPRange(newDataIPRange);
-		deviceList = new ArrayList<BasicDevice>();
+		try
+			{
+			this.name = name;
+			this.idcomu = idcomu;
+			this.idCAF = idCAF;
+			this.shortname = shortname;
+			this.newName = newName;
+			this.officeType = officeType;
+			this.voiceIPRange = new IPRange(voiceIPRange);
+			this.dataIPRange = new IPRange(dataIPRange);
+			this.newVoiceIPRange = new IPRange(newVoiceIPRange);
+			this.newDataIPRange = new IPRange(newDataIPRange);
+			deviceList = new ArrayList<BasicDevice>();
+			}
+		catch (Exception e)
+			{
+			throw new Exception(getInfo()+" : "+e.getMessage());
+			}
 		}
 	
 	public String getInfo()
