@@ -36,6 +36,7 @@ Language configuration file
 			<office>Office</office>
 			<sip>SIP</sip>
 			<ascom>Ascom</ascom>
+			<unknownoffice>Unknown Office</unknownoffice>
 		</values>
 	</language>
 	<language>
@@ -71,6 +72,7 @@ Language configuration file
 			<office>SITE (CAF ou ANT)</office>
 			<sip>Portier IP</sip>
 			<ascom>Ascom</ascom>
+			<unknownoffice>Site inconnu</unknownoffice>
 		</values>
 	</language>
 </languages>

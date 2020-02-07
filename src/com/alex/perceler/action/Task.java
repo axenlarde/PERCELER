@@ -6,15 +6,19 @@ import java.util.Arrays;
 import com.alex.perceler.cli.CliInjector;
 import com.alex.perceler.cli.CliManager;
 import com.alex.perceler.device.misc.Ascom;
+import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.device.misc.PingManager;
 import com.alex.perceler.device.misc.PingProcess;
+import com.alex.perceler.device.misc.BasicPhone.phoneStatus;
 import com.alex.perceler.misc.EmailManager;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
 import com.alex.perceler.misc.storedUUID;
+import com.alex.perceler.office.misc.Office;
 import com.alex.perceler.remoteclient.MultipleClientManager;
 import com.alex.perceler.remoteclient.RequestBuilder;
+import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.LanguageManagement;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -91,6 +95,7 @@ public class Task extends Thread
 		 * Because each ping process is a different thread we can start them all
 		 * simultaneously to save time
 		 */
+		Variables.getLogger().info("Pinging devices");
 		pingManager = new PingManager();
 		
 		for(ItemToMigrate myToDo : todoList)
@@ -116,15 +121,73 @@ public class Task extends Thread
 			}
 		Variables.getLogger().debug("Ping manager ends");
 		
+		/**
+		 * In the case of offices we need to streamline RISRequest
+		 * Indeed, we are allowed maximum 15 request per minute
+		 * We actually send 6 request per minute per office
+		 * In case of multiple office processing at the same time we will reach the limit quite quickly
+		 * 
+		 * To avoid that we will send all the offices' phones in one big request
+		 */
+		int officeCount = 0;
+		ArrayList<BasicPhone> pl = new ArrayList<BasicPhone>();
+		ArrayList<Office> selectedO = new ArrayList<Office>();
+		
+		for(ItemToMigrate myToDo : todoList)
+			{
+			if(!myToDo.getStatus().equals(itmStatus.disabled))
+				{
+				if(myToDo instanceof Office)
+					{
+					Office o = (Office)myToDo;
+					if(o.isExists())
+						{
+						pl.addAll(o.getPhoneList());
+						selectedO.add(o);
+						officeCount++;
+						}
+					}
+				}
+			}
+		Variables.getLogger().debug("Phone survey starts, sending RISRequest for "+officeCount+" offices and "+pl.size()+" phones");
+		pl = RisportTools.doPhoneSurvey(pl);
+		
+		//We now put the result back to each office
+		for(Office o : selectedO)
+			{
+			for(BasicPhone bp : o.getPhoneList())
+				{
+				boolean found = false;
+				for(BasicPhone risBP : pl)
+					{
+					if(bp.getName().equals(risBP.getName()))
+						{
+						found = true;
+						break;
+						}
+					}
+				bp.newStatus(found?phoneStatus.registered:phoneStatus.unregistered);
+				}
+			}
+		Variables.getLogger().debug("Phone survey ends");
+		
+		/**
+		 * Device survey
+		 */
+		Variables.getLogger().info("Device survey starts");
 		for(ItemToMigrate myToDo : todoList)
 			{
 			if(stop)break;
 			if(!myToDo.getStatus().equals(itmStatus.disabled))
 				{
-				myToDo.startSurvey();
+				if(myToDo instanceof Device)
+					{
+					myToDo.startSurvey();
+					}
 				}
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 			}
+		Variables.getLogger().info("Device survey ends");
 		
 		Variables.getLogger().info("End of the survey process");
 		}
