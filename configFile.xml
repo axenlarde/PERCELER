@@ -1,0 +1,50 @@
+﻿<!--
+Overal configuration file
+-->
+
+<xml>
+	<config>
+		<!--Misc-->
+		<log4j>DEBUG</log4j><!--Logging level : ERROR,INFO,DEBUG-->
+		<language>french</language><!--french,english-->
+		<splitter>+</splitter>
+		<csvsplitter>,</csvsplitter>
+		<pingtimeout>5000</pingtimeout><!--used when trying to reach a device--><!--In millisecond-->
+		<maxpingthread>50</maxpingthread>
+		<maxtaskthread>1</maxtaskthread>
+		<devicepoolprefix>DP_</devicepoolprefix>
+		<datamobilityinfopattern>'Net_'+office.idcomu+'-Jabber'</datamobilityinfopattern>
+		<maxinfochar>60</maxinfochar>
+		<!--Cli parameters-->
+		<maxclithread>10</maxclithread>
+		<cliconnectiontimeout>10000</cliconnectiontimeout>
+		<!--Smtp parameters-->
+		<smtpemailenable>true</smtpemailenable>
+		<smtpemailport>25</smtpemailport>
+		<smtpemailprotocol>smtp</smtpemailprotocol>
+		<smtpemailserver>smtp.certiam.cnaf</smtpemailserver>
+		<smtpemail>perceler_noreply@certiam.cnaf</smtpemail>
+		<smtpemailpassword></smtpemailpassword>
+		<smtpemailreceiver>alexandre.ratel@spie.com</smtpemailreceiver><!--One or more destinations separated by a ;-->
+		<!--AXL parameters-->
+		<axlhost>10.0.1.172</axlhost><!--IP of the CUCM server-->
+		<axlport>8443</axlport><!--Port to contact the CUCM server using AXL-->
+		<axlversion>105</axlversion><!--85 or 105--><!--AXL version of the CUCM-->
+		<axlusername>PERCELER</axlusername><!--AXL user name to contact the CUCM server-->
+		<axlpassword>CCMCisco92</axlpassword><!--Password of the AXL user in clear !!!!Warning : keep it secret!!!!-->
+		<!--RISPORT parameters-->
+		<rishost>10.0.1.172</rishost><!--IP of the CUCM server-->
+		<risport>8443</risport><!--Port to contact the CUCM server using RISPORT-->
+		<risusername>PERCELER</risusername><!--RISPORT user name to contact the CUCM server-->
+		<rispassword>CCMCisco92</rispassword><!--Password of the RISPORT user in clear !!!!Warning : keep it secret!!!!-->
+		<rismaxphonerequest>500</rismaxphonerequest><!--Max Phone response per request-->
+		<!--Web server parameters-->
+		<webserverport>8092</webserverport>
+		<!--Remote client parameters-->
+		<remoteclientip>127.0.0.1,127.0.0.1</remoteclientip><!--IP of the remote client, one or more separated by a ,-->
+		<remoteclientport>8091,8090</remoteclientport><!--Port to use to contact the remote client-->
+		<updateanyway>true</updateanyway><!--Update even if the device is not reachable--><!--true,false-->
+		<!--Copy Log parameters-->
+		<targetdirectory>F:\Clients\CNAF\PERCELER\WebPortal\log</targetdirectory>
+	</config>
+</xml>
