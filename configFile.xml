@@ -41,6 +41,7 @@ Overal configuration file
 		<!--Web server parameters-->
 		<webserverport>8092</webserverport>
 		<!--Remote client parameters-->
+		<remoteclientenable>false</remoteclientenable>
 		<remoteclientip>127.0.0.1,127.0.0.1</remoteclientip><!--IP of the remote client, one or more separated by a ,-->
 		<remoteclientport>8091,8090</remoteclientport><!--Port to use to contact the remote client-->
 		<updateanyway>true</updateanyway><!--Update even if the device is not reachable--><!--true,false-->

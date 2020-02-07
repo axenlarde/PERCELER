@@ -2,6 +2,7 @@ package com.alex.perceler.misc;
 
 import java.util.ArrayList;
 
+import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.utils.LanguageManagement;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
@@ -40,7 +41,25 @@ public class EmailManager extends Thread
 			content.append(LanguageManagement.getString("emailreportcontent").replaceAll("\\\\r\\\\n", "\t\r\n"));
 			for(ItemToMigrate itm : itmList)
 				{
-				content.append(itm.getInfo()+" : "+itm.getStatus()+"\t\r\n");
+				content.append(itm.getInfo()+" : "+itm.getStatus()+" : "+itm.getDetailedStatus()+"\t\r\n");
+				if(itm.getErrorList().size() > 0)
+					{
+					for(ErrorTemplate err : itm.getErrorList())
+						{
+						content.append("\t- "+err.getErrorDesc()+"\t\r\n");
+						}
+					}
+				if(itm instanceof Device)
+					{
+					Device d = (Device)itm;
+					if(d.getCliInjector().getErrorList().size() > 0)
+						{
+						for(ErrorTemplate err : d.getCliInjector().getErrorList())
+							{
+							content.append("\t- "+err.getErrorDesc()+"\t\r\n");
+							}
+						}
+					}
 				}
 			content.append("\t\r\n");
 			content.append(LanguageManagement.getString("emailfooter").replaceAll("\\\\r\\\\n", "\t\r\n"));

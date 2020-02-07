@@ -22,7 +22,11 @@ Language configuration file
 			<tomigrate>To migrate</tomigrate>
 			<preaudit>Pre audit</preaudit>
 			<update>Update</update>
+			<rollback>Rollback</rollback>
+			<reset>Reset</reset>
 			<postaudit>Post audit</postaudit>
+			<done>Done</done>
+			<error>Error</error>
 			<phone>Phones</phone>
 			<found>found</found>
 			<lost>lost</lost>
@@ -51,9 +55,13 @@ Language configuration file
 			<emailfooter>CNAF</emailfooter>
 			<migrated>Migré</migrated>
 			<tomigrate>A migrer</tomigrate>
-			<preaudit>Audit initial</preaudit>
-			<update>Migration en cours</update>
-			<postaudit>Audit final</postaudit>
+			<preaudit>Audit préparatoire</preaudit>
+			<update>Migration</update>
+			<rollback>Retour arrière</rollback>
+			<reset>Reset</reset>
+			<postaudit>Audit post opération</postaudit>
+			<done>Terminé</done>
+			<error>Erreur</error>
 			<phone>Téléphones</phone>
 			<found>Trouvés</found>
 			<lost>Perdus</lost>

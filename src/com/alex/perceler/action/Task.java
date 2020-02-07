@@ -364,7 +364,7 @@ public class Task extends Thread
 				/**
 				 * To finish we update service pilot but only if the devices really change there ip
 				 */
-				if(status.equals(itmStatus.postaudit))updateServicePilot();
+				if(status.equals(itmStatus.postaudit) && (UsefulMethod.getTargetOption("remoteclientenable").equals("true")))updateServicePilot();
 				}
 			
 			if(status.equals(itmStatus.postaudit) && (UsefulMethod.getTargetOption("smtpemailenable").equals("true")))new EmailManager(todoList);

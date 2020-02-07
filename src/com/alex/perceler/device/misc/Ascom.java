@@ -40,12 +40,24 @@ public class Ascom extends Device
 	public String getInfo()
 		{
 		StringBuffer s = new StringBuffer("");
-		s.append(LanguageManagement.getString(type.name())+" ");
-		s.append(ip+" ");
-		s.append(deviceType+" ");
-		s.append(name);
 		
-		int maxchar = 50;
+		if(action.equals(actionType.reset))
+			{
+			s.append(LanguageManagement.getString(type.name())+" ");
+			s.append(ip+" ");
+			s.append(deviceType+" ");
+			s.append(name);
+			}
+		else
+			{
+			s.append(LanguageManagement.getString(type.name())+" ");
+			s.append(ip+" > ");
+			s.append(newip+" ");
+			s.append(deviceType+" ");
+			s.append(name);
+			}
+		
+		int maxchar = 60;
 		
 		try
 			{

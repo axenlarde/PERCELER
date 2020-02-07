@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.alex.perceler.device.misc.Device;
 import com.alex.perceler.misc.ErrorTemplate;
+import com.alex.perceler.misc.ItemToMigrate.itmStatus;
 import com.alex.perceler.utils.Variables;
 
 /**
@@ -78,6 +79,7 @@ public class CliInjector extends Thread
 					{
 					Variables.getLogger().error(device.getInfo()+" : CLI : ERROR whith command : "+l.getInfo());
 					device.addError(new ErrorTemplate(device.getInfo()+" : CLI : ERROR whith command : "+l.getInfo()));
+					device.setStatus(itmStatus.error);
 					}
 				}
 			clil.disconnect();

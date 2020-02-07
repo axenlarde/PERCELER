@@ -26,8 +26,8 @@ public class InitLogging
 		RollingFileAppender myR = new RollingFileAppender();
 		myR.setName("myFileAppender");
 		myR.setFile(logFileName);
-		myR.setMaxFileSize("1000KB");
-		myR.setMaxBackupIndex(7);
+		myR.setMaxFileSize("2000KB");
+		myR.setMaxBackupIndex(20);
 		myR.setLayout(myPattern);
 		myR.activateOptions();
 		

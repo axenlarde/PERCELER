@@ -322,7 +322,11 @@ public class Device extends ItemToMigrate
 				}
 			}*/
 		
-		if((cliInjector != null) && (cliInjector.getErrorList().size() > 0))s.append(", Error found");
+		if((cliInjector != null) && (cliInjector.getErrorList().size() > 0))
+			{
+			s.append(", Error found");
+			this.status = itmStatus.error;
+			}
 		else if((errorList != null) && (errorList.size() > 0))s.append(", Error found");
 		
 		return s.toString();

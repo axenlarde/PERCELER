@@ -248,6 +248,16 @@ public abstract class ItemToMigrate implements ItemToMigrateImpl
 		this.action = action;
 		}
 
+	public ArrayList<ErrorTemplate> getErrorList()
+		{
+		return errorList;
+		}
+
+	public void setErrorList(ArrayList<ErrorTemplate> errorList)
+		{
+		this.errorList = errorList;
+		}
+
 	
 	/*2019*//*RATEL Alexandre 8)*/
 	}
