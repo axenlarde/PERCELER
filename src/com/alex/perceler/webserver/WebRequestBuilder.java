@@ -3,21 +3,16 @@ package com.alex.perceler.webserver;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import com.alex.perceler.action.Task;
 import com.alex.perceler.device.misc.BasicDevice;
 import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.ItemToMigrate;
+import com.alex.perceler.misc.SimpleItem;
 import com.alex.perceler.office.misc.BasicOffice;
-import com.alex.perceler.office.misc.BasicOfficeSimple;
-import com.alex.perceler.office.misc.OfficeSimple;
 import com.alex.perceler.office.misc.OfficeTools;
 import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.UsefulMethod;
 import com.alex.perceler.utils.Variables;
-import com.alex.perceler.utils.Variables.actionType;
-import com.alex.perceler.utils.Variables.itmType;
 import com.alex.perceler.webserver.ManageWebRequest.webRequestType;
 
 /**
@@ -141,7 +136,14 @@ public class WebRequestBuilder
 							if(ol.isEmpty())
 								{
 								Variables.getLogger().debug("the office was not found in the database so we create a simple office just to allow to reset the phones");
-								ol.add(new BasicOfficeSimple("Unknown", officeID, devicePoolName);
+								BasicOffice unknownOffice = new BasicOffice(officeID);
+								ol.add(unknownOffice);
+								
+								/**
+								 * In addition we add the unknown office to the office list. this way if the user choose to use it, it will exist.
+								 * We add it only in memory, not in the database file. So it is only for temporary usage
+								 */
+								Variables.getOfficeList().add(unknownOffice);
 								}
 							}
 						else
@@ -229,18 +231,9 @@ public class WebRequestBuilder
 						content.append("						</device>\r\n");
 						}
 					}
-				else
-					{
-					//content.append("						<device></device>\r\n");
-					}
-				
 				content.append("					</devices>\r\n");
 				content.append("				</office>\r\n");
 				}
-			}
-		else
-			{
-			//content.append("				<office></office>\r\n");
 			}
 		content.append("			</offices>\r\n");
 		
@@ -722,5 +715,5 @@ public class WebRequestBuilder
 		return new WebRequest(content.toString(), webRequestType.error);
 		}
 	
-	/*2019*//*RATEL Alexandre 8)*/
+	/*2020*//*RATEL Alexandre 8)*/
 	}

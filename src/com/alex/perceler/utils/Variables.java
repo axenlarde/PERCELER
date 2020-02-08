@@ -636,9 +636,8 @@ public class Variables
 	public static void setLogFileName(String logFileName)
 		{
 		Variables.logFileName = logFileName;
-		}
+		}	
 	
-	
-	/*2019*//*RATEL Alexandre 8)*/
+	/*2020*//*RATEL Alexandre 8)*/
 	}
 

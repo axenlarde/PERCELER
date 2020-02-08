@@ -34,6 +34,7 @@ public class Office extends ItemToMigrate
 	shortname,
 	newName;
 	
+	private boolean unknownOffice;
 	private boolean exists;
 	
 	private MobilityInfo voiceMI, dataMI;
@@ -54,6 +55,7 @@ public class Office extends ItemToMigrate
 		this.newName = newName;
 		this.officeType = officeType;
 		phoneList = new ArrayList<BasicPhone>();
+		unknownOffice = false;
 		exists = false;
 		
 		/**
@@ -79,29 +81,38 @@ public class Office extends ItemToMigrate
 		{
 		super(itmType.office, bo.getName(), bo.getId(), action);
 		this.idcomu = bo.getIdcomu();
-		this.idCAF = bo.getIdCAF();
-		this.shortname = bo.getShortname();
-		this.newName = bo.getNewName();
-		this.officeType = bo.getOfficeType();
+		this.unknownOffice = bo.isUnknownOffice();
 		phoneList = new ArrayList<BasicPhone>();
 		exists = false;
 		
-		/**
-		 * In case of rollback we reverse the following values
-		 */
-		if(action.equals(actionType.rollback))
+		if(unknownOffice)
 			{
-			this.voiceIPRange = bo.getNewVoiceIPRange();
-			this.dataIPRange = bo.getNewDataIPRange();
-			this.newVoiceIPRange = bo.getVoiceIPRange();
-			this.newDataIPRange = bo.getDataIPRange();
+			Variables.getLogger().debug("Reminder : "+idcomu+" is an unknown office. Should just reste associated phones");
 			}
 		else
 			{
-			this.voiceIPRange = bo.getVoiceIPRange();
-			this.dataIPRange = bo.getDataIPRange();
-			this.newVoiceIPRange = bo.getNewVoiceIPRange();
-			this.newDataIPRange = bo.getNewDataIPRange();
+			this.idCAF = bo.getIdCAF();
+			this.shortname = bo.getShortname();
+			this.newName = bo.getNewName();
+			this.officeType = bo.getOfficeType();
+			
+			/**
+			 * In case of rollback we reverse the following values
+			 */
+			if(action.equals(actionType.rollback))
+				{
+				this.voiceIPRange = bo.getNewVoiceIPRange();
+				this.dataIPRange = bo.getNewDataIPRange();
+				this.newVoiceIPRange = bo.getVoiceIPRange();
+				this.newDataIPRange = bo.getDataIPRange();
+				}
+			else
+				{
+				this.voiceIPRange = bo.getVoiceIPRange();
+				this.dataIPRange = bo.getDataIPRange();
+				this.newVoiceIPRange = bo.getNewVoiceIPRange();
+				this.newDataIPRange = bo.getNewDataIPRange();
+				}
 			}
 		}
 
@@ -143,23 +154,6 @@ public class Office extends ItemToMigrate
 	public void doBuild() throws Exception
 		{
 		/**
-		 * We need to find one AXL items : mobilityInfo
-		 * To be sure to find the right one we have to send SQL request to the CUCM
-		 * Just using the database is unreliable
-		 */
-		voiceMI = OfficeTools.getMobilityInfo(voiceIPRange);
-		
-		if(voiceMI != null)
-			{
-			Variables.getLogger().debug(name+" mobilityInfo found for range "+voiceIPRange.getInfo()+" : "+voiceMI.getName());
-			axlList.add(voiceMI);
-			}
-		else
-			{
-			Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+voiceIPRange.getInfo());
-			}
-		
-		/**
 		 * We build the associated device pool
 		 */
 		dp = new DevicePool(UsefulMethod.getTargetOption("devicepoolprefix")+idcomu);
@@ -175,31 +169,55 @@ public class Office extends ItemToMigrate
 			}
 		
 		/**
-		 * For the data mobility info, we inject a new one or delete it in case of rollback
-		 */
-		ArrayList<String> dpList = new ArrayList<String>();
-		dpList.add(dp.getName());
-		dataMI = new MobilityInfo(CollectionTools.resolveOfficeValue(this, UsefulMethod.getTargetOption("datamobilityinfopattern")),
-				newDataIPRange.getSubnet(),
-				newDataIPRange.getShortmask(),
-				dpList);
-		
-		if(action.equals(actionType.update))
-			{
-			dataMI.setAction(actionType.inject);
-			}
-		else if(action.equals(actionType.rollback))
-			{
-			dataMI.setAction(actionType.delete);
-			}
-		
-		dataMI.getReady();
-		dataMI.build();
-		
-		/**
 		 * We now build the associated phone list
 		 */
 		phoneList = OfficeTools.getDevicePoolPhoneList(dp.getName());
+		
+		if(unknownOffice)
+			{
+			//Write something if needed
+			}
+		else
+			{
+			/**
+			 * We need to find one AXL items : mobilityInfo
+			 * To be sure to find the right one we have to send SQL request to the CUCM
+			 * Just using the database is unreliable
+			 */
+			voiceMI = OfficeTools.getMobilityInfo(voiceIPRange);
+			
+			if(voiceMI != null)
+				{
+				Variables.getLogger().debug(name+" mobilityInfo found for range "+voiceIPRange.getInfo()+" : "+voiceMI.getName());
+				axlList.add(voiceMI);
+				}
+			else
+				{
+				Variables.getLogger().debug(name+" no MobilityInfo found for the following ip range :"+voiceIPRange.getInfo());
+				}
+			
+			/**
+			 * For the data mobility info, we inject a new one or delete it in case of rollback
+			 */
+			ArrayList<String> dpList = new ArrayList<String>();
+			dpList.add(dp.getName());
+			dataMI = new MobilityInfo(CollectionTools.resolveOfficeValue(this, UsefulMethod.getTargetOption("datamobilityinfopattern")),
+					newDataIPRange.getSubnet(),
+					newDataIPRange.getShortmask(),
+					dpList);
+			
+			if(action.equals(actionType.update))
+				{
+				dataMI.setAction(actionType.inject);
+				}
+			else if(action.equals(actionType.rollback))
+				{
+				dataMI.setAction(actionType.delete);
+				}
+			
+			dataMI.getReady();
+			dataMI.build();
+			}
 		}
 	
 	/**
@@ -241,26 +259,33 @@ public class Office extends ItemToMigrate
 	@Override
 	public void doUpdate() throws Exception
 		{
-		/**
-		 * here we first used the current values to check that
-		 * the items exists. Now we are about to proceed with the update so
-		 * we change the values with the new ones 
-		 */
-		if(voiceMI != null)
+		if(unknownOffice)
 			{
-			voiceMI.setSubnet(this.newVoiceIPRange.getSubnet());
-			voiceMI.setSubnetMask(this.newVoiceIPRange.getShortmask());
+			//Write something if needed
 			}
-		
-		if(exists)//Only if the device pool exists
+		else
 			{
-			if(action.equals(actionType.update))
+			/**
+			 * here we first used the current values to check that
+			 * the items exists. Now we are about to proceed with the update so
+			 * we change the values with the new ones 
+			 */
+			if(voiceMI != null)
 				{
-				dataMI.inject();
+				voiceMI.setSubnet(this.newVoiceIPRange.getSubnet());
+				voiceMI.setSubnetMask(this.newVoiceIPRange.getShortmask());
 				}
-			else if(action.equals(actionType.rollback))
+			
+			if(exists)//Only if the device pool exists
 				{
-				dataMI.delete();
+				if(action.equals(actionType.update))
+					{
+					dataMI.inject();
+					}
+				else if(action.equals(actionType.rollback))
+					{
+					dataMI.delete();
+					}
 				}
 			}
 		}
@@ -472,6 +497,21 @@ public class Office extends ItemToMigrate
 	public boolean isExists()
 		{
 		return exists;
+		}
+
+	public DevicePool getDp()
+		{
+		return dp;
+		}
+
+	public void setDp(DevicePool dp)
+		{
+		this.dp = dp;
+		}
+
+	public boolean isUnknownOffice()
+		{
+		return unknownOffice;
 		}
 
 	

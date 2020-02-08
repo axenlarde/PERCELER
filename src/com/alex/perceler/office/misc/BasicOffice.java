@@ -23,6 +23,8 @@ public class BasicOffice extends SimpleItem
 	shortname,
 	newName;
 	
+	private boolean unknownOffice;
+	
 	private officeType officeType;
 	private IPRange voiceIPRange, dataIPRange, newVoiceIPRange, newDataIPRange;
 	private ArrayList<BasicDevice> deviceList;
@@ -45,6 +47,7 @@ public class BasicOffice extends SimpleItem
 			this.newVoiceIPRange = new IPRange(newVoiceIPRange);
 			this.newDataIPRange = new IPRange(newDataIPRange);
 			deviceList = new ArrayList<BasicDevice>();
+			unknownOffice = false;
 			}
 		catch (Exception e)
 			{
@@ -52,6 +55,18 @@ public class BasicOffice extends SimpleItem
 			}
 		}
 	
+	/**
+	 * Used to create an office just for phone reset purpose
+	 */
+	public BasicOffice(String idcomu)
+		{
+		super("Unknown"+idcomu);
+		this.name = "Unknown";
+		this.idcomu = idcomu;
+		deviceList = new ArrayList<BasicDevice>();
+		unknownOffice = true;
+		}
+
 	public String getInfo()
 		{
 		return idcomu+" "+
@@ -201,6 +216,16 @@ public class BasicOffice extends SimpleItem
 	public void setDeviceList(ArrayList<BasicDevice> deviceList)
 		{
 		this.deviceList = deviceList;
+		}
+
+	public boolean isUnknownOffice()
+		{
+		return unknownOffice;
+		}
+
+	public void setUnknownOffice(boolean unknownOffice)
+		{
+		this.unknownOffice = unknownOffice;
 		}
 
 	/*2019*//*RATEL Alexandre 8)*/
