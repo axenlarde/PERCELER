@@ -105,6 +105,7 @@ public class WebRequestBuilder
 					ArrayList<BasicPhone> phoneList = RisportTools.getDeviceByIP(search.toLowerCase());
 					for(BasicPhone bp : phoneList)
 						{
+						boolean officeFound = false;
 						//We ask the CUCM for the phone's device pool
 						String devicePoolName = OfficeTools.getDevicePoolFromPhoneName(bp.getName());
 						if(devicePoolName != null)
@@ -119,32 +120,61 @@ public class WebRequestBuilder
 									{
 									Variables.getLogger().debug("Office found : "+o.getInfo());
 									
-									//Then we look for device associated to this office
-									if(o.getDeviceList().size() == 0)
+									if(!ol.contains(o))
 										{
-										for(BasicDevice d : Variables.getDeviceList())
+										//Then we look for device associated to this office
+										if(o.getDeviceList().size() == 0)
 											{
-											if(d.getOfficeid().equals(o.getIdcomu()))
+											for(BasicDevice d : Variables.getDeviceList())
 												{
-												o.getDeviceList().add(d);
+												if(d.getOfficeid().equals(o.getIdcomu()))
+													{
+													o.getDeviceList().add(d);
+													}
 												}
 											}
+										
+										ol.add(o);
+										officeFound = true;
 										}
-									
-									ol.add(o);
 									}
 								}
-							if(ol.isEmpty())
+							if(!officeFound)
 								{
 								Variables.getLogger().debug("the office was not found in the database so we create a simple office just to allow to reset the phones");
 								BasicOffice unknownOffice = new BasicOffice(officeID);
-								ol.add(unknownOffice);
 								
-								/**
-								 * In addition we add the unknown office to the office list. this way if the user choose to use it, it will exist.
-								 * We add it only in memory, not in the database file. So it is only for temporary usage
-								 */
-								Variables.getOfficeList().add(unknownOffice);
+								//We check first if the office doesn't exist
+								boolean found = false;
+								
+								for(BasicOffice bo : ol)
+									{
+									if(bo.getIdcomu().equals(unknownOffice.getIdcomu()))
+										{
+										found = true;
+										break;
+										}
+									}
+								
+								if(!found)
+									{
+									ol.add(unknownOffice);
+									/**
+									 * In addition we add the unknown office to the office list. this way if the user choose to use it, it will exist.
+									 * We add it only in memory, not in the database file. So it is only for temporary usage
+									 */
+									//We also check that the office doesn't already exist
+									found = false;
+									for(BasicOffice bo : Variables.getOfficeList())
+										{
+										if(bo.getIdcomu().equals(unknownOffice.getIdcomu()))
+											{
+											found = true;
+											break;
+											}
+										}
+									if(!found)Variables.getOfficeList().add(unknownOffice);
+									}
 								}
 							}
 						else
