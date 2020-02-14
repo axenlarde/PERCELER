@@ -279,7 +279,7 @@ public class Task extends Thread
 							}
 						catch (Exception e)
 							{
-							Variables.getLogger().debug("Failed to send email to "+adminEmail+" : "+e.getMessage());
+							Variables.getLogger().debug("Failed to send an error email to "+adminEmail+" : "+e.getMessage());
 							}
 						}
 					}
