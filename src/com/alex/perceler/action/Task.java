@@ -12,6 +12,7 @@ import com.alex.perceler.device.misc.PingManager;
 import com.alex.perceler.device.misc.PingProcess;
 import com.alex.perceler.device.misc.BasicPhone.phoneStatus;
 import com.alex.perceler.misc.EmailManager;
+import com.alex.perceler.misc.ErrorTemplate;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.ItemToMigrate.itmStatus;
 import com.alex.perceler.misc.storedUUID;
@@ -109,17 +110,27 @@ public class Task extends Thread
 				}
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 			}
-		if((pingManager.getPingList().size() != 0) && (!stop))pingManager.start();
 		
-		/**
-		 * It is better to wait for the ping manager to end before continue
-		 */
-		Variables.getLogger().debug("We wait for the ping manager to end");
-		while(pingManager.isAlive() && (!stop))
+		if(pingManager.getPingList().size() == 0)
 			{
-			this.sleep(500);
+			Variables.getLogger().debug("No device to ping");
 			}
-		Variables.getLogger().debug("Ping manager ends");
+		else if(!stop)
+			{
+			pingManager.start();
+			
+			/**
+			 * It is better to wait for the ping manager to end before continue
+			 */
+			Variables.getLogger().debug("We wait for the ping manager to end");
+			while(pingManager.isAlive() && (!stop))
+				{
+				this.sleep(500);
+				}
+			Variables.getLogger().debug("Ping manager ends");
+			}
+		
+		//if((pingManager.getPingList().size() != 0) && (!stop))pingManager.start();
 		
 		/**
 		 * In the case of offices we need to streamline RISRequest
@@ -219,23 +230,68 @@ public class Task extends Thread
 				}
 			else Variables.getLogger().debug("The following item has been disabled so we do not process it : "+myToDo.getInfo());
 			}
-		if((cliManager.getCliIList().size() != 0) && (!stop))cliManager.start();
 		
-		/**
-		 * It is better to wait for the cli task to end before starting the AXL ones
-		 * For instance, it is pointless to reset a sip trunk before changing the ISR ip
-		 */
-		Variables.getLogger().debug("We wait for the cli tasks to end");
-		while(cliManager.isAlive() && (!stop))
+		if(cliManager.getCliIList().size() == 0)
 			{
-			this.sleep(500);
+			Variables.getLogger().debug("No device to update");
 			}
-		Variables.getLogger().debug("Cli tasks end so we can start the AXL ones");
+		else if(!stop)
+			{
+			cliManager.start();
+			
+			/**
+			 * It is better to wait for the cli task to end before starting the AXL ones
+			 * For instance, it is pointless to reset a sip trunk before changing the ISR ip
+			 */
+			Variables.getLogger().debug("We wait for the cli tasks to end");
+			while(cliManager.isAlive() && (!stop))
+				{
+				this.sleep(500);
+				}
+			Variables.getLogger().debug("Cli tasks end");
+			
+			if(UsefulMethod.getTargetOption("smtperroremailenable").equals("true"))
+				{
+				/**
+				 * If an error occurred we send an email to warn the main admin
+				 */
+				for(CliInjector clii : cliManager.getCliIList())
+					{
+					Device d = clii.getDevice();
+					if(d.getStatus().equals(itmStatus.error))
+						{
+						Variables.getLogger().debug("Error occurred with device "+d.getInfo()+" : sending email to the main admin");
+						String adminEmail = UsefulMethod.getTargetOption("smtperroremail");
+						
+						try
+							{
+							StringBuffer content = new StringBuffer();
+							content.append("An error occured with the following device : "+d.getInfo()+" , office "+d.getOfficeid()+"\t\r\n");
+							for(ErrorTemplate e : d.getErrorList())
+								{
+								content.append("- "+e.getErrorDesc()+"\t\r\n");
+								}
+							Variables.geteMSender().send(adminEmail,
+									Variables.getSoftwareName()+" : an error occurred with a device",
+									content.toString(),
+									"Error email");
+							Variables.getLogger().debug("Error email sent for "+d.getInfo());
+							}
+						catch (Exception e)
+							{
+							Variables.getLogger().debug("Failed to send email to "+adminEmail+" : "+e.getMessage());
+							}
+						}
+					}
+				}
+			}
 		
 		/**
-		 * Then we start the axl item updates wich is not multithreaded
+		 * Then we start the axl item updates which is not multithreaded
 		 * so it has to be item by item
 		 */
+		Variables.getLogger().debug("Updating AXL items");
+		
 		for(ItemToMigrate myToDo : todoList)
 			{
 			try

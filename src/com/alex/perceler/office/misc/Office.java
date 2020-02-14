@@ -87,7 +87,7 @@ public class Office extends ItemToMigrate
 		
 		if(unknownOffice)
 			{
-			Variables.getLogger().debug("Reminder : "+idcomu+" is an unknown office. Should just reste associated phones");
+			Variables.getLogger().debug("Reminder : "+idcomu+" is an unknown office. Should just reset associated phones");
 			}
 		else
 			{

@@ -9,6 +9,7 @@ import com.alex.perceler.device.misc.BasicPhone;
 import com.alex.perceler.misc.ItemToMigrate;
 import com.alex.perceler.misc.SimpleItem;
 import com.alex.perceler.office.misc.BasicOffice;
+import com.alex.perceler.office.misc.IPRange;
 import com.alex.perceler.office.misc.OfficeTools;
 import com.alex.perceler.risport.RisportTools;
 import com.alex.perceler.utils.UsefulMethod;
@@ -286,21 +287,24 @@ public class WebRequestBuilder
 			{
 			for(BasicOffice o : Variables.getOfficeList())
 				{
-				content.append("				<office>\r\n");
-				content.append(getOffice("				", o));
-				content.append("					<devices>\r\n");
+				StringBuffer temp = new StringBuffer();
+				temp.append("				<office>\r\n");
+				temp.append(getOffice("				", o));
+				temp.append("					<devices>\r\n");
 				
 				if(o.getDeviceList().size()!=0)
 					{
 					for(BasicDevice d : o.getDeviceList())
 						{
-						content.append("						<device>\r\n");
-						content.append("							<id>"+d.getId()+"</id>\r\n");
-						content.append("							<name>"+d.getName()+"</name>\r\n");
-						content.append("							<type>"+d.getType()+"</type>\r\n");
-						content.append("							<ip>"+d.getIp()+"</ip>\r\n");
-						content.append("							<status>"+d.getStatus().name()+"</status>\r\n");
-						content.append("						</device>\r\n");
+						StringBuffer temp2 = new StringBuffer();
+						temp2.append("						<device>\r\n");
+						temp2.append("							<id>"+d.getId()+"</id>\r\n");
+						temp2.append("							<name>"+d.getName()+"</name>\r\n");
+						temp2.append("							<type>"+d.getType()+"</type>\r\n");
+						temp2.append("							<ip>"+d.getIp()+"</ip>\r\n");
+						temp2.append("							<status>"+d.getStatus().name()+"</status>\r\n");
+						temp2.append("						</device>\r\n");
+						temp.append(temp2);
 						}
 					}
 				else
@@ -310,6 +314,7 @@ public class WebRequestBuilder
 				
 				content.append("					</devices>\r\n");
 				content.append("				</office>\r\n");
+				content.append(temp);
 				}
 			}
 		catch (Exception e)
@@ -345,9 +350,11 @@ public class WebRequestBuilder
 			{
 			for(BasicDevice d : Variables.getDeviceList())
 				{
-				content.append("				<device>\r\n");
-				content.append(getDevice("				", d));
-				content.append("				</device>\r\n");
+				StringBuffer temp = new StringBuffer();
+				temp.append("				<device>\r\n");
+				temp.append(getDevice("				", d));
+				temp.append("				</device>\r\n");
+				content.append(temp);
 				}
 			}
 		catch (Exception e)
@@ -384,9 +391,11 @@ public class WebRequestBuilder
 			
 			for(Task t : Variables.getTaskList())
 				{
-				content.append("				<task>\r\n");
-				content.append(getTask("				", t));
-				content.append("				</task>\r\n");
+				StringBuffer temp = new StringBuffer();
+				temp.append("				<task>\r\n");
+				temp.append(getTask("				", t));
+				temp.append("				</task>\r\n");
+				content.append(temp);
 				}
 			}
 		catch (Exception e)
@@ -424,9 +433,10 @@ public class WebRequestBuilder
 				{
 				if(o.getId().equals(officeID))
 					{
-					content.append("			<office>\r\n");
-					content.append(getOffice("			", o));
-					content.append("				<devices>\r\n");
+					StringBuffer temp = new StringBuffer();
+					temp.append("			<office>\r\n");
+					temp.append(getOffice("			", o));
+					temp.append("				<devices>\r\n");
 					
 					//Then we look for device associated to this office
 					if(o.getDeviceList().size() == 0)
@@ -444,13 +454,13 @@ public class WebRequestBuilder
 						{
 						for(BasicDevice d : o.getDeviceList())
 							{
-							content.append("					<device>\r\n");
-							content.append("						<id>"+d.getId()+"</id>\r\n");
-							content.append("						<name>"+d.getName()+"</name>\r\n");
-							content.append("						<type>"+d.getType()+"</type>\r\n");
-							content.append("						<ip>"+d.getIp()+"</ip>\r\n");
-							content.append("						<status>"+d.getStatus().name()+"</status>\r\n");
-							content.append("					</device>\r\n");
+							temp.append("					<device>\r\n");
+							temp.append("						<id>"+d.getId()+"</id>\r\n");
+							temp.append("						<name>"+d.getName()+"</name>\r\n");
+							temp.append("						<type>"+d.getType()+"</type>\r\n");
+							temp.append("						<ip>"+d.getIp()+"</ip>\r\n");
+							temp.append("						<status>"+d.getStatus().name()+"</status>\r\n");
+							temp.append("					</device>\r\n");
 							}
 						}
 					else
@@ -458,9 +468,10 @@ public class WebRequestBuilder
 						//content.append("						<device></device>\r\n");
 						}
 					
-					content.append("				</devices>\r\n");
-					content.append("			</office>\r\n");
+					temp.append("				</devices>\r\n");
+					temp.append("			</office>\r\n");
 					found = true;
+					content.append(temp);
 					break;
 					}
 				}
@@ -500,10 +511,12 @@ public class WebRequestBuilder
 				{
 				if(d.getId().equals(deviceID))
 					{
-					content.append("			<device>\r\n");
-					content.append(getDevice("			", d));
-					content.append("			</device>\r\n");
+					StringBuffer temp = new StringBuffer();
+					temp.append("			<device>\r\n");
+					temp.append(getDevice("			", d));
+					temp.append("			</device>\r\n");
 					found = true;
+					content.append(temp);
 					break;
 					}
 				}
@@ -560,10 +573,12 @@ public class WebRequestBuilder
 					{
 					if(t.getTaskId().equals(taskID))
 						{
-						content.append("			<task>\r\n");
-						content.append(getTask("			", t));
-						content.append("			</task>\r\n");
+						StringBuffer temp = new StringBuffer();
+						temp.append("			<task>\r\n");
+						temp.append(getTask("			", t));
+						temp.append("			</task>\r\n");
 						found = true;
+						content.append(temp);
 						break;
 						}
 					}

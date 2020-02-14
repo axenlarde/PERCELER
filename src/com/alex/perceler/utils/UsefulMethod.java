@@ -937,7 +937,7 @@ public class UsefulMethod
 					}
 				}
 			
-			Variables.getLogger().debug("Email sent to the admin group");
+			Variables.getLogger().debug("Finish to send emails to the admin group");
 			}
 		catch (Exception e)
 			{

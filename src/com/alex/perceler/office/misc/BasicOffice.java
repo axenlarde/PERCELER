@@ -57,12 +57,21 @@ public class BasicOffice extends SimpleItem
 	
 	/**
 	 * Used to create an office just for phone reset purpose
+	 * @throws Exception 
 	 */
-	public BasicOffice(String idcomu)
+	public BasicOffice(String idcomu) throws Exception
 		{
 		super("Unknown"+idcomu);
-		this.name = "Unknown";
+		this.name = "Unknown office "+idcomu;
 		this.idcomu = idcomu;
+		this.idCAF = "Unknown";
+		this.shortname = "Unknown";
+		this.newName = "Unknown";
+		this.officeType = officeType.CAF;
+		this.voiceIPRange = new IPRange("0.0.0.0/24");
+		this.dataIPRange = new IPRange("0.0.0.0/24");
+		this.newVoiceIPRange = new IPRange("0.0.0.0/24");
+		this.newDataIPRange = new IPRange("0.0.0.0/24");
 		deviceList = new ArrayList<BasicDevice>();
 		unknownOffice = true;
 		}
