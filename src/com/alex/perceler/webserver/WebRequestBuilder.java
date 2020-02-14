@@ -113,15 +113,25 @@ public class WebRequestBuilder
 							Variables.getLogger().debug("Looking for the office corresponding to devicePool "+devicePoolName);
 							
 							String officeID = devicePoolName.replaceAll(UsefulMethod.getTargetOption("devicepoolprefix"), "");//We strip the device pool prefix to get the office ID
-							//Then we look for the corresponding office
-							for(BasicOffice o : Variables.getOfficeList())
+							
+							//We first check if the office is not already in the list
+							for(BasicOffice bo : ol)
 								{
-								if(o.getIdcomu().equals(officeID))
+								if(bo.getIdcomu().equals(officeID))
 									{
-									Variables.getLogger().debug("Office found : "+o.getInfo());
-									
-									if(!ol.contains(o))
+									officeFound = true;
+									break;
+									}
+								}
+							
+							//Then we look for the corresponding office
+							if(!officeFound)
+								{
+								for(BasicOffice o : Variables.getOfficeList())
+									{
+									if(o.getIdcomu().equals(officeID))
 										{
+										Variables.getLogger().debug("Office found : "+o.getInfo());
 										//Then we look for device associated to this office
 										if(o.getDeviceList().size() == 0)
 											{
@@ -133,47 +143,22 @@ public class WebRequestBuilder
 													}
 												}
 											}
-										
 										ol.add(o);
 										officeFound = true;
-										}
-									}
-								}
-							if(!officeFound)
-								{
-								Variables.getLogger().debug("the office was not found in the database so we create a simple office just to allow to reset the phones");
-								BasicOffice unknownOffice = new BasicOffice(officeID);
-								
-								//We check first if the office doesn't exist
-								boolean found = false;
-								
-								for(BasicOffice bo : ol)
-									{
-									if(bo.getIdcomu().equals(unknownOffice.getIdcomu()))
-										{
-										found = true;
 										break;
 										}
 									}
-								
-								if(!found)
+								if(!officeFound)
 									{
+									Variables.getLogger().debug("the office was not found in the database so we create a simple office just to allow to reset the phones");
+									BasicOffice unknownOffice = new BasicOffice(officeID);
 									ol.add(unknownOffice);
+
 									/**
 									 * In addition we add the unknown office to the office list. this way if the user choose to use it, it will exist.
 									 * We add it only in memory, not in the database file. So it is only for temporary usage
 									 */
-									//We also check that the office doesn't already exist
-									found = false;
-									for(BasicOffice bo : Variables.getOfficeList())
-										{
-										if(bo.getIdcomu().equals(unknownOffice.getIdcomu()))
-											{
-											found = true;
-											break;
-											}
-										}
-									if(!found)Variables.getOfficeList().add(unknownOffice);
+									Variables.getOfficeList().add(unknownOffice);
 									}
 								}
 							}
