@@ -97,10 +97,10 @@ public class WebRequestBuilder
 				 * We fetch the phone using the given IP
 				 * 
 				 * We ask the CUCM only if it looks like an IP
-				 * (At least 2 number : ex : 10.0.)
+				 * (At least 3 number : ex : 10.0.0.)
 				 */
 				
-				if(Pattern.matches("\\d{1,3}\\.\\d{1,3}\\..*", search.toLowerCase()))
+				if(Pattern.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}.*", search.toLowerCase()))
 					{
 					ArrayList<BasicPhone> phoneList = RisportTools.getDeviceByIP(search.toLowerCase());
 					for(BasicPhone bp : phoneList)
