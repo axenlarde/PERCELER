@@ -77,8 +77,8 @@ public class CliInjector extends Thread
 					}
 				catch (Exception e)
 					{
-					Variables.getLogger().error(device.getInfo()+" : CLI : ERROR whith command : "+l.getInfo());
-					device.addError(new ErrorTemplate(device.getInfo()+" : CLI : ERROR whith command : "+l.getInfo()));
+					Variables.getLogger().error(device.getInfo()+" : CLI : ERROR whith the command : "+l.getInfo());
+					device.addError(new ErrorTemplate("CLI : ERROR whith the command : "+l.getInfo()));
 					device.setStatus(itmStatus.error);
 					}
 				}
@@ -88,7 +88,8 @@ public class CliInjector extends Thread
 		catch (Exception e)
 			{
 			Variables.getLogger().error(device.getInfo()+" : CLI : Critical ERROR : "+e.getMessage());
-			device.addError(new ErrorTemplate(device.getInfo()+" : CLI : Critical ERROR : "+e.getMessage()));
+			device.addError(new ErrorTemplate("CLI : Critical ERROR : "+e.getMessage()));
+			device.setStatus(itmStatus.error);
 			}
 		}
 
